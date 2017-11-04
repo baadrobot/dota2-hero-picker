@@ -80,8 +80,6 @@ $(document).ready(function ()
     });
 
 
-
-
     // click on PLUS btn (add balance)
     $('#btnCreateNewBalancePopup').click(function ()
     {
@@ -233,6 +231,77 @@ $(document).ready(function ()
     });
     // end of minus btn
 
+    // rename btn
+    $('#btnRenameSelectedTagPopup').click(function ()
+    {
+        var question = '';
+        question += '<div class="form-group">';
+        question += '<label for="inputRenameTagName" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
+        question += '<input id="inputRenameTagName" type="text" class="form-control" value="'+$('#tagListWrap .selectedTag').text()+'">';
+        question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
+        question += '</div>';
+
+        confirmDialog({
+            confirmTitle : getPreStr_js('EDITOR', '_RENAME_TAG_')
+            ,confirmHtml : question
+            ,btnOKCaption : getPreStr_js('EDITOR', '_RENAME_')
+            ,btnCancelCaption : 'default'            
+            ,btnOKColorClass : 'btn-warning'
+            ,allowBackClickClose : true
+            ,onBeforeShow: function ()
+            {
+                $('#btnConfirmDialogOK').attr('disabled', 'disabled');
+                bindInputTagAlreadyExists('#inputRenameTagName');
+                $('#noticeTagExist').hide();
+            }
+            ,onAfterShow : function ()
+            {
+                $('#inputRenameTagName').focus();
+            }
+            ,onUserClickedOK : function ()
+            {
+                pleaseWaitOpen();
+                // $('.tag.selectedTag').click();
+        
+                //Ajax
+                $.ajax({
+                    url: 'php/ajax.editor.php',
+                    data: {  ajaxType: 'editorRenameTag'
+                            , renamedTagId: $('#tagListWrap .selectedTag').attr('data-tag-id')
+                           , renamedTagName: $.trim($('#inputRenameTagName').val())
+                          },
+                    datatype: 'json',
+                    type: 'POST',
+                    cache: false,
+                    success: function (result)
+                    {
+                        if (result.php_result == 'OK')
+                        {
+                            $('#createNewTagPopup').modal('hide');
+                            ajaxGetTagsArray(rebuildEditorTags);
+                        }
+                        else if (result.php_result == 'ERROR')
+                        {
+                            console.log(result.php_error_msg);
+                        };
+                    },
+                    complete: function (result)
+                    {
+                        pleaseWaitClose();
+                    },
+                    error: function (request, status, error)
+                    {
+                        // we recieved NOT json
+                    }
+                });
+            }
+            ,onUserClickedCancel : function ()
+            {
+                //
+            }
+        });        
+    });
+    // end of rename btn
 
     $('#editHeroTagHeroImgWrap img').click(function () 
     {
@@ -552,7 +621,7 @@ function colorizeAllHeroes()
     });
     // hide minus btn
     $('#btnDeleteSelectedTagPopup').hide();
-    $('#btnRenameSelectedTagPopup').hide(); //kaina check if exist
+    $('#btnRenameSelectedTagPopup').hide();
 }
 
 function rebuildEditorTags(tagsList)
@@ -565,7 +634,7 @@ function rebuildEditorTags(tagsList)
 
     for (var i = 0; i < tagsList.length; i++) 
     {
-        tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'">['+tagsList[i]['name']+']</span>');
+        tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'" data-tag-name'+tagsList[i]['name']+'">['+tagsList[i]['name']+']</span>');
     }
     
     // add click listener
@@ -592,9 +661,9 @@ function rebuildEditorTags(tagsList)
                 );                
             });
 
-            // show minus btn
+            // show minus and rename btns
             $('#btnDeleteSelectedTagPopup').show();
-            // hide minus btn
+            $('#btnRenameSelectedTagPopup').show();
 
             pleaseWaitOpen();
             

@@ -108,6 +108,22 @@
             ));
         }
     }
+    elseif (($_POST['ajaxType'] == 'editorRenameTag') && (isGotAccess(_ROLE_EDITOR)))
+    {
+        $query = 'UPDATE tb_dota2_tag_list
+                     SET `cf_d2TagList_name_en_US` = ?
+                   WHERE `cf_d2TagList_id` = ?;';
+        $isUpdateOk = $dbClass->update($query, $_POST['renamedTagName'], $_POST['renamedTagId']);
+
+        if ($isUpdateOk)
+        {
+            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+        } else {
+            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #s3q-ls992-2s9c-0a0a!'
+            ));
+        }
+    }
     elseif (($_POST['ajaxType'] == 'editorDeleteTag') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'DELETE FROM tb_dota2_heroTag_set

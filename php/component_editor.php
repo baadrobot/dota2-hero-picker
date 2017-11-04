@@ -88,6 +88,7 @@
                         echo '</a>';
                         echo '<i id="btnCreateNewTagPopup" class="fa fa-plus-square text-secondary acrdHdrBtn hvrDrkGr" aria-hidden="true"></i>';
                         echo '<i id="btnDeleteSelectedTagPopup" class="fa fa-minus-square text-secondary acrdHdrBtn hvrMaroon" aria-hidden="true"></i>';
+                        echo '<i id="btnRenameSelectedTagPopup" class="fa fa-pencil-square text-secondary acrdHdrBtn hvrOrange" aria-hidden="true"></i>';
 
                         echo '<div id="editAccordion1" class="collapse show" role="tabpanel">';
                             echo '<p id="tagListWrap" class="mb-3">';
@@ -266,6 +267,8 @@ echo '<div id="abilityTooltip" style="display: none;">';
     echo '</div>';
 echo '</div>';
 
+
+// --------------
 echo '<script>';
     echo 'window.LangPreStr["EDITOR"] = [];';
     echo 'window.LangPreStr["EDITOR"]["_CONFIRM_UNSET_TAG_"] = "Вы действительно хотите снять тэг {TAG} с героя {HERO}?";';
