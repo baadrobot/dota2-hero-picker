@@ -1,0 +1,145 @@
+.acrdHdrBtn {
+    cursor: pointer;
+    margin: 5px 0 0 5px;
+}
+
+.hvrDrkGr:hover {
+    color: green!important;
+}
+
+#btnDeleteSelectedTagPopup {
+    cursor: pointer;
+    display: none;
+}
+
+.hvrMaroon:hover {
+    color: maroon!important;
+}
+
+.heroList {
+    width: 100%;
+    margin: 10px auto 10px auto;
+    /* max-width: 702px; */
+    clear: both;
+}
+
+.heroListImg {
+    float: left;
+    width: 40px;
+    height: 46px;
+    background-color: black;
+    margin: 1px 1px 0 0;
+}
+
+.heroListImg img {
+    width: 36px;
+    height: auto;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.heroListImg:hover {
+    -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(0%);
+}
+
+hr {
+    clear: both;
+    visibility: hidden;
+}
+
+.heroBalancePanel img{
+    width: 40px;
+    height: auto;
+    margin: 1px;
+    cursor: pointer;
+}
+
+.heroBalance{
+    z-index: 99;
+    position: absolute;
+    font-weight: 700;
+    text-shadow: 1px 1px rgba(10, 6, 6, 0.78);
+    margin: 8px 12px 0px 13px;
+    font-size: .8em;
+    pointer-events: none;
+}
+
+.noticeRed {
+    color: red;
+}
+
+.blueBold {
+    color: rgb(14, 109, 199);
+    font-weight: bold;    
+}
+
+.selectedTag
+,#editHeroTagTagName
+,.greenBold
+{
+    font-weight: bold;
+    color: rgb(18, 168, 23);
+}    
+
+
+#editHeroTagPopup
+{
+    text-align: center;
+}
+
+#editHeroTagHeroImgWrap img
+{
+    height: 120px;
+    width: auto;
+    margin: 2px;
+}
+
+#custom-handle {
+    width: 1.7em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#editHeroTagSlider {
+    width: 70%;
+    margin: auto;
+}
+
+#editHeroTagAbilitiesImgWrap .heroAbilityImg
+{
+    width: 50px;
+    height: auto;
+    border: 3px solid rgba(0, 0, 0, 0);
+    margin: 3px 0px;
+}
+
+#editHeroTagAbilitiesImgWrap .selectedAbility {
+    border: 6px double rgb(18, 168, 23);
+}
+
+#editHeroTagHeroImgWrap .selectedAbility {
+    border: 6px double rgb(18, 168, 23);
+}
+
+#editHeroTagHeroImgWrap {
+    width: 217px;
+    height: 124px;
+    background-color: black;
+    margin: auto;
+}
+
+#tagListWrap{
+    line-height: 1;
+}
+
+/* #editInfoTagHeroNone{
+    height: 33px!important;
+    top: 214px!important;
+    margin: 0!important;
+    width: 418px!important;
+    display: inline-block!important;    
+} */
