@@ -1,0 +1,14 @@
+todo.txt
+.git/
+.vscode/
+php/aws/
+js/min.kainax.*.js
+css/min.kainax.*.css
+js/eco_prebuild_*.js
+css/eco_prebuild_*.css
+php/eco_prebuild_*.php
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
