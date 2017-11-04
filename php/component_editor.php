@@ -97,7 +97,7 @@
                         echo '</div>';
                     echo '</div>';
                     echo '<div class="item">';
-                        echo '<a class="accordionHeader" data-toggle="collapse" data-parent="#editAccordion" href="#editAccordion2" aria-expanded="false" aria-controls="editAccordion2">';
+                        echo '<a class="accordionHeader collapsed" data-toggle="collapse" data-parent="#editAccordion" href="#editAccordion2" aria-expanded="false" aria-controls="editAccordion2">';
                             echo '<span class="h4 text-secondary">Баланс тэгов</span>';
                         echo '</a>';
                         echo '<i id="btnCreateNewBalancePopup" class="fa fa-plus-square text-secondary acrdHdrBtn hvrDrkGr" aria-hidden="true"></i>';

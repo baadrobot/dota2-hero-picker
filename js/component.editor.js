@@ -15,7 +15,7 @@ $(document).ready(function ()
         question += '<div class="form-group">';
         question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
         question += '<input id="inputCreateNewTagName" type="text" class="form-control">';
-        question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
+        question += '<p id="noticeTagExist" class="noticeRed" style="display:none">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
         question += '</div>';
 
         confirmDialog({
@@ -30,7 +30,6 @@ $(document).ready(function ()
                 $('#inputCreateNewTagName').val('');
                 $('#btnConfirmDialogOK').attr('disabled', 'disabled');
                 bindInputTagAlreadyExists('#inputCreateNewTagName');
-                $('#noticeTagExist').hide();
             }
             ,onAfterShow : function ()
             {
@@ -237,8 +236,8 @@ $(document).ready(function ()
         var question = '';
         question += '<div class="form-group">';
         question += '<label for="inputRenameTagName" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
-        question += '<input id="inputRenameTagName" type="text" class="form-control" value="'+$('#tagListWrap .selectedTag').text()+'">';
-        question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
+        question += '<input id="inputRenameTagName" type="text" class="form-control">';
+        question += '<p id="noticeTagExist" class="noticeRed" style="display:none">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
         question += '</div>';
 
         confirmDialog({
@@ -252,11 +251,13 @@ $(document).ready(function ()
             {
                 $('#btnConfirmDialogOK').attr('disabled', 'disabled');
                 bindInputTagAlreadyExists('#inputRenameTagName');
-                $('#noticeTagExist').hide();
             }
             ,onAfterShow : function ()
             {
-                $('#inputRenameTagName').focus();
+                $('#inputRenameTagName')
+                .focus()
+                .val('')
+                .val($('#tagListWrap .selectedTag').attr('data-tag-name')); // set cursor to the end
             }
             ,onUserClickedOK : function ()
             {
@@ -634,7 +635,7 @@ function rebuildEditorTags(tagsList)
 
     for (var i = 0; i < tagsList.length; i++) 
     {
-        tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'" data-tag-name'+tagsList[i]['name']+'">['+tagsList[i]['name']+']</span>');
+        tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'" data-tag-name="'+tagsList[i]['name']+'">['+tagsList[i]['name']+']</span>');
     }
     
     // add click listener

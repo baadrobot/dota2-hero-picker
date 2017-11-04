@@ -111,8 +111,8 @@
     elseif (($_POST['ajaxType'] == 'editorRenameTag') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'UPDATE tb_dota2_tag_list
-                     SET `cf_d2TagList_name_en_US` = ?
-                   WHERE `cf_d2TagList_id` = ?;';
+                     SET cf_d2TagList_name_en_US = ?
+                   WHERE cf_d2TagList_id = ?;';
         $isUpdateOk = $dbClass->update($query, $_POST['renamedTagName'], $_POST['renamedTagId']);
 
         if ($isUpdateOk)
