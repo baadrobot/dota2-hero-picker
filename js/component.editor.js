@@ -13,7 +13,7 @@ $(document).ready(function ()
     {
         var question = '';
         question += '<div class="form-group">';
-        question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
+        question += '<label for="inputCreateNewTagName" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
         question += '<input id="inputCreateNewTagName" type="text" class="form-control">';
         question += '<p id="noticeTagExist" class="noticeRed" style="display:none">'+getPreStr_js('EDITOR', '_TAG_EXIST_')+'</p>';
         question += '</div>';

@@ -33,7 +33,7 @@
             fclose($fp);        
         }
 
-
+exit;
 
         // ****************** read hero info
 
