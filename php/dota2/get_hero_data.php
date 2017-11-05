@@ -50,7 +50,7 @@
             $pro_win = 0;
         } else {
             $pro_win = $hero_data_array[$i]['pro_win'];
-        }                
+        }
         
         $codename = substr($hero_data_array[$i]['name'], 14);
 

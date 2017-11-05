@@ -3,38 +3,6 @@
 
     if (isLocalhost())
     {
-        // ****************** download and save hero_abilities_en_US.json
-
-        $fp = fopen(__DIR__."/data/hero_abilities_en_US.json", "w");
-        
-        //$url = "https://www.dota2.com/jsfeed/abilitydata?language=en";
-        $url = "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&l=english";
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-
-        curl_setopt($ch,  CURLOPT_RETURNTRANSFER, TRUE);
-
-        curl_exec($ch);
-
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if ( $httpCode == 404 )
-        {
-            echo 'File "'.$url.'"not found! Code 404. Exiting.';
-            curl_close($ch);
-            fclose($fp);
-            exit;
-        } else {
-            $contents = curl_exec($ch);
-            fwrite($fp, $contents);
-            curl_close($ch);
-            fclose($fp);        
-        }
-
-exit;
-
         // ****************** read hero info
 
         $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
@@ -146,7 +114,6 @@ exit;
             }
         }
 
-        
 
         global $dbClass;
 
@@ -766,5 +733,38 @@ exit;
         } else {
             echo 'NO!!!!! '.$system_name.'<br />';
         }
+
+
+exit;
+
+        // ****************** download and save hero_abilities_en_US.json
+
+        $fp = fopen(__DIR__."/data/hero_abilities_en_US.json", "w");
+        
+        //$url = "https://www.dota2.com/jsfeed/abilitydata?language=en";
+        $url = "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&l=english";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+
+        curl_setopt($ch,  CURLOPT_RETURNTRANSFER, TRUE);
+
+        curl_exec($ch);
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ( $httpCode == 404 )
+        {
+            echo 'File "'.$url.'"not found! Code 404. Exiting.';
+            curl_close($ch);
+            fclose($fp);
+            exit;
+        } else {
+            $contents = curl_exec($ch);
+            fwrite($fp, $contents);
+            curl_close($ch);
+            fclose($fp);        
+        }        
     }
 ?>

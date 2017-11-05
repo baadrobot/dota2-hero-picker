@@ -83,25 +83,35 @@ $(document).ready(function ()
     $('#btnCreateNewBalancePopup').click(function ()
     {
         var question = '';
-        question += '<div class="form-group ui-widget">';
-        question += '<select id="combobox1">';
-            question += '<option value="1">One</option>';
-            question += '<option value="2">Two</option>';
-            question += '<option value="3">Three</option>';
-        question += '</select>';
+        question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
+            question += '<div id="combobox1" class="form-group">';        
+                question += '<select>';
+                    var selectOptionValues = '';
+                    $('#tagListWrap .tag').each(function ()
+                    {
+                        selectOptionValues += '<option value="'+$(this).attr('data-tag-id')+'">'+$(this).attr('data-tag-name')+'</option>';
+                    });
+                    question += selectOptionValues;
+                question += '</select>';
+            question += '</div>';
 
-        question += '<span> VS </span>';
 
-        question += '<select id="combobox2">';
-            question += '<option value="1">One</option>';
-            question += '<option value="2">Two</option>';
-            question += '<option value="3">Three</option>';
-        question += '</select>';
+            question += '<div class="form-group">';
+                question += '<div id="editBalanceTagSlider">';
+                    question += '<div id="custom-handle2" class="ui-slider-handle"></div>';
+                question += '</div>';
+            question += '</div>';                                
 
-        question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
+            question += '<div  id="combobox2" class="form-group">';
+                question += '<select>';
+                    question += selectOptionValues;
+                question += '</select>';
+            question += '</div>';
+        question += '</div>';        
+
+        // question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
         //question += '<input id="inputCreateNewBalanceName" type="text" class="form-control">';
         //question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+window.LangPreStr["editor"]["tag_exist"]+'</p>';
-        question += '</div>';
 
         confirmDialog({
             confirmTitle : getPreStr_js('EDITOR', '_CREATE_BALANCE_')
@@ -110,17 +120,61 @@ $(document).ready(function ()
             ,btnCancelCaption : 'default'            
             ,btnOKColorClass : 'btn-success'
             ,allowBackClickClose : true
-            //,dialogWidth: '800px'
             ,onBeforeShow: function ()
             {
+                $("#combobox1 select, #combobox2 select").combobox();
+                
+                $('#combobox1 input, #combobox2 input').autocomplete({
+                    select: function()
+                    {
+                        //console.log($('#combobox1 option:selected').val());
+                        editBalancePopupDecideBtnCreate();
+                    },
+                    search: function()
+                    {
+                        editBalancePopupDecideBtnCreate();
+                    }                    
+                });
+                //$("#combobox2 select").combobox();
+                $('#combobox1 a, #combobox2 a').tooltip({
+                    disabled: true
+                  });   
+
+                var handle2 = $( "#custom-handle2" );
+                $( "#editBalanceTagSlider" ).slider({
+                  max: 50,
+                  min: -50,
+                  value: 0,
+                  range: "min",
+                  create: function() {
+                    handle2.text( $( this ).slider( "value" ) );
+                  },
+                  change: function( event, ui )
+                  {
+                    handle2.text( ui.value );
+                  },
+                  slide: function( event, ui )
+                  {
+                    handle2.text( ui.value );
+
+                    if (ui.value > 0)
+                    {
+                        $('#editBalancePopupHtml').removeClass('sliderLess').addClass('sliderMore');
+                    } else if (ui.value < 0)
+                    {
+                        $('#editBalancePopupHtml').removeClass('sliderMore').addClass('sliderLess');
+                    } else {
+                        $('#editBalancePopupHtml').removeClass('sliderLess').removeClass('sliderMore');
+                    }
+
+                    editBalancePopupDecideBtnCreate();
+                  }
+                });
+                
                 $('#inputCreateNewTagName').val('');
                 $('#btnConfirmDialogOK').attr('disabled', 'disabled');
                 bindInputTagAlreadyExists('#inputCreateNewTagName');
                 $('#noticeTagExist').hide();
-
-                $("#combobox1").combobox();
-                $("#combobox2").combobox();
-
             }
             ,onAfterShow : function ()
             {
@@ -562,7 +616,8 @@ $(document).ready(function ()
         handle.text( ui.value );
       }
     });
-    
+
+   
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -829,4 +884,30 @@ function bindInputTagAlreadyExists(inputSelector)
             }
         }
     });    
+}
+
+function editBalancePopupDecideBtnCreate()
+{
+    if (($('#combobox1 input').val() != '') && ($('#combobox2 input').val() != '')
+    && ($('#combobox1 input').val() != $('#combobox2 input').val())
+    )
+    {
+        var var1 = true;
+    } else {
+        var var1 = false;
+    }
+
+    if (($( "#editBalanceTagSlider" ).slider('value') != 0))
+    {
+        var var2 = true;
+    } else {
+        var var2 = false;
+    }
+
+    if (var1 && var2)
+    {
+        $('#btnConfirmDialogOK').removeAttr('disabled');
+    } else {
+        $('#btnConfirmDialogOK').attr('disabled', 'disable');
+    }
 }

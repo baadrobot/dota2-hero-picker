@@ -99,7 +99,34 @@ hr {
     margin: 2px;
 }
 
-#custom-handle {
+#editBalancePopupHtml .form-group{
+    text-align: center;
+}
+
+#editBalancePopupHtml input{
+    width: 315px;
+}
+
+#editBalancePopupHtml .ui-slider-horizontal,
+#editBalancePopupHtml .ui-slider-range-min {
+    background: white;
+}
+
+#editBalancePopupHtml.sliderMore .ui-slider-horizontal,
+#editBalancePopupHtml.sliderLess .ui-slider-range-min,
+#editBalancePopupHtml.sliderMore #combobox2 .ui-widget-content,
+#editBalancePopupHtml.sliderLess #combobox1 .ui-widget-content {
+    background: #ee7360;
+}
+
+#editBalancePopupHtml.sliderMore .ui-slider-range-min,
+#editBalancePopupHtml.sliderLess .ui-slider-horizontal,
+#editBalancePopupHtml.sliderMore #combobox1 .ui-widget-content,
+#editBalancePopupHtml.sliderLess #combobox2 .ui-widget-content {
+    background: #98e498;
+}
+
+#custom-handle, #custom-handle2 {
     width: 1.7em;
     height: 1.6em;
     top: 50%;
@@ -108,7 +135,7 @@ hr {
     line-height: 1.6em;
 }
 
-#editHeroTagSlider {
+#editHeroTagSlider, #editBalanceTagSlider {
     width: 70%;
     margin: auto;
 }

@@ -178,7 +178,7 @@ function confirmDialog(paramObj)
     {
         paramObj.btnCancelCaption = getPreStr_js('GLOBAL', '_CANCEL_');
     }
-    
+   
     $('#confirmDialog #confirmDialogTitle').html(paramObj.confirmTitle);
     $('#confirmDialog #confirmDialogText').html(paramObj.confirmHtml);
 
