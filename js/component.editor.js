@@ -171,25 +171,27 @@ $(document).ready(function ()
                   }
                 });
                 
-                $('#inputCreateNewTagName').val('');
+                // $('#inputCreateNewTagName').val('');
                 $('#btnConfirmDialogOK').attr('disabled', 'disabled');
-                bindInputTagAlreadyExists('#inputCreateNewTagName');
-                $('#noticeTagExist').hide();
+                // bindInputTagAlreadyExists('#inputCreateNewTagName');
+                // $('#noticeTagExist').hide();
             }
             ,onAfterShow : function ()
             {
-                $('#inputCreateNewTagName').focus();
+                // $('#inputCreateNewTagName').focus();
             }
             ,onUserClickedOK : function ()
             {
                 pleaseWaitOpen();
-                $('.tag.selectedTag').click();
+                // $('.tag.selectedTag').click();
         
                 //Ajax
                 $.ajax({
                     url: 'php/ajax.editor.php',
-                    data: {  ajaxType: 'editorAddNewTag'
-                           , tagName: $.trim($('#inputCreateNewTagName').val())
+                    data: {  ajaxType: 'editorAddNewTagBalance'
+                           , firstTagId: $('#combobox1 option:selected').val()
+                           , secondTagId: $('#combobox2 option:selected').val()
+                           , balanceValue: $('#editBalanceTagSlider').slider('value')
                           },
                     datatype: 'json',
                     type: 'POST',
@@ -199,7 +201,7 @@ $(document).ready(function ()
                         if (result.php_result == 'OK')
                         {
                             $('#createNewTagPopup').modal('hide');
-                            ajaxGetTagsArray(rebuildEditorTags);
+                            // ajaxGetTagsArray(rebuildEditorTags);
                         }
                         else if (result.php_result == 'ERROR')
                         {
@@ -692,7 +694,7 @@ function rebuildEditorTags(tagsList)
     {
         tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'" data-tag-name="'+tagsList[i]['name']+'">['+tagsList[i]['name']+']</span>');
     }
-    
+
     // add click listener
     tagListEl.find('.tag').click(function ()
     {

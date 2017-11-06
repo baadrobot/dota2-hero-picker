@@ -23,9 +23,17 @@ $(document).ready(function ()
             }
         });
     }
+
+    
+
+
     //................. Tooltips
 
     eXoActivateInactiveTooltips();
+
+    // end of tooltips
+
+    
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -50,7 +58,7 @@ $(window).on("load",function()
         modal.find('.modal-title').text('New message to ' + recipient);
         modal.find('.modal-body input').val(recipient);
     });
-    */    
+    */  
 });
 // - END WINDOW LOAD////////////////////////////////////
 

@@ -144,6 +144,70 @@
             ));
         }
     }
+    elseif (($_POST['ajaxType'] == 'editorAddNewTagBalance') && (isGotAccess(_ROLE_EDITOR)))
+    {
+        $query = 'INSERT INTO tb_dota2_tag_balance_set
+                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
+                          ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
+        $isInsertOk = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
+        
+        if ($isInsertOk)
+        {
+            ajaxReturnAndExit(array('php_result'=>'OK'));
+        } else {
+            // no ajaxType in request
+            ajaxReturnAndExit(array('php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #j2h4n-8ui2-n9a7-j2j!'
+            ));
+        }
+    }
+    // elseif (($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities') && (isGotAccess(_ROLE_EDITOR)))
+    elseif ($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities')
+    {
+        $query = 'SELECT cf_d2HeroAbilityList_id as `id` 
+                    FROM tb_dota2_hero_ability_list
+                    WHERE cf_d2HeroAbilityList_isAbilityIgnored = ?;';
+
+        $allIgnoredAbilitiesId = $dbClass->select($query, 1);
+
+        ajaxReturnAndExit(array('php_result' => 'OK',
+                                'ignored_abilities_id_array' => $allIgnoredAbilitiesId
+        ));
+    }
+    // elseif (($_POST['ajaxType'] == 'masterIgnoreUpdate') && (isGotAccess(_ROLE_EDITOR)))
+    elseif ($_POST['ajaxType'] == 'masterIgnoreUpdateTo1')
+    {
+        $query = 'UPDATE tb_dota2_hero_ability_list
+                     SET cf_d2HeroAbilityList_isAbilityIgnored = ?
+                   WHERE cf_d2HeroAbilityList_id = ?;';
+        $isUpdateOk = $dbClass->update($query, 1, $_POST['tagId']);
+
+        if ($isUpdateOk)
+        {
+            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+        } else {
+            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #si8a1-s9s-m7b4c-dy2q!'
+            ));
+        }
+    }
+    // elseif (($_POST['ajaxType'] == 'masterIgnoreUpdate') && (isGotAccess(_ROLE_EDITOR)))
+    elseif ($_POST['ajaxType'] == 'masterIgnoreUpdateTo0')
+    {
+        $query = 'UPDATE tb_dota2_hero_ability_list
+                     SET cf_d2HeroAbilityList_isAbilityIgnored = ?
+                   WHERE cf_d2HeroAbilityList_id = ?;';
+        $isUpdateOk = $dbClass->update($query, 0, $_POST['tagId']);
+
+        if ($isUpdateOk)
+        {
+            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+        } else {
+            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #f71m-a0m2-c3r-87y32!'
+            ));
+        }
+    }
     else 
     {
         ajaxReturnAndExit(array( 'php_result'=>'ERROR',

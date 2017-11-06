@@ -1,0 +1,24 @@
+
+/* for abilities_data */
+.ignore {
+	border: 2px solid red;
+}
+
+.masterAbilityImgWrap{
+    float: left;
+    width: 54px;
+    height: 54px;
+    background-color: black;
+    margin: 1px 1px 0 0;
+}
+
+.masterAbilityImgWrap img {
+    width: 50px;
+    height: auto;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.masterHeroImg {
+
+}

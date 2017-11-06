@@ -105,7 +105,7 @@
 
                         echo '<div id="editAccordion2" class="collapse" role="tabpanel">';
                             echo '<p class="mb-3">';
-                                echo 'Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.';
+                                echo '<span>Test Span</span>';
                             echo '</p>';
                         echo '</div>';
                     echo '</div>';
