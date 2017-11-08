@@ -124,7 +124,7 @@
 
     //**** *Role constants in alphabetical order
     define('_ROLE_FULL_ACCESS', 'full_access');
-    
+
         //Granted to see admin menu
         //isGotAccess(_ROLE_ADMIN_MENU)
     define('_ROLE_ADMIN_MENU', 'am');
@@ -143,16 +143,20 @@
 
         //Granted to see PHP error-popups in web-page (including AJAX PHP-Side errors)
         //isGotAccess(_ROLE_CAN_SEE_ERRORS)
-    define('_ROLE_CAN_SEE_ERRORS', 'er');    
+    define('_ROLE_CAN_SEE_ERRORS', 'er');
 
         //Role logged in user
         //isGotAccess(_ROLE_GUEST)
     define('_ROLE_GUEST', 'g');
 
+    //Granted to master editors of the game
+    //isGotAccess(_ROLE_MASTER)
+    define('_ROLE_MASTER', 'm');
+
     //Granted to programmers
     //isGotAccess(_ROLE_PROGRAMMER)
     define('_ROLE_PROGRAMMER', 'pr');
-    
+
         //Granted to see page creation time
         //isGotAccess(_ROLE_PAGE_CREATION_TIME)
     define('_ROLE_PAGE_CREATION_TIME', 'pct');
@@ -163,11 +167,11 @@
 
         //Granted to see translator's tools
         //isGotAccess(_ROLE_TRANSLATOR)
-    define('_ROLE_TRANSLATOR', 'tr_');    
+    define('_ROLE_TRANSLATOR', 'tr_');
 
         //Role logged in user
         //isGotAccess(_ROLE_USER)
-    define('_ROLE_USER', 'u');    
+    define('_ROLE_USER', 'u');
 
 
 
@@ -234,27 +238,32 @@
         $legalLangs['ru_RU']['local_name'] = 'Русский Язык';
         $legalLangs['ru_RU']['status'] = 1;
         $legalLangs['ru_RU']['dependency'] = 'pre';
+        $legalLangs['ru_RU']['d2lang'] = 'russian';
     $legalLangs['en_UK'] = array();
         $legalLangs['en_UK']['flag'] = 'GB';
         $legalLangs['en_UK']['local_name'] = 'English Language';
         $legalLangs['en_UK']['status'] = 2;
         $legalLangs['en_UK']['dependency'] = 'ru_RU';
+        $legalLangs['en_UK']['d2lang'] = 'english';
     $legalLangs['fr_FR'] = array();
         $legalLangs['fr_FR']['flag'] = 'FR';
         $legalLangs['fr_FR']['local_name'] = 'Langue Française';
         $legalLangs['fr_FR']['status'] = 2;
         $legalLangs['fr_FR']['dependency'] = 'en_UK';
+        $legalLangs['fr_FR']['d2lang'] = 'french';
     $legalLangs['de_DE'] = array();
         $legalLangs['de_DE']['flag'] = 'DE';
         $legalLangs['de_DE']['local_name'] = 'Deutsch Sprache';
         $legalLangs['de_DE']['status'] = 2;
         $legalLangs['de_DE']['dependency'] = 'en_UK';
+        $legalLangs['de_DE']['d2lang'] = 'german';
     $legalLangs['tr_TR'] = array();
         $legalLangs['tr_TR']['flag'] = 'TR';
         $legalLangs['tr_TR']['local_name'] = 'Türk Dili';
         $legalLangs['tr_TR']['status'] = 0;
-        $legalLangs['tr_TR']['dependency'] = 'en_UK';    
-    
+        $legalLangs['tr_TR']['dependency'] = 'en_UK';
+        $legalLangs['en_UK']['d2lang'] = 'turkish';
+
 
     //Get dependency lang
     function getPrimLangFromDependLang($dependLang)
@@ -450,7 +459,7 @@
         {
 
         }
-    }  
+    }
 
 
 
@@ -888,7 +897,7 @@ addAccessRole(_ROLE_EDITOR);
     }
 
     function isLocalhost() {
-        if ((strtolower($_SERVER["HTTP_HOST"]) == 'localhost') or (substr($_SERVER["HTTP_HOST"], 0, 7) == '192.168'))
+        if ((strtolower($_SERVER["HTTP_HOST"]) == 'localhost') or (substr($_SERVER["HTTP_HOST"], 0, 7) == '192.168') or (strtolower($_SERVER["HTTP_HOST"]) == 'pb'))
         {
             return TRUE;
         } else {
@@ -955,7 +964,7 @@ addAccessRole(_ROLE_EDITOR);
             return false;
         }
     }
-//....... END GET #_COOKIE KEY IF SET .........    
+//....... END GET #_COOKIE KEY IF SET .........
 
     function addGrantedRole($roleConstant)
     {
