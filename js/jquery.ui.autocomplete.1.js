@@ -46,7 +46,7 @@ $( function() {
         var input = this.input,
           wasOpen = false;
  
-        this.a = $( "<a>" )
+        $( "<a>" )
           .attr( "tabIndex", -1 )
           .attr( "title", "Show All Items" )
           .tooltip()
@@ -126,22 +126,6 @@ $( function() {
       _destroy: function() {
         this.wrapper.remove();
         this.element.show();
-      },
-      disable: function() {
-        this.input.prop('disabled',true);
-        this.input.autocomplete("disable");
-        this.a.button("disable");
-      },
-      enable: function() {
-          this.input.prop('disabled',false);
-          this.input.autocomplete("enable");
-          this.a.button("enable");
-      },
-      value: function(myVal)
-      {
-        this.element.val(myVal); // set select
-        var mySelectedEl = this.element.children( ":selected" );
-        this.input.val( mySelectedEl.val() ? mySelectedEl.text() : "" );
       }
     });
  

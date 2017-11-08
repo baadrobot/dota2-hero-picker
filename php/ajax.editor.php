@@ -50,9 +50,9 @@
     {
         $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                     FROM tb_dota2_hero_ability_list
-                   WHERE cf_d2HeroAbilityList_heroId = ?
+                   WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = ?
                 ORDER BY cf_d2HeroAbilityList_orderPosition;';
-        $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId']);
+        $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId'], 0);
 
         $query = 'SELECT cf_d2HeroTagSet_tag_val as `value`, cf_d2HeroTagSet_selected_abilities as `selectedAbilities`
                     FROM tb_dota2_heroTag_set
@@ -144,6 +144,34 @@
             ));
         }
     }
+    //nurax - доделать!
+    elseif ($_POST['ajaxType'] == 'getAllBalanceTags')
+    {
+        $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
+                    FROM tb_dota2_tag_balance_set
+                    WHERE cf_d2TagBalanceSet_balance_value > ?;';
+
+        $allBalanceTags = $dbClass->select($query, 0);
+        
+        // $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
+        //             FROM tb_dota2_tag_list
+        //            WHERE cf_d2TagList_id > ?;';
+
+        // $allBalanceTags = $dbClass->select($query, 0);
+
+        if (count($allBalanceTags) > 0)
+        {
+            ajaxReturnAndExit(array('php_result' => 'OK',
+                                    'balance_tag_array' => $allBalanceTags
+            ));
+        } else {
+            // no ajaxType in request
+            ajaxReturnAndExit(array('php_result' => 'OK',
+            'balance_tag_array' => 'NONE'
+            ));
+        }
+        
+    }
     elseif (($_POST['ajaxType'] == 'editorAddNewTagBalance') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'INSERT INTO tb_dota2_tag_balance_set
@@ -151,13 +179,38 @@
                           ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
         $isInsertOk = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
         
-        if ($isInsertOk)
+        $query = 'INSERT INTO tb_dota2_tag_balance_set
+                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
+                           ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
+        $isInsertOk2 = $dbClass->insert($query, $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1), $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1));
+
+        if ($isInsertOk && $isInsertOk2)
         {
             ajaxReturnAndExit(array('php_result'=>'OK'));
         } else {
             // no ajaxType in request
             ajaxReturnAndExit(array('php_result'=>'ERROR',
                                     'php_error_msg'=>'New tag has not been created! Error #j2h4n-8ui2-n9a7-j2j!'
+            ));
+        }
+    }
+    elseif (($_POST['ajaxType'] == 'editorDeleteTagBalance') && (isGotAccess(_ROLE_EDITOR)))
+    {
+        $query = 'DELETE FROM tb_dota2_tag_balance_set
+                         WHERE (cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ?) OR (cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ?);';
+        $isDeleteOkOne = $dbClass->delete($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['secondTagId'], $_POST['firstTagId']);
+
+        // $query2 = 'DELETE FROM tb_dota2_tag_balance_set 
+        //                 WHERE cf_d2TagBalanceSet_second_tag_id = ? AND cf_d2TagBalanceSet_first_tag_id = ?;';
+        // $isDeleteOkTwo = $dbClass->delete($query2, $_POST['secondTagId'], $_POST['firstTagId']);
+
+        if ($isDeleteOkOne)
+        {
+            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+        } else {
+            // no ajaxType in request
+            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #k66km-77s-1p0sd-xcv7!'
             ));
         }
     }

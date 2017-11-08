@@ -78,156 +78,16 @@ $(document).ready(function ()
         });        
     });
 
-
     // click on PLUS btn (add balance)
-    $('#btnCreateNewBalancePopup').click(function ()
+    $('#btnCreateNewBalancePopup').click(function()
     {
-        var question = '';
-        question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
-            question += '<div id="combobox1" class="form-group">';        
-                question += '<select>';
-                    var selectOptionValues = '';
-                    $('#tagListWrap .tag').each(function ()
-                    {
-                        selectOptionValues += '<option value="'+$(this).attr('data-tag-id')+'">'+$(this).attr('data-tag-name')+'</option>';
-                    });
-                    question += selectOptionValues;
-                question += '</select>';
-            question += '</div>';
-
-
-            question += '<div class="form-group">';
-                question += '<div id="editBalanceTagSlider">';
-                    question += '<div id="custom-handle2" class="ui-slider-handle"></div>';
-                question += '</div>';
-            question += '</div>';                                
-
-            question += '<div  id="combobox2" class="form-group">';
-                question += '<select>';
-                    question += selectOptionValues;
-                question += '</select>';
-            question += '</div>';
-        question += '</div>';        
-
-        // question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
-        //question += '<input id="inputCreateNewBalanceName" type="text" class="form-control">';
-        //question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+window.LangPreStr["editor"]["tag_exist"]+'</p>';
-
-        confirmDialog({
-            confirmTitle : getPreStr_js('EDITOR', '_CREATE_BALANCE_')
-            ,confirmHtml : question
-            ,btnOKCaption : getPreStr_js('EDITOR', '_CREATE_')
-            ,btnCancelCaption : 'default'            
-            ,btnOKColorClass : 'btn-success'
-            ,allowBackClickClose : true
-            ,onBeforeShow: function ()
-            {
-                $("#combobox1 select, #combobox2 select").combobox();
-                
-                $('#combobox1 input, #combobox2 input').autocomplete({
-                    select: function()
-                    {
-                        //console.log($('#combobox1 option:selected').val());
-                        editBalancePopupDecideBtnCreate();
-                    },
-                    search: function()
-                    {
-                        editBalancePopupDecideBtnCreate();
-                    }                    
-                });
-                //$("#combobox2 select").combobox();
-                $('#combobox1 a, #combobox2 a').tooltip({
-                    disabled: true
-                  });   
-
-                var handle2 = $( "#custom-handle2" );
-                $( "#editBalanceTagSlider" ).slider({
-                  max: 50,
-                  min: -50,
-                  value: 0,
-                  range: "min",
-                  create: function() {
-                    handle2.text( $( this ).slider( "value" ) );
-                  },
-                  change: function( event, ui )
-                  {
-                    handle2.text( ui.value );
-                  },
-                  slide: function( event, ui )
-                  {
-                    handle2.text( ui.value );
-
-                    if (ui.value > 0)
-                    {
-                        $('#editBalancePopupHtml').removeClass('sliderLess').addClass('sliderMore');
-                    } else if (ui.value < 0)
-                    {
-                        $('#editBalancePopupHtml').removeClass('sliderMore').addClass('sliderLess');
-                    } else {
-                        $('#editBalancePopupHtml').removeClass('sliderLess').removeClass('sliderMore');
-                    }
-
-                    editBalancePopupDecideBtnCreate();
-                  }
-                });
-                
-                // $('#inputCreateNewTagName').val('');
-                $('#btnConfirmDialogOK').attr('disabled', 'disabled');
-                // bindInputTagAlreadyExists('#inputCreateNewTagName');
-                // $('#noticeTagExist').hide();
-            }
-            ,onAfterShow : function ()
-            {
-                // $('#inputCreateNewTagName').focus();
-            }
-            ,onUserClickedOK : function ()
-            {
-                pleaseWaitOpen();
-                // $('.tag.selectedTag').click();
-        
-                //Ajax
-                $.ajax({
-                    url: 'php/ajax.editor.php',
-                    data: {  ajaxType: 'editorAddNewTagBalance'
-                           , firstTagId: $('#combobox1 option:selected').val()
-                           , secondTagId: $('#combobox2 option:selected').val()
-                           , balanceValue: $('#editBalanceTagSlider').slider('value')
-                          },
-                    datatype: 'json',
-                    type: 'POST',
-                    cache: false,
-                    success: function (result)
-                    {
-                        if (result.php_result == 'OK')
-                        {
-                            $('#createNewTagPopup').modal('hide');
-                            // ajaxGetTagsArray(rebuildEditorTags);
-                        }
-                        else if (result.php_result == 'ERROR')
-                        {
-                            console.log(result.php_error_msg);
-                        };
-                    },
-                    complete: function (result)
-                    {
-                        pleaseWaitClose();
-                    },
-                    error: function (request, status, error)
-                    {
-                        // we recieved NOT json
-                    }
-                });
-            }
-            ,onUserClickedCancel : function ()
-            {
-                //
-            }
-        });        
-    });    
+        tagBalancePopupDo('new', '');
+    });
 
 
     // on page load
-    ajaxGetTagsArray(rebuildEditorTags);
+    ajaxGetTagsArray(rebuildAll);
+
 
     
 
@@ -619,7 +479,7 @@ $(document).ready(function ()
       }
     });
 
-   
+    
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -627,9 +487,188 @@ $(document).ready(function ()
 
 $(window).on("load",function()
 {
-
+    
 });
 // - END WINDOW LOAD////////////////////////////////////
+
+
+function colorizeAllHeroes()
+{
+    // colorize all heroes
+    $('.heroListImg').each(function () 
+    {
+        $(this).removeClass('grayscale');
+        $(this).find('.heroTagValue').html('');
+    });
+    // hide minus btn
+    $('#btnDeleteSelectedTagPopup').hide();
+    $('#btnRenameSelectedTagPopup').hide();
+}
+
+//nurax
+function rebuildEditorBalanceTags()
+{
+    pleaseWaitOpen();
+
+    $.ajax({
+        url: 'php/ajax.editor.php',
+        data: {  ajaxType: 'getAllBalanceTags'
+              },
+        datatype: 'json',
+        type: 'POST',
+        cache: false,
+        success: function (result)
+        {
+            if (result.php_result == 'OK')
+            {
+                // -- rebuld tag balace list
+                var balanceTagsList = result.balance_tag_array;
+                var tagBalanceListEl = $('#tagBalanceListWrap');
+                tagBalanceListEl.html('');
+
+                if (balanceTagsList != 'NONE')
+                {
+                    for (var i = 0; i < balanceTagsList.length; i++) 
+                    {
+                        var firstBalanceTagId = balanceTagsList[i]['firstTagId'];
+                        var secondBalanceTagId = balanceTagsList[i]['secondTagId'];
+                        var balanceTagValue = balanceTagsList[i]['value'];
+
+                        var firstBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+firstBalanceTagId+'"]').attr('data-tag-name');
+                        var secondBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+secondBalanceTagId+'"]').attr('data-tag-name');
+
+                        tagBalanceListEl.append('<div><span class="tag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +') [' + firstBalanceTagName + ']</span> VS <span class="tag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + '] ('+(balanceTagValue * -1)+')</span></div>');
+                    }
+                }
+
+                // $('#tagBalanceListWrap .tag:first').parent().click(function ()
+                // {
+                //     tagBalancePopupDo('edit', $(this));
+                // });
+
+
+                $('#tagBalanceListWrap div').click(function ()
+                {
+                    tagBalancePopupDo('edit', $(this));
+                });
+
+
+                // $('#tagBalanceListWrap [data-tag-name="'+ balanceTagsList[i] +'"]').attr('data-tag-name');
+
+                // add click listener
+                // tagListEl.find('.tag').click(function ()
+                // {
+                //     if ($(this).hasClass('selectedTag'))
+                //     {
+                //         // tag off
+                //         $(this).removeClass('selectedTag');
+
+                //         colorizeAllHeroes();
+
+                //     } else 
+                //     {
+                //         // tag on
+                //         $('.selectedTag').removeClass('selectedTag');
+                //         $(this).addClass('selectedTag');
+
+                //         var selectedTagName = $(this).text();
+                //         $('.editHeroTagInfoText').each(function () 
+                //         {
+                //             $(this).html(
+                //                 $(this).attr('data-template-text').replace(/{TAG}/, '<span id="editHeroTagTagName" class="greenBold">'+selectedTagName+'</span>')
+                //             );                
+                //         });
+
+                //         // show minus and rename btns
+                //         $('#btnDeleteSelectedTagPopup').show();
+                //         $('#btnRenameSelectedTagPopup').show();
+
+                //         pleaseWaitOpen();
+                        
+                //         $.ajax({
+                //             url: 'php/ajax.editor.php',
+                //             data: {  ajaxType: 'getHeroesWithSelectedTag'
+                //                       ,tagId : $(this).attr('data-tag-id')
+                //                     },
+                //             datatype: 'json',
+                //             type: 'POST',
+                //             cache: false,
+                //             success: function (result)
+                //             {
+                //                 if (result.php_result == 'OK')
+                //                 {
+                //                     if (result.hero_id_and_value_array == "NONE")
+                //                     {
+                //                         $('.heroListImg').each(function () 
+                //                         {
+                //                             $(this).addClass('grayscale');
+                //                             $(this).find('.heroTagValue').html('');
+                //                         });
+                //                     } else
+                //                     {
+                //                         $('.heroListImg').each(function () 
+                //                         {
+                //                             var isFound = false;
+                //                             for (i = 0; i < result.hero_id_and_value_array.length; i++)
+                //                             {
+                //                                 if ($(this).attr('data-hero-id') == (result.hero_id_and_value_array[i]['id']))
+                //                                 {                                
+                //                                     isFound = true;
+                //                                     break;
+                //                                 }
+                //                             }
+                
+                //                             var heroTagValueSpan = $(this).find('.heroTagValue');                            
+                //                             if (isFound)
+                //                             {
+                //                                 heroTagValueSpan.html(result.hero_id_and_value_array[i]['value']);
+                //                                 heroTagValueSpan.css('margin-left', ($(this).width() / 2) - (heroTagValueSpan.width() / 2) + 'px');
+                //                                 $(this).removeClass('grayscale');
+                //                             } else {
+                //                                 heroTagValueSpan.html('');
+                //                                 $(this).addClass('grayscale');
+                //                             }
+                //                         });
+                //                     }
+                //                     // callbackNextFunction(result.tag_array);
+                //                 }
+                //                 else if (result.php_result == 'ERROR')
+                //                 {
+                //                     console.log(result.php_error_msg);
+                //                 };
+                //             },
+                //             complete: function (result)
+                //             {
+                //                 pleaseWaitClose();
+                //             },
+                //             error: function (request, status, error)
+                //             {
+                //                 // we recieved NOT json
+                //                 console.log(error);
+                //             }
+                //         });
+
+                //     }
+                    
+                // });                
+            }
+            else if (result.php_result == 'ERROR')
+            {
+                console.log(result.php_error_msg);
+            };
+        },
+        complete: function (result)
+        {
+            pleaseWaitClose();
+        },
+        error: function (request, status, error)
+        {
+            // we recieved NOT json
+            console.log(error);
+            pleaseWaitClose();
+        }
+    });
+}
 
 
 function ajaxGetTagsArray(callbackNextFunction)
@@ -667,19 +706,6 @@ function ajaxGetTagsArray(callbackNextFunction)
             pleaseWaitClose();
         }
     });
-}
-
-function colorizeAllHeroes()
-{
-    // colorize all heroes
-    $('.heroListImg').each(function () 
-    {
-        $(this).removeClass('grayscale');
-        $(this).find('.heroTagValue').html('');
-    });
-    // hide minus btn
-    $('#btnDeleteSelectedTagPopup').hide();
-    $('#btnRenameSelectedTagPopup').hide();
 }
 
 function rebuildEditorTags(tagsList)
@@ -912,4 +938,219 @@ function editBalancePopupDecideBtnCreate()
     } else {
         $('#btnConfirmDialogOK').attr('disabled', 'disable');
     }
+}
+
+function rebuildAll(tagsArray)
+{
+    rebuildEditorTags(tagsArray);
+    rebuildEditorBalanceTags();
+}
+
+function tagBalancePopupDo(addOrEdit, clickedEl)
+{
+    var question = '';
+    question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
+        question += '<div id="combobox1" class="form-group">';        
+            question += '<select>';
+                var selectOptionValues = '';
+                $('#tagListWrap .tag').each(function ()
+                {
+                    selectOptionValues += '<option value="'+$(this).attr('data-tag-id')+'">'+$(this).attr('data-tag-name')+'</option>';
+                });
+                question += selectOptionValues;
+            question += '</select>';
+        question += '</div>';
+
+
+        question += '<div class="form-group">';
+            question += '<div id="editBalanceTagSlider">';
+                question += '<div id="custom-handle2" class="ui-slider-handle"></div>';
+            question += '</div>';
+        question += '</div>';                                
+
+        question += '<div  id="combobox2" class="form-group">';
+            question += '<select>';
+                question += selectOptionValues;
+            question += '</select>';
+        question += '</div>';
+    question += '</div>';        
+
+    // question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
+    //question += '<input id="inputCreateNewBalanceName" type="text" class="form-control">';
+    //question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+window.LangPreStr["editor"]["tag_exist"]+'</p>';
+
+    confirmDialog({
+        confirmTitle : getPreStr_js('EDITOR', '_SET_BALANCE_')
+        ,confirmHtml : question
+        ,btnDeleteCaption : 'default'
+        ,btnOKCaption : getPreStr_js('EDITOR', '_SET_')
+        ,btnCancelCaption : 'default'            
+        ,btnOKColorClass : 'btn-success'
+        ,allowBackClickClose : true
+        ,onBeforeShow: function ()
+        {
+            $("#combobox1 select, #combobox2 select").combobox();
+            
+            $('#combobox1 input, #combobox2 input').autocomplete({
+                select: function()
+                {
+                    //console.log($('#combobox1 option:selected').val());
+                    editBalancePopupDecideBtnCreate();
+                },
+                search: function()
+                {
+                    editBalancePopupDecideBtnCreate();
+                }                    
+            });
+            //$("#combobox2 select").combobox();
+            $('#combobox1 a, #combobox2 a').tooltip({
+                disabled: true
+              });   
+            
+            var handle2 = $( "#custom-handle2" );
+            $( "#editBalanceTagSlider" ).slider({
+              max: 50,
+              min: -50,
+              value: 0,
+              range: "min",
+              create: function() {
+                handle2.text( $( this ).slider( "value" ) );
+              },
+              change: function( event, ui )
+              {
+                handle2.text( ui.value );
+                $(this).slider('option', 'slide').call($(this), event, ui);
+              },
+              slide: function( event, ui )
+              {
+                handle2.text( ui.value );
+
+                if (ui.value > 0)
+                {
+                    $('#editBalancePopupHtml').removeClass('sliderLess').addClass('sliderMore');
+                } else if (ui.value < 0)
+                {
+                    $('#editBalancePopupHtml').removeClass('sliderMore').addClass('sliderLess');
+                } else {
+                    $('#editBalancePopupHtml').removeClass('sliderLess').removeClass('sliderMore');
+                }
+
+                editBalancePopupDecideBtnCreate();
+              }
+            });
+
+            // if (addOrEdit == 'new')
+            // {
+            //     $('#btnConfirmDialogDelete').hide();
+            // }
+
+            if (addOrEdit == 'edit')
+            {
+                $("#combobox1 select, #combobox2 select").combobox('disable');
+
+                $('#combobox1 select').combobox('value', clickedEl.find('span:first').attr('data-tag-id'));
+                $('#combobox2 select').combobox('value', clickedEl.find('span:last').attr('data-tag-id'));
+
+                $( "#editBalanceTagSlider" ).slider('value', clickedEl.find('span:first').attr('data-tag-value'));
+                
+                // console.log($('#combobox1 option:selected').val());
+                $('#btnConfirmDialogDelete').show();
+                //todo: add delete button
+            }            
+            
+            // $('#inputCreateNewTagName').val('');
+            $('#btnConfirmDialogOK').attr('disabled', 'disabled');
+            // bindInputTagAlreadyExists('#inputCreateNewTagName');
+            // $('#noticeTagExist').hide();
+        }
+        ,onAfterShow : function ()
+        {
+            // $('#inputCreateNewTagName').focus();
+        }
+        ,onUserClickedDelete : function ()
+        {
+            console.log($('#combobox1 option:selected').val());
+            console.log($('#combobox2 option:selected').val());
+
+            pleaseWaitOpen();
+            // $('.tag.selectedTag').click();
+    
+            //Ajax
+            $.ajax({
+                url: 'php/ajax.editor.php',
+                data: {  ajaxType: 'editorDeleteTagBalance'
+                       , firstTagId: $('#combobox1 option:selected').val()
+                       , secondTagId: $('#combobox2 option:selected').val()
+                    //    , balanceValue: $('#editBalanceTagSlider').slider('value')
+                      },
+                datatype: 'json',
+                type: 'POST',
+                cache: false,
+                success: function (result)
+                {
+                    if (result.php_result == 'OK')
+                    {
+                        $('#createNewTagPopup').modal('hide');
+                        rebuildEditorBalanceTags();
+                        // ajaxGetTagsArray(rebuildEditorTags);
+                    }
+                    else if (result.php_result == 'ERROR')
+                    {
+                        console.log(result.php_error_msg);
+                    };
+                },
+                complete: function (result)
+                {
+                    pleaseWaitClose();
+                },
+                error: function (request, status, error)
+                {
+                    // we recieved NOT json
+                }
+            });
+        }
+        ,onUserClickedOK : function ()
+        {
+            pleaseWaitOpen();
+            // $('.tag.selectedTag').click();
+    
+            //Ajax
+            $.ajax({
+                url: 'php/ajax.editor.php',
+                data: {  ajaxType: 'editorAddNewTagBalance'
+                       , firstTagId: $('#combobox1 option:selected').val()
+                       , secondTagId: $('#combobox2 option:selected').val()
+                       , balanceValue: $('#editBalanceTagSlider').slider('value')
+                      },
+                datatype: 'json',
+                type: 'POST',
+                cache: false,
+                success: function (result)
+                {
+                    if (result.php_result == 'OK')
+                    {
+                        $('#createNewTagPopup').modal('hide');
+                        rebuildEditorBalanceTags();
+                        // ajaxGetTagsArray(rebuildEditorTags);
+                    }
+                    else if (result.php_result == 'ERROR')
+                    {
+                        console.log(result.php_error_msg);
+                    };
+                },
+                complete: function (result)
+                {
+                    pleaseWaitClose();
+                },
+                error: function (request, status, error)
+                {
+                    // we recieved NOT json
+                }
+            });
+        }
+        ,onUserClickedCancel : function ()
+        {
+            //
+        }
+    });
 }

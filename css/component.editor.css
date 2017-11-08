@@ -73,6 +73,10 @@ hr {
     color: red;
 }
 
+.noticeGreen {
+    color: rgb(0, 199, 0);
+}
+
 .blueBold {
     color: rgb(14, 109, 199);
     font-weight: bold;    

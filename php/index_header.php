@@ -81,6 +81,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             echo 'window.LangPreStr["GLOBAL"] = [];';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_"] = "Подтвердить";';
             echo 'window.LangPreStr["GLOBAL"]["_CANCEL_"] = "Отмена";';
+            echo 'window.LangPreStr["GLOBAL"]["_DELETE_"] = "Удалить";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_ACTION_"] = "Подтвердите действие";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_QUESTION_"] = "Вы уверены что хотите выполнить данное действие?";';
             
