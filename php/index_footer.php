@@ -16,6 +16,7 @@
                 <div id="confirmDialogText" class="modal-body"></div>
 
                 <div class="modal-footer">
+                    <button id="btnConfirmDialogDelete" type="button" data-dismiss="modal"></button>
                     <button id="btnConfirmDialogOK" type="button" data-dismiss="modal"></button>
                     <button id="btnConfirmDialogCancel" type="button" class="btn btn-secondary" data-dismiss="modal"></button>
                 </div>

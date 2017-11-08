@@ -23,9 +23,17 @@ $(document).ready(function ()
             }
         });
     }
+
+    
+
+
     //................. Tooltips
 
     eXoActivateInactiveTooltips();
+
+    // end of tooltips
+
+    
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -50,7 +58,7 @@ $(window).on("load",function()
         modal.find('.modal-title').text('New message to ' + recipient);
         modal.find('.modal-body input').val(recipient);
     });
-    */    
+    */  
 });
 // - END WINDOW LOAD////////////////////////////////////
 
@@ -146,13 +154,21 @@ function confirmDialog(paramObj)
 {
     $('#btnConfirmDialogOK').removeAttr('disabled');
     $('#btnConfirmDialogCancel').removeAttr('disabled');
+    $('#btnConfirmDialogDelete').hide();
 
     // OK btn color class
     if (typeof paramObj.btnOKColorClass == 'undefined')
     {
         paramObj.btnOKColorClass = 'btn-danger';
     }
-    $('#btnConfirmDialogOK').attr('class','').addClass('btn').addClass(paramObj.btnOKColorClass);    
+    $('#btnConfirmDialogOK').attr('class','').addClass('btn').addClass(paramObj.btnOKColorClass);
+
+    // DELETE btn color class
+    if (typeof paramObj.btnDeleteColorClass == 'undefined')
+    {
+        paramObj.btnDeleteColorClass = 'btn-danger';
+    }
+    $('#btnConfirmDialogDelete').attr('class','').addClass('btn').addClass(paramObj.btnDeleteColorClass);
          
     if (typeof paramObj.allowBackClickClose == 'undefined')
     {
@@ -169,6 +185,11 @@ function confirmDialog(paramObj)
         paramObj.confirmHtml = getPreStr_js('GLOBAL', '_CONFIRM_QUESTION_');
     }
 
+    if ((typeof paramObj.btnDeleteCaption == 'undefined') || (paramObj.btnDeleteCaption == 'default'))        
+    {
+        paramObj.btnDeleteCaption = getPreStr_js('GLOBAL', '_DELETE_');
+    }
+
     if ((typeof paramObj.btnOKCaption == 'undefined') || (paramObj.btnOKCaption == 'default'))        
     {
         paramObj.btnOKCaption = getPreStr_js('GLOBAL', '_CONFIRM_');
@@ -181,6 +202,14 @@ function confirmDialog(paramObj)
    
     $('#confirmDialog #confirmDialogTitle').html(paramObj.confirmTitle);
     $('#confirmDialog #confirmDialogText').html(paramObj.confirmHtml);
+
+    $('#confirmDialog #btnConfirmDialogDelete')
+    .html(paramObj.btnDeleteCaption)
+    .unbind('click')
+    .bind('click', function()
+    {
+        paramObj.onUserClickedDelete();
+    });
 
     $('#confirmDialog #btnConfirmDialogOK')
     .html(paramObj.btnOKCaption)

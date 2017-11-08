@@ -104,8 +104,8 @@
                         //echo '<i id="btnDeleteSelectedBalancePopup" class="fa fa-minus-square text-secondary acrdHdrBtn hvrMaroon" aria-hidden="true"></i>';
 
                         echo '<div id="editAccordion2" class="collapse" role="tabpanel">';
-                            echo '<p class="mb-3">';
-                                echo 'Donec at ipsum dignissim, rutrum turpis scelerisque, tristique lectus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus nec dui turpis. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.';
+                            echo '<p id="tagBalanceListWrap" class="mb-3">';
+                                echo '<span>Test Span</span>';
                             echo '</p>';
                         echo '</div>';
                     echo '</div>';
@@ -282,9 +282,9 @@ echo '<script>';
     echo 'window.LangPreStr["EDITOR"]["_RENAME_"] = "Переименовать";';
 
     echo 'window.LangPreStr["EDITOR"]["_CREATE_TAG_"] = "Создание тэга";';
-    echo 'window.LangPreStr["EDITOR"]["_CREATE_"] = "Создать";';
+    echo 'window.LangPreStr["EDITOR"]["_SET_"] = "Назначить";';
 
-    echo 'window.LangPreStr["EDITOR"]["_CREATE_BALANCE_"] = "Создание баланса между тэгами";';
+    echo 'window.LangPreStr["EDITOR"]["_SET_BALANCE_"] = "Назначение баланса между тэгами";';
     
 echo '</script>';
 
