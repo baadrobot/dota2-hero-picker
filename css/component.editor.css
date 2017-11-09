@@ -127,12 +127,25 @@ hr {
     background: #ee7360;
 }
 
+#editBalancePopupHtml.cccolorForSynergy .ui-slider-horizontal,
+#editBalancePopupHtml.rrred #combobox1 .ui-widget-content,
+#editBalancePopupHtml.rrred #combobox2 .ui-widget-content {
+    background: #ee7360!important;
+}
+
 #editBalancePopupHtml.sliderMore .ui-slider-range-min,
 #editBalancePopupHtml.sliderLess .ui-slider-horizontal,
 #editBalancePopupHtml.sliderMore #combobox1 .ui-widget-content,
 #editBalancePopupHtml.sliderLess #combobox2 .ui-widget-content {
     background: #98e498;
 }
+
+#editBalancePopupHtml.cccolorForSynergy .ui-slider-range-min,
+#editBalancePopupHtml.gggreen #combobox1 .ui-widget-content,
+#editBalancePopupHtml.gggreen #combobox2 .ui-widget-content {
+    background: #98e498!important;
+}
+
 
 #custom-handle, #custom-handle2 {
     width: 1.7em;

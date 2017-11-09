@@ -2,6 +2,11 @@ $(document).ready(function ()
 {
     window.isMobile = false;
 
+    // $('[name="counterpickOrSynergy"]').click(function()
+    // {
+    //     console.log( $(this).val() );
+    // });
+
     //''''''''''''''''' Tooltips
     if (!window.isMobile)
     {

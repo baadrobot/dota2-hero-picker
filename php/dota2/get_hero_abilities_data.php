@@ -88,10 +88,18 @@
 
                 if (isset($heroes[$heroFullCodename]['Ability'.$abilityIndex]))
                 {
+                    
+                    if ($heroCodename == 'sand_king')
+                    {
+                        $heroTrickCodename = 'sandking';                       
+                    } else {
+                        $heroTrickCodename = $heroCodename;                        
+                    }
+
                     // if ability name begins with hero codename,
                     // example yeah: ["npc_dota_hero_invoker"]["Ability12"]["invoker_chaos_meteor"]
                     // example nope: ["npc_dota_hero_invoker"]["Ability17"]["special_bonus_unique_invoker_8"]
-                    if ((substr($heroes[$heroFullCodename]['Ability'.$abilityIndex], 0, strlen($heroCodename)) == $heroCodename)
+                    if ((substr($heroes[$heroFullCodename]['Ability'.$abilityIndex], 0, strlen($heroTrickCodename)) == $heroTrickCodename)
                      && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'generic_hidden')
                      && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden1')
                      && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden2')

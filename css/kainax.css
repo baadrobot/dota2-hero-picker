@@ -17,13 +17,24 @@ body > .container {
 
 .tag {
     margin: 0 2px;
-	display: inline-block;
+	/* display: inline-block; */
 	font-size: 12px;
 }
 
 .tag:hover {
     cursor: pointer;
     color: rgb(18, 168, 23);
+}
+
+.balanceTag {
+    margin: 0 2px;
+	display: inline-block;
+	font-size: 12px;
+}
+
+.balanceTag:hover {
+    cursor: pointer;
+    /* color: rgb(18, 168, 23); */
 }
 
 .loader {

@@ -147,7 +147,7 @@
     //nurax - доделать!
     elseif ($_POST['ajaxType'] == 'getAllBalanceTags')
     {
-        $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
+        $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`, cf_d2TagBalanceSet_set_type as `setType`
                     FROM tb_dota2_tag_balance_set
                     WHERE cf_d2TagBalanceSet_balance_value > ?;';
 
@@ -175,18 +175,27 @@
     elseif (($_POST['ajaxType'] == 'editorAddNewTagBalance') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'INSERT INTO tb_dota2_tag_balance_set
-                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
+                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?, cf_d2TagBalanceSet_set_type = ?
                           ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
-        $isInsertOk = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
+        $isInsertOk = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['setType'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
 
-        $query = 'INSERT INTO tb_dota2_tag_balance_set
-                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
+        $query2 = 'INSERT INTO tb_dota2_tag_balance_set
+                          SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?, cf_d2TagBalanceSet_set_type = ?
                            ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
-        $isInsertOk2 = $dbClass->insert($query, $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1), $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1));
+
+        if ($_POST['setType'] == 1 && $_POST['firstTagId'] == $_POST['secondTagId'])
+        {
+            $isInsertOk2 = $dbClass->insert($query, $_POST['secondTagId'], $_POST['firstTagId'], $_POST['balanceValue'], $_POST['setType'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
+        } else {
+            $isInsertOk2 = $dbClass->insert($query2, $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1), $_POST['setType'], $_POST['secondTagId'], $_POST['firstTagId'], ($_POST['balanceValue'] * -1));
+        }
+        
 
         if ($isInsertOk && $isInsertOk2)
         {
-            ajaxReturnAndExit(array('php_result'=>'OK'));
+            ajaxReturnAndExit(array('php_result'=>'OK',
+                                    // 'set_type_value' => $_POST['setType']                
+            ));
         } else {
             // no ajaxType in request
             ajaxReturnAndExit(array('php_result'=>'ERROR',
@@ -243,7 +252,9 @@
 
         if ($isUpdateOk)
         {
-            ajaxReturnAndExit(array( 'php_result'=>'OK', 'php_is_ignore'=>$isIgnore, 'php_tag_id'=>$_POST['tagId']));
+            ajaxReturnAndExit(array( 'php_result'=>'OK',
+                                  'php_is_ignore'=>$isIgnore,
+                                     'php_tag_id'=>$_POST['tagId']));
         } else {
             ajaxReturnAndExit(array( 'php_result'=>'ERROR',
                                     'php_error_msg'=>'Ability ignore has not been updated! Error #g4na32-gv89m-0980v-2n308-3fr6v!'

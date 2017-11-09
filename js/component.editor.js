@@ -537,7 +537,17 @@ function rebuildEditorBalanceTags()
                         var firstBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+firstBalanceTagId+'"]').attr('data-tag-name');
                         var secondBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+secondBalanceTagId+'"]').attr('data-tag-name');
 
-                        tagBalanceListEl.append('<div><span class="tag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +') [' + firstBalanceTagName + ']</span> VS <span class="tag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + '] ('+(balanceTagValue * -1)+')</span></div>');
+                        if (result.balance_tag_array[i]['setType'] == 1)
+                        {
+                            if (balanceTagValue > 0)
+                            {
+                                tagBalanceListEl.append('<div><div class="balanceTag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeGreen"> [' + firstBalanceTagName + ']</div> <div class="balanceTag"><></div> <div class="balanceTag noticeGreen" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeGreen"> ('+balanceTagValue+')</div></div>');
+                            } else {
+                                tagBalanceListEl.append('<div><div class="balanceTag noticeRed" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeRed"> [' + firstBalanceTagName + ']</div> <div class="balanceTag"><></div> <div class="balanceTag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeRed"> ('+balanceTagValue+')</div></div>');
+                            }
+                        } else {
+                            tagBalanceListEl.append('<div><div class="balanceTag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeGreen"> [' + firstBalanceTagName + ']</div> <div class="balanceTag">VS</div> <div class="balanceTag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeRed"> ('+(balanceTagValue * -1)+')</div></div>');
+                        }
                     }
                 }
 
@@ -925,6 +935,16 @@ function editBalancePopupDecideBtnCreate()
         var var1 = false;
     }
 
+    // for synergy
+    if (($('#combobox1 input').val() != '') && ($('#combobox2 input').val() != '')
+    && ($('#combobox1 input').val() == $('#combobox2 input').val())
+    )
+    {
+        var var3 = true;
+    } else {
+        var var3 = false;
+    }
+
     if (($( "#editBalanceTagSlider" ).slider('value') != 0))
     {
         var var2 = true;
@@ -932,12 +952,29 @@ function editBalancePopupDecideBtnCreate()
         var var2 = false;
     }
 
-    if (var1 && var2)
+    if ($('[name="counterpickOrSynergy"]:checked').val() == 1)
     {
-        $('#btnConfirmDialogOK').removeAttr('disabled');
+        if (var2 && var3)
+        {
+            $('#btnConfirmDialogOK').removeAttr('disabled');
+        } else {
+            $('#btnConfirmDialogOK').attr('disabled', 'disable');
+        }
     } else {
-        $('#btnConfirmDialogOK').attr('disabled', 'disable');
+        if (var1 && var2)
+        {
+            $('#btnConfirmDialogOK').removeAttr('disabled');
+        } else {
+            $('#btnConfirmDialogOK').attr('disabled', 'disable');
+        } 
     }
+
+    // if (var1 && var2)
+    // {
+    //     $('#btnConfirmDialogOK').removeAttr('disabled');
+    // } else {
+    //     $('#btnConfirmDialogOK').attr('disabled', 'disable');
+    // }
 }
 
 function rebuildAll(tagsArray)
@@ -949,6 +986,18 @@ function rebuildAll(tagsArray)
 function tagBalancePopupDo(addOrEdit, clickedEl)
 {
     var question = '';
+
+    question += '<div class="form-check form-check-inline">';
+        question += '<label class="form-check-label">';
+        question += '<input class="form-check-input" type="radio" name="counterpickOrSynergy" checked="checked" value="0"> Контрпик';
+        question += '</label>';
+    question += '</div>';
+    question += '<div class="form-check form-check-inline">';
+       question += ' <label class="form-check-label">';
+       question += ' <input class="form-check-input" type="radio" name="counterpickOrSynergy" value="1"> Синергия';
+       question += '</label>';
+    question += '</div>';
+
     question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
         question += '<div id="combobox1" class="form-group">';
             question += '<select>';
@@ -989,6 +1038,23 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         ,allowBackClickClose : true
         ,onBeforeShow: function ()
         {
+            $('[name="counterpickOrSynergy"]').click(function()
+            {
+                if ($(this).val() == 1)
+                {
+                    $('#editBalancePopupHtml').addClass('cccolorForSynergy');                
+                } else {
+                    $('#editBalancePopupHtml').removeClass('cccolorForSynergy');
+                }
+                // console.log( $(this).val() );
+                
+                // Написать чтоб при клике на радио кнопки срабатывал слайд или чендж, 
+                // чтобы менялся дизейблд у кнопки назначения, а пока просто при клике отключаем кнопку
+                $('#btnConfirmDialogOK').attr('disabled', 'disable');
+            });
+
+            // console.log($('[name="counterpickOrSynergy"]:checked').val());
+
             $("#combobox1 select, #combobox2 select").combobox();
 
             $('#combobox1 input, #combobox2 input').autocomplete({
@@ -1028,11 +1094,27 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 if (ui.value > 0)
                 {
                     $('#editBalancePopupHtml').removeClass('sliderLess').addClass('sliderMore');
+                    if ($('[name="counterpickOrSynergy"]:checked').val() == 1) 
+                    {
+                        $('#editBalancePopupHtml').removeClass('rrred').addClass('gggreen');
+                    } else 
+                    {
+                        $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
+                    }
                 } else if (ui.value < 0)
                 {
+                    if ($('[name="counterpickOrSynergy"]:checked').val() == 1) 
+                    {
+                        $('#editBalancePopupHtml').removeClass('gggreen').addClass('rrred');
+                    } else 
+                    {
+                        $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
+                    }
                     $('#editBalancePopupHtml').removeClass('sliderMore').addClass('sliderLess');
+                    // $('#editBalancePopupHtml').removeClass('gggreen').addClass('rrred');
                 } else {
                     $('#editBalancePopupHtml').removeClass('sliderLess').removeClass('sliderMore');
+                    // $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
                 }
 
                 editBalancePopupDecideBtnCreate();
@@ -1121,6 +1203,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                        , firstTagId: $('#combobox1 option:selected').val()
                        , secondTagId: $('#combobox2 option:selected').val()
                        , balanceValue: $('#editBalanceTagSlider').slider('value')
+                       , setType: $('[name="counterpickOrSynergy"]:checked').val()
                       },
                 datatype: 'jsonp',
                 type: 'POST',

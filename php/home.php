@@ -15,3 +15,14 @@
 
 
 ?>
+
+<!-- <div class="form-check form-check-inline">
+  <label class="form-check-label">
+    <input class="form-check-input" type="radio" name="counterpickOrSynergy" checked="checked" value="1"> Контрпик
+  </label>
+</div>
+<div class="form-check form-check-inline">
+  <label class="form-check-label">
+    <input class="form-check-input" type="radio" name="counterpickOrSynergy" value="0"> Синергия
+  </label>
+</div> -->
