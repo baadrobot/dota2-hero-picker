@@ -90,32 +90,31 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<link rel="stylesheet" href="css/kainax.css">';
         echo '<script src="js/kainax.js"></script>';
 
-
         if (isset($_GET['component']))
         {
-            if  ($_GET['component'] == 'editor')
-            {
-                if (isGotAccess(_ROLE_EDITOR))
-                {
-                    // if problems with horisontal scroll in GB will apear, find "var gbHorizontalScrollsEl = jQuery('.horizontalScrollWrap');" in guidebook js
-                    echo '<link rel="stylesheet" href="css/component.editor.css" />';
-                    echo '<script src="js/component.editor.js"></script>';
+            $externalData = '<script>';
+                $externalData .= '$(document).ready(function(){';
+                    $externalData .= '$.ajax({url: "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=lore&l='.$legalLangs[$_SESSION['SUserLang']]['d2lang'].'",dataType:"jsonp",jsonpCallback:"lore",';
+                        $externalData .= 'success:function(data){window.abilityData = data["abilitydata"];}';
+                    $externalData .= '});';
+                $externalData .= '});';
+            $externalData .= '</script>';
 
-                    echo '<script>';
-                        echo '$(document).ready(function(){';
-                            echo '$.ajax({url: "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=lore&l='.$legalLangs[$_SESSION['SUserLang']]['d2lang'].'",dataType:"jsonp",jsonpCallback:"lore",';
-                                echo 'success:function(data){window.abilityData = data["abilitydata"];}';
-                            echo '});';
-                        echo '});';
-                    echo '</script>';
-                }
+            if  (($_GET['component'] == 'editor') && isGotAccess(_ROLE_EDITOR))
+            {
+                // if problems with horisontal scroll in GB will apear, find "var gbHorizontalScrollsEl = jQuery('.horizontalScrollWrap');" in guidebook js
+                echo '<link rel="stylesheet" href="css/component.editor.css" />';
+                echo '<script src="js/component.editor.js"></script>';
+                echo $externalData;
 
                 // KainaxMinifyTools::compressAndLinkOut('css', 'SIMPLE', 'guidebook');
                 // KainaxMinifyTools::compressAndLinkOut('js', 'DEFAULT', 'guidebook');
             }
-            else if ($_GET['component'] == 'economic_globe')
+            else if (($_GET['component'] == 'master') && isGotAccess(_ROLE_MASTER))
             {
-
+                echo '<script src="js/component.master.js"></script>';
+                echo '<link rel="stylesheet" href="css/component.master.css">';
+                echo $externalData;
             }
             else if ($_GET['component'] == 'registration')
             {
@@ -147,3 +146,4 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
       </div>
     </div>
   </nav>
+  <div id="mainbodyContainer" class="container">

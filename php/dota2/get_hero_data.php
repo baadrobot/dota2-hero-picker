@@ -1,10 +1,10 @@
 <?php
-    require_once('../a_functions.php');
+    require_once('php/a_functions.php');
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "https://api.opendota.com/api/heroStats");
     curl_setopt($ch, CURLOPT_HEADER, 0);
-    // true - return the response, false - echo the response    
+    // true - return the response, false - echo the response
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
@@ -14,18 +14,18 @@
     //echo "<pre>",print_r($hero_data_array),"</pre>";
 
 
-    global $dbClass;    
+    global $dbClass;
 
     for ($i=0; $i < count($hero_data_array); $i++)
     {
         if ($hero_data_array[$i]['primary_attr'] == 'str')
         {
             $primary_attr = 1;
-        } else 
+        } else
         if ($hero_data_array[$i]['primary_attr'] == 'agi')
         {
             $primary_attr = 2;
-        } else 
+        } else
         if ($hero_data_array[$i]['primary_attr'] == 'int')
         {
             $primary_attr = 3;
@@ -51,10 +51,10 @@
         } else {
             $pro_win = $hero_data_array[$i]['pro_win'];
         }
-        
+
         $codename = substr($hero_data_array[$i]['name'], 14);
 
-        $myQuery = 'INSERT INTO tb_dota2_hero_list 
+        $myQuery = 'INSERT INTO tb_dota2_hero_list
         (cf_d2HeroList_id,
         cf_d2HeroList_codename,
         cf_d2HeroList_name_en_US,
@@ -107,12 +107,12 @@
 
 
         $result = $dbClass->insert($myQuery,
-            $hero_data_array[$i]['id'],    
+            $hero_data_array[$i]['id'],
             $codename,
             $hero_data_array[$i]['localized_name'],
             $primary_attr,
             $hero_data_array[$i]['attack_type'],
-            $hero_data_array[$i]['attack_range'],    
+            $hero_data_array[$i]['attack_range'],
             $hero_data_array[$i]['img'],
             $hero_data_array[$i]['icon'],
             $hero_data_array[$i]['move_speed'],
@@ -123,39 +123,39 @@
             $hero_data_array[$i]['1000_pick'],
             $hero_data_array[$i]['1000_win'],
             $hero_data_array[$i]['2000_pick'],
-            $hero_data_array[$i]['2000_win'],    
+            $hero_data_array[$i]['2000_win'],
             $hero_data_array[$i]['3000_pick'],
             $hero_data_array[$i]['3000_win'],
             $hero_data_array[$i]['4000_pick'],
             $hero_data_array[$i]['4000_win'],
-            $hero_data_array[$i]['5000_pick'],    
-            $hero_data_array[$i]['5000_win'],    
+            $hero_data_array[$i]['5000_pick'],
+            $hero_data_array[$i]['5000_win'],
             // on update
-            $hero_data_array[$i]['id'],    
+            $hero_data_array[$i]['id'],
             $codename,
             $hero_data_array[$i]['localized_name'],
             $primary_attr,
             $hero_data_array[$i]['attack_type'],
-            $hero_data_array[$i]['attack_range'],    
+            $hero_data_array[$i]['attack_range'],
             $hero_data_array[$i]['img'],
             $hero_data_array[$i]['icon'],
             $hero_data_array[$i]['move_speed'],
             $hero_data_array[$i]['cm_enabled'],
             $pro_ban,
-            $pro_pick,    
+            $pro_pick,
             $pro_win,
             $hero_data_array[$i]['1000_pick'],
             $hero_data_array[$i]['1000_win'],
             $hero_data_array[$i]['2000_pick'],
-            $hero_data_array[$i]['2000_win'],    
+            $hero_data_array[$i]['2000_win'],
             $hero_data_array[$i]['3000_pick'],
             $hero_data_array[$i]['3000_win'],
             $hero_data_array[$i]['4000_pick'],
             $hero_data_array[$i]['4000_win'],
-            $hero_data_array[$i]['5000_pick'],    
+            $hero_data_array[$i]['5000_pick'],
             $hero_data_array[$i]['5000_win']
         );
-        
+
         if ($result)
         {
             //echo $codename.' successfully updated<br/>';
@@ -167,7 +167,11 @@
 
 
 // ****************** download and save hero_abilities_en_US.json
+
     // alternative url (same data): "https://www.dota2.com/jsfeed/abilitydata?language=en";
+
+    // kainax: no need in this as we are now loading external .js files directly from the web
+    /*
     downloadDotaJsFeedFile('hero_abilities_en_US.json', 'english', "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&l=");
     downloadDotaJsFeedFile('hero_abilities_ru_RU.json', 'russian', "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&l=");
 
@@ -199,4 +203,5 @@
             fclose($fp);
         }
     }
+    */
 ?>

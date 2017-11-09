@@ -527,8 +527,9 @@
 
         //Ключи с ограничениями:
         //pushToLegalGet('e_id', 'component', 'password_reset', 'fixedLength', 32);
-        pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'editor');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'registration');
+        pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'editor');
+        pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'master');
         /*
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'registration');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'user_profile');
@@ -560,6 +561,7 @@
         echo $max_item_id;
 */
         pushToLegalGet('game', 'component', 'editor', 'anyVal', '');
+        pushToLegalGet('update', 'component', 'master', 'fixedList', 'all');
         //pushToLegalGet('id', 'component', 'guidebook', 'maxInt', 3000);
         pushToLegalGet('email', 'component', 'registration', 'anyVal', ''); //store express checkout - from email link
         pushToLegalGet('token', 'component', 'registration', 'anyVal', ''); //store express checkout - from email link
@@ -831,7 +833,12 @@
 // placeholder for redirect logic
 
 $_SESSION["SAccessRoles"] = _ROLE_GUEST;
+
+// temporary before normal login works:
+$_SESSION["SAccessRoles"] = _ROLE_USER;
 addAccessRole(_ROLE_EDITOR);
+addAccessRole(_ROLE_MASTER);
+
 
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

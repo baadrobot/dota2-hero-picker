@@ -1,39 +1,107 @@
 <?php
-    require_once('../a_functions.php');
-    require_once(__DIR__.'/get_hero_data.php');  
-    $prebuildMasterAbilitiesFilenamePath = __DIR__.'/prebuild.master.abilities.php';
+    require_once('php/a_functions.php');
+    ini_set('max_execution_time', 0);
 
     if (isLocalhost())
     {
-        if (file_exists($prebuildMasterAbilitiesFilenamePath) && (!isset($_GET['refresh'])))
+        if (!isset($_GET['update']))
         {
-            require $prebuildMasterAbilitiesFilenamePath;
-        } else {
-            $echoCache = '';
-            $echoCache .= '<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>';
-        
-            $echoCache .= '<script src="../../js/kainax.js"></script>';
-            $echoCache .= '<script src="../../js/component.master.js"></script>';
-            $echoCache .= '<link rel="stylesheet" href="../../css/kainax.css">';
-            $echoCache .= '<link rel="stylesheet" href="../../css/component.master.css">';
+            echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
+            //require $prebuildMasterAbilitiesFilenamePath;
 
+
+
+            // // For tests!
+            // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
+            // $heroes = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
+            // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt';
+            // $abilities = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
+            // echo '<pre>',print_r($heroes),'</pre>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<br>----------------------------------<br>';
+            // echo '<pre>',print_r($abilities),'</pre>';
+            // exit;
+
+            $query = 'SELECT
+                        cf_d2HeroAbilityList_heroId as `heroId`
+                        ,cf_d2HeroList_codename as `heroCodename`
+                        ,cf_d2HeroList_name_en_US as `heroLocalname`
+                        ,cf_d2HeroAbilityList_id as `abilityId`
+                        ,cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
+                        ,cf_d2HeroAbilityList_isAbilityIgnored as `ignoreStatus`
+                        ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
+                        FROM tb_dota2_hero_ability_list
+                        INNER JOIN tb_dota2_hero_list
+                            ON tb_dota2_hero_ability_list.cf_d2HeroAbilityList_heroId = tb_dota2_hero_list.cf_d2HeroList_id
+                        ORDER BY
+                        cf_d2HeroAbilityList_heroId, cf_d2HeroAbilityList_orderPosition;';
+
+            $result = $dbClass->select($query);
+
+            echo '<div id="masterList"></div>';
+
+            echo '<script>';
+                echo 'window.masterAllHeroesList = '.json_encode($result).';';
+            echo '</script>';
+
+            require 'php/template_d2_hero_ability_tooltip.php';
+
+        } else {
+            require_once(__DIR__.'/get_hero_data.php');
+
+                                    // prepare temp array for forbidden abilities
+                                    $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
+                                                    ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
+                                            FROM tb_dota2_hero_ability_list;';
+                                    $oldAbilitiesResult = $dbClass->select($query);
+
+                                    $tempForbiddenAbilitiesArray = [];
+                                    for ($i = 0; $i < count($oldAbilitiesResult); $i++)
+                                    {
+                                        $tempForbiddenAbilitiesArray[$oldAbilitiesResult[$i]['abilityId']] = $oldAbilitiesResult[$i]['isForbidden'];
+                                    }
+                                    unset($oldAbilitiesResult); //free memory
+
+            $echoCache = '';
 
             // ****************** read hero info
 
             $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
             $heroes = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
 
-            $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt';        
+            $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt';
             $abilities = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
 
             $heroKeyPrefix = 'npc_dota_hero_';
 
-            // remade getHeroAbilityNameIfLegal function
-            function getHeroAbilityNameIfLegal($heroes, $key, $abilityIndex)
+
+            function getHeroAbilityNameIfLegal($heroes, $heroFullCodename, $heroCodename, $abilityIndex)
             {
-                if (isset($heroes[$key]['Ability'.$abilityIndex]))
+
+                if (isset($heroes[$heroFullCodename]['Ability'.$abilityIndex]))
                 {
-                    return $heroes[$key]['Ability'.$abilityIndex];
+                    // if ability name begins with hero codename,
+                    // example yeah: ["npc_dota_hero_invoker"]["Ability12"]["invoker_chaos_meteor"]
+                    // example nope: ["npc_dota_hero_invoker"]["Ability17"]["special_bonus_unique_invoker_8"]
+                    if ((substr($heroes[$heroFullCodename]['Ability'.$abilityIndex], 0, strlen($heroCodename)) == $heroCodename)
+                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'generic_hidden')
+                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden1')
+                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden2')
+                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden3')
+                     )
+                    {
+                        return $heroes[$heroFullCodename]['Ability'.$abilityIndex];
+                    } else {
+                        return false;
+                    }
                 } else
                 {
                     return false;
@@ -47,10 +115,8 @@
             {
                 if ((substr($key, 0, strlen($heroKeyPrefix)) == $heroKeyPrefix) && ($key != $heroKeyPrefix.'target_dummy' ))
                 {
-                    $heroName = substr($key, strlen($heroKeyPrefix));
-                    $echoCache .= '<div>'$heroName.'</div>';
-                    $echoCache .= '<img class="masterHeroImg" src="//cdn.dota2.com/apps/dota2/images/heroes/'.$heroName.'_vert.jpg?v=4195662">';
-                    $echoCache .= '<br>';
+                    $heroCodename = substr($key, strlen($heroKeyPrefix));
+
                     $heroId = $heroes[$key]['HeroID'];
                     $heroRole = $heroes[$key]['Role'];
 
@@ -66,104 +132,104 @@
                     }
 
                     $abilityOrderPosition = -1;
-                    for ($i = 1; $i <= 9; $i++)
+                    for ($i = 1; $i <= 20; $i++) // Kainax: maxed from 9 to 20 for Invoker
                     {
-                        $abilityFullName = getHeroAbilityNameIfLegal($heroes, $key, $abilityIndex = $i);
-                        if ($abilityFullName !== false)
+                        $abilityCodename = getHeroAbilityNameIfLegal($heroes, $key, $heroCodename, $abilityIndex = $i);
+                        if ($abilityCodename !== false)
                         {
-                            if (isset($abilities[$abilityFullName]) && (isset($abilities[$abilityFullName]['ID'])))
+                            if (isset($abilities[$abilityCodename]) && (isset($abilities[$abilityCodename]['ID'])))
                             {
-                                $abilityId = $abilities[$abilityFullName]['ID'];
+                                $abilityId = $abilities[$abilityCodename]['ID'];
                             } else {
                                 continue;
                             }
                             $abilityOrderPosition++;
-                            $echoCache .= '<span class="masterAbilityImgWrap">';
-                                $echoCache .= '<img data-ability-id="'.$abilityId.'" title="Ability'.$i.': '.$abilityFullName.'" src="//cdn.dota2.com/apps/dota2/images/abilities/'.$abilityFullName.'_hp1.png?v=4195662">';
-                            $echoCache .= '</span>';
-                            
-                            if (isset($abilities[$abilityFullName]['AbilityManaCost']))
+
+                            // this ability still exists, unset from temp array
+                            unset($tempForbiddenAbilitiesArray[$abilityId]);
+
+
+                            if (isset($abilities[$abilityCodename]['AbilityManaCost']))
                             {
-                                $abilityManaCost = $abilities[$abilityFullName]['AbilityManaCost'];
+                                $abilityManaCost = $abilities[$abilityCodename]['AbilityManaCost'];
                             } else {
                                 $abilityManaCost = '0';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityCooldown']))
+                            if (isset($abilities[$abilityCodename]['AbilityCooldown']))
                             {
-                                $abilityCooldown = $abilities[$abilityFullName]['AbilityCooldown'];
+                                $abilityCooldown = $abilities[$abilityCodename]['AbilityCooldown'];
                             } else {
                                 $abilityCooldown = '0';
                             }
-                            
-                            if (isset($abilities[$abilityFullName]['AbilityCastPoint']))
+
+                            if (isset($abilities[$abilityCodename]['AbilityCastPoint']))
                             {
-                                $abilityCastPoint = $abilities[$abilityFullName]['AbilityCastPoint'];
+                                $abilityCastPoint = $abilities[$abilityCodename]['AbilityCastPoint'];
                             } else {
                                 $abilityCastPoint = '0';
                             }
-                            
-                            if (isset($abilities[$abilityFullName]['AbilityCastRange']))
+
+                            if (isset($abilities[$abilityCodename]['AbilityCastRange']))
                             {
-                                $abilityCastRange = $abilities[$abilityFullName]['AbilityCastRange'];
+                                $abilityCastRange = $abilities[$abilityCodename]['AbilityCastRange'];
                             } else {
                                 $abilityCastRange = '0';
                             }
-                            
-                            if (isset($abilities[$abilityFullName]['AbilityUnitDamageType']))
+
+                            if (isset($abilities[$abilityCodename]['AbilityUnitDamageType']))
                             {
-                                $abilityUnitDamageType = $abilities[$abilityFullName]['AbilityUnitDamageType'];
+                                $abilityUnitDamageType = $abilities[$abilityCodename]['AbilityUnitDamageType'];
                             } else {
                                 $abilityUnitDamageType = null;
                             }
-                            
-                            if (isset($abilities[$abilityFullName]['SpellDispellableType']))
+
+                            if (isset($abilities[$abilityCodename]['SpellDispellableType']))
                             {
-                                $spellDispellableType = $abilities[$abilityFullName]['SpellDispellableType'];
+                                $spellDispellableType = $abilities[$abilityCodename]['SpellDispellableType'];
                             } else {
                                 $spellDispellableType = null;
                             }
-                            
-                            if (isset($abilities[$abilityFullName]['HasScepterUpgrade']))
+
+                            if (isset($abilities[$abilityCodename]['HasScepterUpgrade']))
                             {
-                                $hasScepterUpgrade = $abilities[$abilityFullName]['HasScepterUpgrade'];
+                                $hasScepterUpgrade = $abilities[$abilityCodename]['HasScepterUpgrade'];
                             } else {
                                 $hasScepterUpgrade = false;
                             }
 
-                            if (isset($abilities[$abilityFullName]['IsGrantedByScepter']))
+                            if (isset($abilities[$abilityCodename]['IsGrantedByScepter']))
                             {
-                                $isGrantedByScepter = $abilities[$abilityFullName]['IsGrantedByScepter'];
+                                $isGrantedByScepter = $abilities[$abilityCodename]['IsGrantedByScepter'];
                             } else {
                                 $isGrantedByScepter = false;
                             }
 
-                            // NuryVampir 
-                            if (isset($abilities[$abilityFullName]['AbilityType']))
+                            if (isset($abilities[$abilityCodename]['AbilityType']))
                             {
-                                $abilityType = $abilities[$abilityFullName]['AbilityType'];
+                                $abilityType = $abilities[$abilityCodename]['AbilityType'];
                             } else {
                                 $abilityType = 'DOTA_ABILITY_TYPE_BASIC';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityBehavior']))
+                            if (isset($abilities[$abilityCodename]['AbilityBehavior']))
                             {
-                                $abilityBehavior = $abilities[$abilityFullName]['AbilityBehavior'];
+                                $abilityBehavior = $abilities[$abilityCodename]['AbilityBehavior'];
                             } else {
                                 //  $abilityBehavior = 'DOTA_ABILITY_BEHAVIOR_NONE';
                                 $abilityBehavior = null;
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityDuration']))
+                            if (isset($abilities[$abilityCodename]['AbilityDuration']))
                             {
-                                $abilityDuration = $abilities[$abilityFullName]['AbilityDuration'];
+                                $abilityDuration = $abilities[$abilityCodename]['AbilityDuration'];
                             } else {
                                 $abilityDuration = '0';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityDamage']))
+                            if (isset($abilities[$abilityCodename]['AbilityDamage']))
                             {
-                                $abilityDamage = $abilities[$abilityFullName]['AbilityDamage'];
+                                $abilityDamage = $abilities[$abilityCodename]['AbilityDamage'];
                                 if ($abilityDamage == '0 0 0 0')
                                 {
                                     $abilityDamage = '0';
@@ -172,49 +238,49 @@
                                 $abilityDamage = '0';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityModifierSupportValue']))
+                            if (isset($abilities[$abilityCodename]['AbilityModifierSupportValue']))
                             {
-                                $abilityModifierSupportValue = $abilities[$abilityFullName]['AbilityModifierSupportValue'];
+                                $abilityModifierSupportValue = $abilities[$abilityCodename]['AbilityModifierSupportValue'];
                             } else {
                                 $abilityModifierSupportValue = '1.0';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityModifierSupportBonus']))
+                            if (isset($abilities[$abilityCodename]['AbilityModifierSupportBonus']))
                             {
-                                $abilityModifierSupportBonus = $abilities[$abilityFullName]['AbilityModifierSupportBonus'];
+                                $abilityModifierSupportBonus = $abilities[$abilityCodename]['AbilityModifierSupportBonus'];
                             } else {
                                 $abilityModifierSupportBonus = '0';
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityUnitTargetTeam']))
+                            if (isset($abilities[$abilityCodename]['AbilityUnitTargetTeam']))
                             {
-                                $abilityUnitTargetTeam = $abilities[$abilityFullName]['AbilityUnitTargetTeam'];
+                                $abilityUnitTargetTeam = $abilities[$abilityCodename]['AbilityUnitTargetTeam'];
                             } else {
                                 $abilityUnitTargetTeam = null;
                             }
 
-                            if (isset($abilities[$abilityFullName]['SpellImmunityType']))
+                            if (isset($abilities[$abilityCodename]['SpellImmunityType']))
                             {
-                                $spellImmunityType = $abilities[$abilityFullName]['SpellImmunityType'];
+                                $spellImmunityType = $abilities[$abilityCodename]['SpellImmunityType'];
                             } else {
                                 $spellImmunityType = null;
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityUnitTargetType']))
+                            if (isset($abilities[$abilityCodename]['AbilityUnitTargetType']))
                             {
-                                $abilityUnitTargetType = $abilities[$abilityFullName]['AbilityUnitTargetType'];
+                                $abilityUnitTargetType = $abilities[$abilityCodename]['AbilityUnitTargetType'];
                             } else {
                                 $abilityUnitTargetType = null;
                             }
 
-                            if (isset($abilities[$abilityFullName]['AbilityUnitTargetFlags']))
+                            if (isset($abilities[$abilityCodename]['AbilityUnitTargetFlags']))
                             {
-                                $abilityUnitTargetFlags = $abilities[$abilityFullName]['AbilityUnitTargetFlags'];
+                                $abilityUnitTargetFlags = $abilities[$abilityCodename]['AbilityUnitTargetFlags'];
                             } else {
                                 $abilityUnitTargetFlags = null;
                             }
 
-                        
+
                             // AbilityType //ultimate etc
                             // AbilityBehavior // passive, channeling, DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES" etc
                             // AbilityDuration
@@ -226,12 +292,11 @@
                             // AbilityUnitTargetType // not sure if needed
                             // AbilityUnitTargetFlags // looks like important thing (no basic value)
                             // AbilityUnitTargetFlag // need to find difference btwn this and previous one
-                            
 
-                            $query = 'INSERT INTO tb_dota2_hero_ability_list SET 
+
+                            $query = 'INSERT INTO tb_dota2_hero_ability_list SET
                                 cf_d2HeroAbilityList_id = ?
                                 ,cf_d2HeroAbilityList_heroId = ?
-                                -- ,cf_d2HeroAbilityList_abilityId = ?
                                 ,cf_d2HeroAbilityList_abilityCodename = ?
                                 ,cf_d2HeroAbilityList_abilityManaCost = ?
                                 ,cf_d2HeroAbilityList_abilityCooldown = ?
@@ -273,11 +338,13 @@
                                 ,cf_d2HeroAbilityList_abilityUnitTargetType = ?
                                 ,cf_d2HeroAbilityList_abilityUnitTargetFlags = ?
                                 ,cf_d2HeroAbilityList_orderPosition = ?
-                                ;';
+                                ,cf_d2HeroAbilityList_isAbilityForbidden = 0;';
+
+                            global $dbClass;
                             $isInsertOk = $dbClass->insert($query
                                                         ,$abilityId
                                                         ,$heroId
-                                                        ,$abilityFullName
+                                                        ,$abilityCodename
                                                         ,$abilityManaCost
                                                         ,$abilityCooldown
                                                         ,$abilityCastPoint
@@ -298,7 +365,7 @@
                                                         ,$abilityUnitTargetFlags
                                                         ,$abilityOrderPosition
                                                         // on update
-                                                        ,$abilityFullName
+                                                        ,$abilityCodename
                                                         ,$abilityManaCost
                                                         ,$abilityCooldown
                                                         ,$abilityCastPoint
@@ -318,22 +385,39 @@
                                                         ,$abilityUnitTargetType
                                                         ,$abilityUnitTargetFlags
                                                         ,$abilityOrderPosition
-                            );
+                                                        );
                         }
                     }
 
-                    $echoCache .= '<br>';
-                    $echoCache .= '<br>';
+
                 }
             }
-            
+
+            // forbidden abilities check
+            foreach ($tempForbiddenAbilitiesArray as $forbiddenAbilityId => $isAbilityForbiddenInDatabase)
+            {
+                if ($isAbilityForbiddenInDatabase == 0)
+                {
+                    $query = 'UPDATE tb_dota2_hero_ability_list
+                                SET cf_d2HeroAbilityList_isAbilityForbidden = 1
+                            WHERE cf_d2HeroAbilityList_id = ?;';
+                    $dbClass->update($query, $forbiddenAbilityId);
+                }
+            }
+
+
             // -- read hero abilities data from Dota 2 game installation path
             // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
             // $echoCache .= '<pre>',print_r(getParamsFromDotaFile($heroAbilitiesDota2FilePathName)),'</pre>';
 
-            echo '<br>------------ SUCCESSFULLY REFRESHED ------------<br>';
-            file_put_contents($prebuildMasterAbilitiesFilenamePath, $echoCache);
-            require $prebuildMasterAbilitiesFilenamePath;
+            echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
+            echo '<br>Reloading...<br>';
+            //file_put_contents($prebuildMasterAbilitiesFilenamePath, $echoCache);
+
+            // redirect page when all done
+            echo '<script>';
+                echo 'document.location.replace("/index.php?lang='.$_SESSION['SUserLang'].'&component=master");';
+            echo '</script>';
         }
     }
 
@@ -374,7 +458,7 @@
                     {
                         $quotePos1 = 1;
                         $quotePos2 = strpos($currentLine, '"', $quotePos1 + 1);
-                        $key = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));                                    
+                        $key = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));
                         $result[$key] = [];
 
                         //$echoCache .= '************* - '.$key.'<br>';
@@ -407,7 +491,7 @@
                 }
 
                 // close file read
-                fclose($myfile);                
+                fclose($myfile);
                 return $result;
             }
 
@@ -416,6 +500,4 @@
             return false;
         }
     }
-
-    exit('<br />done');
 ?>

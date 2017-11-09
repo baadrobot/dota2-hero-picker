@@ -4,21 +4,45 @@
 	border: 2px solid red;
 }
 
-.masterAbilityImgWrap{
+.autoIgnore {
+	border: 2px solid red;
+}
+
+.masterHeroWrap {
+    clear: both;
+}
+
+.masterHeroImgWrap {
+    display: none;
+    background-color: black;
+    /* margin: 2px; */
+    width: 132px;
+    height: 152px;
+}
+
+.masterHeroImgWrap img {
+    width: 128px;
+    height: auto;
+    background-color: black;
+    margin: 2px;
+}
+
+.masterAbilityImgWrap {
     float: left;
     width: 54px;
     height: 54px;
     background-color: black;
-    margin: 1px 1px 0 0;
+    margin: 2px 2px 0 0;
 }
 
 .masterAbilityImgWrap img {
     width: 50px;
-    height: auto;
+    height: 50px;
     margin: 2px;
     cursor: pointer;
 }
 
-.masterHeroImg {
-
+.forbidden {
+    opacity: 0.2;
+    cursor: default!important;
 }

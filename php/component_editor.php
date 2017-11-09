@@ -1,13 +1,13 @@
 <?php
-    global $dbClass;    
-    
-    $query = 'SELECT cf_d2HeroList_id as `id`    
+    global $dbClass;
+
+    $query = 'SELECT cf_d2HeroList_id as `id`
                     ,cf_d2HeroList_name_en_US as `n`
                     ,cf_d2HeroList_codename as `cn`
                     ,cf_d2HeroList_primary_attr as `a`
                     -- ,cf_d2HeroList_icon as `icon`
                 FROM tb_dota2_hero_list ORDER BY cf_d2HeroList_name_en_US;';
-    
+
     $hero_array = $dbClass->select($query);
 
     echo '<script>';
@@ -31,10 +31,10 @@
 
     function getHeroImg($heroNameLocal, $heroId, $heroCodeName)
     {
-        return '<div class="heroListImg" data-hero-id="'.$heroId.'" data-hero-codename="'.$heroCodeName.'" data-hero-name="'.$heroNameLocal.'"><img src="'.getHeroImgPath($heroCodeName).'" /></div>';        
+        return '<div class="heroListImg" data-hero-id="'.$heroId.'" data-hero-codename="'.$heroCodeName.'" data-hero-name="'.$heroNameLocal.'"><img src="'.getHeroImgPath($heroCodeName).'" /></div>';
     }
 
-    echo '<div class="container-fluid">';
+    //echo '<div class="container-fluid">';
         echo '<div class="row">';
             echo '<div id="heroListWrap" class="col-8">';
                 // hero list >>>>>>>>>>>>>>>>>
@@ -142,11 +142,11 @@
                             echo '</p>';
                         echo '</div>';
                     echo '</div>';
-                echo '</div>';  
-*/                              
+                echo '</div>';
+*/
             echo '</div>';
         echo '</div>';
-    echo '</div>';
+    //echo '</div>';
 
 
 
@@ -176,7 +176,7 @@
 //         //     <label for="message-text" class="col-form-label">Message:</label>
 //         //     <textarea class="form-control" id="message-text"></textarea>
 //         //   </div>
-// echo 
+// echo
 //       '</div>
 //       <div class="modal-footer">
 //         <button id="btnCreateNewTagDo" type="button" class="btn btn-primary">Создать</button>
@@ -204,7 +204,7 @@ echo
             </div>
 
             <div id="editHeroTagAbilitiesImgWrap">
-                
+
             </div>
 
             <div class="form-group">
@@ -212,7 +212,7 @@ echo
                 <span id="editHeroTagInfoHero" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на героя"></span>
                 <span id="editHeroTagInfoAbilities" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на выбранные способности"></span>';
 
-echo '                
+echo '
             </div>
 
             <div class="form-group">
@@ -224,7 +224,7 @@ echo '
         //     <label for="message-text" class="col-form-label">Message:</label>
         //     <textarea class="form-control" id="message-text"></textarea>
         //   </div>
-echo 
+echo
       '</div>
       <div class="modal-footer">
         <button id="btnEditHeroTagUnset" type="button" class="btn btn-danger" >Снять тэг</button>
@@ -237,35 +237,7 @@ echo
 
 
 
-// -------------- Hero Ability Tooltip
-echo '<div id="abilityTooltip" style="display: none;">';
-    echo '<div class="iconTooltip iconTooltip_ability">';
-        echo '<div class="abilityName"></div>'; //Mana Void
-        echo '<div class="abilityHR1"></div>'; // empty ??
-        echo '<div class="abilityTarget">ABILITY: <span class="attribVal">Unit Target</span>
-                                <br>AFFECTS: <span class="attribVal">Enemy Units</span>
-                                <br>DAMAGE TYPE: <span class="attribVal">Magical</span>
-                                <br>PIERCES SPELL IMMUNITY: <span class="attribVal"><font color="#70EA72">Yes</font></span><br>
-        </div>';
-        echo '<div class="abilityHR2"></div>';
-        echo '<div class="abilityDesc">For each point of mana missing by the target unit, damage is dealt to it and surrounding enemies.  The main target is also mini-stunned.</div>';
-        echo '<div class="abilityNotes">The stun passes through spell immunity.<br>Damage is calculated based on the primary target\'s mana, but applied to all enemies within the area of effect.</div>';
-        echo '<div class="abilityDmg"></div>';
-        echo '<div class="abilityAttrib">DAMAGE: <span class="attribVal">0.6 / 0.85 / 1.1</span>
-                                <br>STUN DURATION: <span class="attribVal">0.3</span>
-                                <br>RADIUS: <span class="attribVal">500</span>
-        </div>';
-        echo '<div class="abilityCMB">';
-            echo '<div class="cooldownMana">';
-                echo '<div class="mana"><img alt="Mana Cost" title="Mana Cost" class="manaImg" src="http://cdn.dota2.com/apps/dota2/images/tooltips/mana.png" width="16" height="16" border="0"> 125/200/275</div>';
-                echo '<div class="cooldown"><img alt="Cooldown" title="Cooldown" class="cooldownImg" src="http://cdn.dota2.com/apps/dota2/images/tooltips/cooldown.png" width="16" height="16" border="0"> 70</div>';
-                echo '<br clear="left">';
-            echo '</div>';
-        echo '</div>';
-        echo '<div class="abilityLore">After bringing enemies to their knees, Anti-Mage punishes them for their use of the arcane arts.</div>';
-        //echo '<div class="BaseArrow ArrowLeft" style="left: 0px; top: 402px;"></div>';
-    echo '</div>';
-echo '</div>';
+require 'php/template_d2_hero_ability_tooltip.php';
 
 
 // --------------
@@ -285,7 +257,7 @@ echo '<script>';
     echo 'window.LangPreStr["EDITOR"]["_SET_"] = "Назначить";';
 
     echo 'window.LangPreStr["EDITOR"]["_SET_BALANCE_"] = "Назначение баланса между тэгами";';
-    
+
 echo '</script>';
 
 ?>

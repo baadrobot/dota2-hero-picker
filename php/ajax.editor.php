@@ -13,7 +13,7 @@
     }
     elseif ($_POST['ajaxType'] == 'getHeroesWithSelectedTag')
     {
-        $query = 'SELECT cf_d2HeroTagSet_hero_id as `id`, cf_d2HeroTagSet_tag_val as `value` 
+        $query = 'SELECT cf_d2HeroTagSet_hero_id as `id`, cf_d2HeroTagSet_tag_val as `value`
                     FROM tb_dota2_heroTag_set
                     WHERE cf_d2HeroTagSet_tag_id = ?;';
         $heroesWithSelectedTag = $dbClass->select($query, $_POST['tagId']);
@@ -35,7 +35,7 @@
                           SET cf_d2HeroTagSet_hero_id = ?, cf_d2HeroTagSet_tag_id = ?, cf_d2HeroTagSet_tag_val = ?, cf_d2HeroTagSet_selected_abilities = ?
                           ON DUPLICATE KEY UPDATE cf_d2HeroTagSet_tag_val=?, cf_d2HeroTagSet_selected_abilities = ?;';
         $isInsertOk = $dbClass->insert($query, $_POST['heroId'], $_POST['tagId'], $_POST['value'], $_POST['selectedAbilities'], $_POST['value'], $_POST['selectedAbilities']);
-        
+
         if ($isInsertOk)
         {
             ajaxReturnAndExit(array('php_result'=>'OK'));
@@ -50,9 +50,9 @@
     {
         $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                     FROM tb_dota2_hero_ability_list
-                   WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = ?
+                   WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = 0 AND cf_d2HeroAbilityList_isAbilityForbidden = 0
                 ORDER BY cf_d2HeroAbilityList_orderPosition;';
-        $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId'], 0);
+        $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId']);
 
         $query = 'SELECT cf_d2HeroTagSet_tag_val as `value`, cf_d2HeroTagSet_selected_abilities as `selectedAbilities`
                     FROM tb_dota2_heroTag_set
@@ -67,8 +67,8 @@
             } else {
                 $tagResult = $tagSetResult[0]['selectedAbilities'];
             }
-            $tagValue = $tagSetResult[0]['value'];            
-        } else 
+            $tagValue = $tagSetResult[0]['value'];
+        } else
         {
             $tagResult = 'NONE';
             $tagValue = '';
@@ -81,7 +81,7 @@
     }
     elseif (($_POST['ajaxType'] == 'editorEditHeroTagDeleteHeroTag') && (isGotAccess(_ROLE_EDITOR)))
     {
-        $query = 'DELETE FROM tb_dota2_heroTag_set 
+        $query = 'DELETE FROM tb_dota2_heroTag_set
                         WHERE `cf_d2HeroTagSet_hero_id` = ? AND `cf_d2HeroTagSet_tag_id` = ?;';
         $isDeleteOk = $dbClass->delete($query, $_POST['heroId'], $_POST['tagId']);
         if ($isDeleteOk)
@@ -130,7 +130,7 @@
                          WHERE `cf_d2HeroTagSet_tag_id` = ?;';
         $isDeleteOkTwo = $dbClass->delete($query, $_POST['tagId']);
 
-        $query2 = 'DELETE FROM tb_dota2_tag_list 
+        $query2 = 'DELETE FROM tb_dota2_tag_list
                         WHERE `cf_d2TagList_id` = ?;';
         $isDeleteOkOne = $dbClass->delete($query2, $_POST['tagId']);
 
@@ -152,7 +152,7 @@
                     WHERE cf_d2TagBalanceSet_balance_value > ?;';
 
         $allBalanceTags = $dbClass->select($query, 0);
-        
+
         // $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
         //             FROM tb_dota2_tag_list
         //            WHERE cf_d2TagList_id > ?;';
@@ -170,7 +170,7 @@
             'balance_tag_array' => 'NONE'
             ));
         }
-        
+
     }
     elseif (($_POST['ajaxType'] == 'editorAddNewTagBalance') && (isGotAccess(_ROLE_EDITOR)))
     {
@@ -178,7 +178,7 @@
                           SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
                           ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
         $isInsertOk = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
-        
+
         $query = 'INSERT INTO tb_dota2_tag_balance_set
                           SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?
                            ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
@@ -200,7 +200,7 @@
                          WHERE (cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ?) OR (cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ?);';
         $isDeleteOkOne = $dbClass->delete($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['secondTagId'], $_POST['firstTagId']);
 
-        // $query2 = 'DELETE FROM tb_dota2_tag_balance_set 
+        // $query2 = 'DELETE FROM tb_dota2_tag_balance_set
         //                 WHERE cf_d2TagBalanceSet_second_tag_id = ? AND cf_d2TagBalanceSet_first_tag_id = ?;';
         // $isDeleteOkTwo = $dbClass->delete($query2, $_POST['secondTagId'], $_POST['firstTagId']);
 
@@ -214,10 +214,9 @@
             ));
         }
     }
-    // elseif (($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities') && (isGotAccess(_ROLE_EDITOR)))
-    elseif ($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities')
+    elseif (($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities') && (isGotAccess(_ROLE_MASTER)))
     {
-        $query = 'SELECT cf_d2HeroAbilityList_id as `id` 
+        $query = 'SELECT cf_d2HeroAbilityList_id as `id`
                     FROM tb_dota2_hero_ability_list
                     WHERE cf_d2HeroAbilityList_isAbilityIgnored = ?;';
 
@@ -227,41 +226,31 @@
                                 'ignored_abilities_id_array' => $allIgnoredAbilitiesId
         ));
     }
-    // elseif (($_POST['ajaxType'] == 'masterIgnoreUpdate') && (isGotAccess(_ROLE_EDITOR)))
-    elseif ($_POST['ajaxType'] == 'masterIgnoreUpdateTo1')
+    elseif (($_POST['ajaxType'] == 'masterSetAbilityIgnore') && (isGotAccess(_ROLE_MASTER)))
     {
+        if ($_POST['isIgnore'] == 0)
+        {
+            $isIgnore = 0;
+        } else {
+            $isIgnore = 1;
+        }
+
         $query = 'UPDATE tb_dota2_hero_ability_list
                      SET cf_d2HeroAbilityList_isAbilityIgnored = ?
                    WHERE cf_d2HeroAbilityList_id = ?;';
-        $isUpdateOk = $dbClass->update($query, 1, $_POST['tagId']);
+
+        $isUpdateOk = $dbClass->update($query, $isIgnore, $_POST['tagId']);
 
         if ($isUpdateOk)
         {
-            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+            ajaxReturnAndExit(array( 'php_result'=>'OK', 'php_is_ignore'=>$isIgnore, 'php_tag_id'=>$_POST['tagId']));
         } else {
             ajaxReturnAndExit(array( 'php_result'=>'ERROR',
-                                    'php_error_msg'=>'New tag has not been created! Error #si8a1-s9s-m7b4c-dy2q!'
+                                    'php_error_msg'=>'Ability ignore has not been updated! Error #g4na32-gv89m-0980v-2n308-3fr6v!'
             ));
         }
     }
-    // elseif (($_POST['ajaxType'] == 'masterIgnoreUpdate') && (isGotAccess(_ROLE_EDITOR)))
-    elseif ($_POST['ajaxType'] == 'masterIgnoreUpdateTo0')
-    {
-        $query = 'UPDATE tb_dota2_hero_ability_list
-                     SET cf_d2HeroAbilityList_isAbilityIgnored = ?
-                   WHERE cf_d2HeroAbilityList_id = ?;';
-        $isUpdateOk = $dbClass->update($query, 0, $_POST['tagId']);
-
-        if ($isUpdateOk)
-        {
-            ajaxReturnAndExit(array( 'php_result'=>'OK'));
-        } else {
-            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
-                                    'php_error_msg'=>'New tag has not been created! Error #f71m-a0m2-c3r-87y32!'
-            ));
-        }
-    }
-    else 
+    else
     {
         ajaxReturnAndExit(array( 'php_result'=>'ERROR',
                                 'php_error_msg'=>"Access denied, please login to your account!"

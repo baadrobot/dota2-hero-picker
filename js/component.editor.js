@@ -22,7 +22,7 @@ $(document).ready(function ()
             confirmTitle : getPreStr_js('EDITOR', '_CREATE_TAG_')
             ,confirmHtml : question
             ,btnOKCaption : getPreStr_js('EDITOR', '_CREATE_')
-            ,btnCancelCaption : 'default'            
+            ,btnCancelCaption : 'default'
             ,btnOKColorClass : 'btn-success'
             ,allowBackClickClose : true
             ,onBeforeShow: function ()
@@ -39,14 +39,14 @@ $(document).ready(function ()
             {
                 pleaseWaitOpen();
                 $('.tag.selectedTag').click();
-        
+
                 //Ajax
                 $.ajax({
                     url: 'php/ajax.editor.php',
                     data: {  ajaxType: 'editorAddNewTag'
                            , tagName: $.trim($('#inputCreateNewTagName').val())
                           },
-                    datatype: 'json',
+                    datatype: 'jsonp',
                     type: 'POST',
                     cache: false,
                     success: function (result)
@@ -75,7 +75,7 @@ $(document).ready(function ()
             {
                 //
             }
-        });        
+        });
     });
 
     // click on PLUS btn (add balance)
@@ -89,7 +89,7 @@ $(document).ready(function ()
     ajaxGetTagsArray(rebuildAll);
 
 
-    
+
 
     // click on MINUS btn (delete tag)
     $('#btnDeleteSelectedTagPopup').click(function ()
@@ -101,19 +101,19 @@ $(document).ready(function ()
             confirmTitle : 'default'
             ,confirmHtml : question
             ,btnOKCaption : getPreStr_js('EDITOR', '_DELETE_TAG_')
-            ,btnCancelCaption : 'default'            
+            ,btnCancelCaption : 'default'
             ,allowBackClickClose : true
             ,onUserClickedOK : function ()
             {
                         pleaseWaitOpen();
-                
+
                         //Ajax
                         $.ajax({
                             url: 'php/ajax.editor.php',
                             data: {  ajaxType: 'editorDeleteTag'
                                       , tagId: $('#tagListWrap .selectedTag').attr('data-tag-id')
                                     },
-                            datatype: 'json',
+                            datatype: 'jsonp',
                             type: 'POST',
                             cache: false,
                             success: function (result)
@@ -160,7 +160,7 @@ $(document).ready(function ()
             confirmTitle : getPreStr_js('EDITOR', '_RENAME_TAG_')
             ,confirmHtml : question
             ,btnOKCaption : getPreStr_js('EDITOR', '_RENAME_')
-            ,btnCancelCaption : 'default'            
+            ,btnCancelCaption : 'default'
             ,btnOKColorClass : 'btn-warning'
             ,allowBackClickClose : true
             ,onBeforeShow: function ()
@@ -179,7 +179,7 @@ $(document).ready(function ()
             {
                 pleaseWaitOpen();
                 // $('.tag.selectedTag').click();
-        
+
                 //Ajax
                 $.ajax({
                     url: 'php/ajax.editor.php',
@@ -187,7 +187,7 @@ $(document).ready(function ()
                             , renamedTagId: $('#tagListWrap .selectedTag').attr('data-tag-id')
                            , renamedTagName: $.trim($('#inputRenameTagName').val())
                           },
-                    datatype: 'json',
+                    datatype: 'jsonp',
                     type: 'POST',
                     cache: false,
                     success: function (result)
@@ -216,11 +216,11 @@ $(document).ready(function ()
             {
                 //
             }
-        });        
+        });
     });
     // end of rename btn
 
-    $('#editHeroTagHeroImgWrap img').click(function () 
+    $('#editHeroTagHeroImgWrap img').click(function ()
     {
         if ($(this).toggleClass('selectedAbility').hasClass('selectedAbility'))
         {
@@ -257,10 +257,10 @@ $(document).ready(function ()
 
             $('#editHeroTagHeroImgWrap img')
                 .attr('src', '//cdn.dota2.com/apps/dota2/images/heroes/'+curSelectedHeroEl.attr('data-hero-codename')+'_full.png?v=4212550');
-           
+
             $('#editHeroTagSlider').slider('value', 3);
 
-            
+
 
             // Ajax
             $.ajax({
@@ -269,14 +269,14 @@ $(document).ready(function ()
                         , heroId: clickedheroId
                          , tagId: selectedTagId
                         },
-                datatype: 'json',
+                datatype: 'jsonp',
                 type: 'POST',
                 cache: false,
                 success: function (result)
                 {
                     if (result.php_result == 'OK')
                     {
-                        for (var i = 0; i < result.hero_abilities_array.length; i++) 
+                        for (var i = 0; i < result.hero_abilities_array.length; i++)
                         {
                             editHeroAbilitiesImgWrapEl.append('<img class="heroAbilityImg" data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+result.hero_abilities_array[i]['abilityCodename']+'" src="//cdn.dota2.com/apps/dota2/images/abilities/'+result.hero_abilities_array[i]['abilityCodename']+'_hp1.png?v=4195662">');
                         }
@@ -293,7 +293,7 @@ $(document).ready(function ()
                         var tooltipYoffset = -180;
 
                         addOnHoverTooltipsForAbilityImg('#editHeroTagAbilitiesImgWrap', tooltipYoffset);
-                        
+
                         if (result.tag_result == 'NONE')
                         {
                             $('#editHeroTagHeroImgWrap .selectedAbility').removeClass('selectedAbility');
@@ -307,12 +307,12 @@ $(document).ready(function ()
                             $('#editHeroTagSlider').slider('value', result.tag_value);
                             $('#btnEditHeroTagUnset').show();
                         } else {
-                            $('#editHeroTagHeroImgWrap .selectedAbility').removeClass('selectedAbility'); 
+                            $('#editHeroTagHeroImgWrap .selectedAbility').removeClass('selectedAbility');
 
                             var selectedTagsIdArray = result.tag_result.split(' ');
                             for (var i = 0; i < selectedTagsIdArray.length; i++)
                             {
-                                $('#editHeroTagAbilitiesImgWrap [data-ability-id="'+selectedTagsIdArray[i]+'"]').addClass('selectedAbility');    
+                                $('#editHeroTagAbilitiesImgWrap [data-ability-id="'+selectedTagsIdArray[i]+'"]').addClass('selectedAbility');
                             }
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);
@@ -320,7 +320,7 @@ $(document).ready(function ()
                         }
 
                         editHeroTagDecideInfoText();
-                        
+
                         $('#editHeroTagPopup').modal();
                     }
                     else if (result.php_result == 'ERROR')
@@ -340,7 +340,7 @@ $(document).ready(function ()
         }
     });
 
-    $('#btnEditHeroTagDo').click(function () 
+    $('#btnEditHeroTagDo').click(function ()
     {
         if ($('#editHeroTagInfoNone:visible').length)
         {
@@ -348,9 +348,9 @@ $(document).ready(function ()
             return; //exit
         }
         pleaseWaitOpen();
-        
+
         var editHeroTagSelectedAbilitiesIdString = '';
-        $('#editHeroTagAbilitiesImgWrap img.selectedAbility').each(function () 
+        $('#editHeroTagAbilitiesImgWrap img.selectedAbility').each(function ()
         {
             if (editHeroTagSelectedAbilitiesIdString != '')
             {
@@ -368,7 +368,7 @@ $(document).ready(function ()
                       , value: $('#editHeroTagSlider').slider('value')
           , selectedAbilities: editHeroTagSelectedAbilitiesIdString
                     },
-            datatype: 'json',
+            datatype: 'jsonp',
             type: 'POST',
             cache: false,
             success: function (result)
@@ -396,10 +396,10 @@ $(document).ready(function ()
     });
 
     // tag_unset click
-    $('#btnEditHeroTagUnset').click(function () 
+    $('#btnEditHeroTagUnset').click(function ()
     {
         $('#editHeroTagPopup').modal('hide');
-        
+
         var question = getPreStr_js('EDITOR', '_CONFIRM_UNSET_TAG_');
         question = question.replace(/{TAG}/, '<span class="greenBold">'+$('#editHeroTagTagName').text()+'</span>');
         question = question.replace(/{HERO}/, '<span class="blueBold">'+$('#editHeroTagHeroName').text()+'</span>');
@@ -408,12 +408,12 @@ $(document).ready(function ()
             confirmTitle : 'default'
             ,confirmHtml : question
             ,btnOKCaption : getPreStr_js('EDITOR', '_UNSET_TAG_')
-            ,btnCancelCaption : 'default'            
+            ,btnCancelCaption : 'default'
             ,allowBackClickClose : true
             ,onUserClickedOK : function ()
             {
                         pleaseWaitOpen();
-                
+
                         //Ajax
                         $.ajax({
                             url: 'php/ajax.editor.php',
@@ -421,7 +421,7 @@ $(document).ready(function ()
                                       , tagId: $('#editHeroTagPopup').attr('data-tag-id')
                                      , heroId: $('#editHeroTagPopup').attr('data-hero-id')
                                     },
-                            datatype: 'json',
+                            datatype: 'jsonp',
                             type: 'POST',
                             cache: false,
                             success: function (result)
@@ -454,13 +454,13 @@ $(document).ready(function ()
 
 
 
-    $('#btnEditHeroTagUnsetCancel').click(function () 
+    $('#btnEditHeroTagUnsetCancel').click(function ()
     {
         $('#editHeroTagPopup').modal();
     });
 
 
-   
+
 
     var handle = $( "#custom-handle" );
     $( "#editHeroTagSlider" ).slider({
@@ -479,7 +479,7 @@ $(document).ready(function ()
       }
     });
 
-    
+
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -487,7 +487,7 @@ $(document).ready(function ()
 
 $(window).on("load",function()
 {
-    
+
 });
 // - END WINDOW LOAD////////////////////////////////////
 
@@ -495,7 +495,7 @@ $(window).on("load",function()
 function colorizeAllHeroes()
 {
     // colorize all heroes
-    $('.heroListImg').each(function () 
+    $('.heroListImg').each(function ()
     {
         $(this).removeClass('grayscale');
         $(this).find('.heroTagValue').html('');
@@ -514,7 +514,7 @@ function rebuildEditorBalanceTags()
         url: 'php/ajax.editor.php',
         data: {  ajaxType: 'getAllBalanceTags'
               },
-        datatype: 'json',
+        datatype: 'jsonp',
         type: 'POST',
         cache: false,
         success: function (result)
@@ -528,7 +528,7 @@ function rebuildEditorBalanceTags()
 
                 if (balanceTagsList != 'NONE')
                 {
-                    for (var i = 0; i < balanceTagsList.length; i++) 
+                    for (var i = 0; i < balanceTagsList.length; i++)
                     {
                         var firstBalanceTagId = balanceTagsList[i]['firstTagId'];
                         var secondBalanceTagId = balanceTagsList[i]['secondTagId'];
@@ -565,18 +565,18 @@ function rebuildEditorBalanceTags()
 
                 //         colorizeAllHeroes();
 
-                //     } else 
+                //     } else
                 //     {
                 //         // tag on
                 //         $('.selectedTag').removeClass('selectedTag');
                 //         $(this).addClass('selectedTag');
 
                 //         var selectedTagName = $(this).text();
-                //         $('.editHeroTagInfoText').each(function () 
+                //         $('.editHeroTagInfoText').each(function ()
                 //         {
                 //             $(this).html(
                 //                 $(this).attr('data-template-text').replace(/{TAG}/, '<span id="editHeroTagTagName" class="greenBold">'+selectedTagName+'</span>')
-                //             );                
+                //             );
                 //         });
 
                 //         // show minus and rename btns
@@ -584,13 +584,13 @@ function rebuildEditorBalanceTags()
                 //         $('#btnRenameSelectedTagPopup').show();
 
                 //         pleaseWaitOpen();
-                        
+
                 //         $.ajax({
                 //             url: 'php/ajax.editor.php',
                 //             data: {  ajaxType: 'getHeroesWithSelectedTag'
                 //                       ,tagId : $(this).attr('data-tag-id')
                 //                     },
-                //             datatype: 'json',
+                //             datatype: 'jsonp',
                 //             type: 'POST',
                 //             cache: false,
                 //             success: function (result)
@@ -599,26 +599,26 @@ function rebuildEditorBalanceTags()
                 //                 {
                 //                     if (result.hero_id_and_value_array == "NONE")
                 //                     {
-                //                         $('.heroListImg').each(function () 
+                //                         $('.heroListImg').each(function ()
                 //                         {
                 //                             $(this).addClass('grayscale');
                 //                             $(this).find('.heroTagValue').html('');
                 //                         });
                 //                     } else
                 //                     {
-                //                         $('.heroListImg').each(function () 
+                //                         $('.heroListImg').each(function ()
                 //                         {
                 //                             var isFound = false;
-                //                             for (i = 0; i < result.hero_id_and_value_array.length; i++)
+                //                             for (var i = 0; i < result.hero_id_and_value_array.length; i++)
                 //                             {
                 //                                 if ($(this).attr('data-hero-id') == (result.hero_id_and_value_array[i]['id']))
-                //                                 {                                
+                //                                 {
                 //                                     isFound = true;
                 //                                     break;
                 //                                 }
                 //                             }
-                
-                //                             var heroTagValueSpan = $(this).find('.heroTagValue');                            
+
+                //                             var heroTagValueSpan = $(this).find('.heroTagValue');
                 //                             if (isFound)
                 //                             {
                 //                                 heroTagValueSpan.html(result.hero_id_and_value_array[i]['value']);
@@ -649,8 +649,8 @@ function rebuildEditorBalanceTags()
                 //         });
 
                 //     }
-                    
-                // });                
+
+                // });
             }
             else if (result.php_result == 'ERROR')
             {
@@ -679,7 +679,7 @@ function ajaxGetTagsArray(callbackNextFunction)
         url: 'php/ajax.editor.php',
         data: {  ajaxType: 'getAllTags'
               },
-        datatype: 'json',
+        datatype: 'jsonp',
         type: 'POST',
         cache: false,
         success: function (result)
@@ -697,7 +697,7 @@ function ajaxGetTagsArray(callbackNextFunction)
         },
         complete: function (result)
         {
-            
+
         },
         error: function (request, status, error)
         {
@@ -716,7 +716,7 @@ function rebuildEditorTags(tagsList)
 
     colorizeAllHeroes();
 
-    for (var i = 0; i < tagsList.length; i++) 
+    for (var i = 0; i < tagsList.length; i++)
     {
         tagListEl.append('<span class="tag" data-tag-id="'+tagsList[i]['id']+'" data-tag-name="'+tagsList[i]['name']+'">['+tagsList[i]['name']+']</span>');
     }
@@ -731,18 +731,18 @@ function rebuildEditorTags(tagsList)
 
             colorizeAllHeroes();
 
-        } else 
+        } else
         {
             // tag on
             $('.selectedTag').removeClass('selectedTag');
             $(this).addClass('selectedTag');
 
             var selectedTagName = $(this).text();
-            $('.editHeroTagInfoText').each(function () 
+            $('.editHeroTagInfoText').each(function ()
             {
                 $(this).html(
                     $(this).attr('data-template-text').replace(/{TAG}/, '<span id="editHeroTagTagName" class="greenBold">'+selectedTagName+'</span>')
-                );                
+                );
             });
 
             // show minus and rename btns
@@ -750,13 +750,13 @@ function rebuildEditorTags(tagsList)
             $('#btnRenameSelectedTagPopup').show();
 
             pleaseWaitOpen();
-            
+
             $.ajax({
                 url: 'php/ajax.editor.php',
                 data: {  ajaxType: 'getHeroesWithSelectedTag'
                           ,tagId : $(this).attr('data-tag-id')
                         },
-                datatype: 'json',
+                datatype: 'jsonp',
                 type: 'POST',
                 cache: false,
                 success: function (result)
@@ -765,26 +765,26 @@ function rebuildEditorTags(tagsList)
                     {
                         if (result.hero_id_and_value_array == "NONE")
                         {
-                            $('.heroListImg').each(function () 
+                            $('.heroListImg').each(function ()
                             {
                                 $(this).addClass('grayscale');
                                 $(this).find('.heroTagValue').html('');
                             });
                         } else
                         {
-                            $('.heroListImg').each(function () 
+                            $('.heroListImg').each(function ()
                             {
                                 var isFound = false;
-                                for (i = 0; i < result.hero_id_and_value_array.length; i++)
+                                for (var i = 0; i < result.hero_id_and_value_array.length; i++)
                                 {
                                     if ($(this).attr('data-hero-id') == (result.hero_id_and_value_array[i]['id']))
-                                    {                                
+                                    {
                                         isFound = true;
                                         break;
                                     }
                                 }
-    
-                                var heroTagValueSpan = $(this).find('.heroTagValue');                            
+
+                                var heroTagValueSpan = $(this).find('.heroTagValue');
                                 if (isFound)
                                 {
                                     heroTagValueSpan.html(result.hero_id_and_value_array[i]['value']);
@@ -815,7 +815,7 @@ function rebuildEditorTags(tagsList)
             });
 
         }
-       
+
     });
 }
 
@@ -823,13 +823,13 @@ function rebuildEditorTags(tagsList)
 function getTagHeroes(curTagId)
 {
     pleaseWaitOpen();
-    
+
     $.ajax({
         url: 'php/ajax.editor.php',
         data: {  ajaxType: 'getTagHeroes'
                   , tagId: curTagId
                 },
-        datatype: 'json',
+        datatype: 'jsonp',
         type: 'POST',
         cache: false,
         success: function (result)
@@ -847,7 +847,7 @@ function getTagHeroes(curTagId)
         },
         complete: function (result)
         {
-            
+
         },
         error: function (request, status, error)
         {
@@ -865,7 +865,7 @@ function editHeroTagDecideInfoText()
         $('#editHeroTagInfoNone, #editHeroTagInfoHero').hide();
         $('#editHeroTagInfoAbilities').show();
         //$('#btnEditHeroTagDo').removeAttr('disabled', 'disabled');
-    } 
+    }
     else if ($('#editHeroTagHeroImgWrap img.selectedAbility').length)
     {
         $('#editHeroTagInfoNone , #editHeroTagInfoAbilities').hide();
@@ -889,9 +889,9 @@ function bindInputTagAlreadyExists(inputSelector)
         {
             $('#noticeTagExist').slideUp();
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
-        } else 
+        } else
         {
-            isTagExist = false;            
+            isTagExist = false;
             $('#tagListWrap').find('.tag').each(function ()
             {
                 if ($(this).text().toLowerCase() == '['+curInputVal.toLowerCase()+']')
@@ -905,13 +905,13 @@ function bindInputTagAlreadyExists(inputSelector)
             if (isTagExist)
             {
                 $('#noticeTagExist').slideDown();
-                $('#btnConfirmDialogOK').attr('disabled', 'disabled');  
+                $('#btnConfirmDialogOK').attr('disabled', 'disabled');
             } else {
                 $('#noticeTagExist').slideUp();
                 $('#btnConfirmDialogOK').removeAttr('disabled');
             }
         }
-    });    
+    });
 }
 
 function editBalancePopupDecideBtnCreate()
@@ -950,7 +950,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 {
     var question = '';
     question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
-        question += '<div id="combobox1" class="form-group">';        
+        question += '<div id="combobox1" class="form-group">';
             question += '<select>';
                 var selectOptionValues = '';
                 $('#tagListWrap .tag').each(function ()
@@ -966,14 +966,14 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
             question += '<div id="editBalanceTagSlider">';
                 question += '<div id="custom-handle2" class="ui-slider-handle"></div>';
             question += '</div>';
-        question += '</div>';                                
+        question += '</div>';
 
         question += '<div  id="combobox2" class="form-group">';
             question += '<select>';
                 question += selectOptionValues;
             question += '</select>';
         question += '</div>';
-    question += '</div>';        
+    question += '</div>';
 
     // question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
     //question += '<input id="inputCreateNewBalanceName" type="text" class="form-control">';
@@ -984,13 +984,13 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         ,confirmHtml : question
         ,btnDeleteCaption : 'default'
         ,btnOKCaption : getPreStr_js('EDITOR', '_SET_')
-        ,btnCancelCaption : 'default'            
+        ,btnCancelCaption : 'default'
         ,btnOKColorClass : 'btn-success'
         ,allowBackClickClose : true
         ,onBeforeShow: function ()
         {
             $("#combobox1 select, #combobox2 select").combobox();
-            
+
             $('#combobox1 input, #combobox2 input').autocomplete({
                 select: function()
                 {
@@ -1000,13 +1000,13 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 search: function()
                 {
                     editBalancePopupDecideBtnCreate();
-                }                    
+                }
             });
             //$("#combobox2 select").combobox();
             $('#combobox1 a, #combobox2 a').tooltip({
                 disabled: true
-              });   
-            
+              });
+
             var handle2 = $( "#custom-handle2" );
             $( "#editBalanceTagSlider" ).slider({
               max: 50,
@@ -1052,12 +1052,12 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 $('#combobox2 select').combobox('value', clickedEl.find('span:last').attr('data-tag-id'));
 
                 $( "#editBalanceTagSlider" ).slider('value', clickedEl.find('span:first').attr('data-tag-value'));
-                
+
                 // console.log($('#combobox1 option:selected').val());
                 $('#btnConfirmDialogDelete').show();
                 //todo: add delete button
-            }            
-            
+            }
+
             // $('#inputCreateNewTagName').val('');
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
             // bindInputTagAlreadyExists('#inputCreateNewTagName');
@@ -1074,7 +1074,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 
             pleaseWaitOpen();
             // $('.tag.selectedTag').click();
-    
+
             //Ajax
             $.ajax({
                 url: 'php/ajax.editor.php',
@@ -1083,7 +1083,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                        , secondTagId: $('#combobox2 option:selected').val()
                     //    , balanceValue: $('#editBalanceTagSlider').slider('value')
                       },
-                datatype: 'json',
+                datatype: 'jsonp',
                 type: 'POST',
                 cache: false,
                 success: function (result)
@@ -1113,7 +1113,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         {
             pleaseWaitOpen();
             // $('.tag.selectedTag').click();
-    
+
             //Ajax
             $.ajax({
                 url: 'php/ajax.editor.php',
@@ -1122,7 +1122,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                        , secondTagId: $('#combobox2 option:selected').val()
                        , balanceValue: $('#editBalanceTagSlider').slider('value')
                       },
-                datatype: 'json',
+                datatype: 'jsonp',
                 type: 'POST',
                 cache: false,
                 success: function (result)

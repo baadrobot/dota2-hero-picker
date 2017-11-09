@@ -24,7 +24,7 @@ $(document).ready(function ()
         });
     }
 
-    
+
 
 
     //................. Tooltips
@@ -33,7 +33,7 @@ $(document).ready(function ()
 
     // end of tooltips
 
-    
+
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -46,7 +46,7 @@ $(window).on("load",function()
         $(this).find('input:first').trigger('focus');
     });
 
-   
+
     /*
     $('#examplePopup').on('show.bs.modal', function (event)
     {
@@ -58,7 +58,7 @@ $(window).on("load",function()
         modal.find('.modal-title').text('New message to ' + recipient);
         modal.find('.modal-body input').val(recipient);
     });
-    */  
+    */
 });
 // - END WINDOW LOAD////////////////////////////////////
 
@@ -76,10 +76,12 @@ function pleaseWaitClose()
 
 function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
 {
-    $(wrapIdEl).find('img[data-ability-codename]')
+    $(wrapIdEl).find('[data-ability-codename]')
     .mouseenter(function ()
     {
         var heroAbilityCodeName = $(this).attr('data-ability-codename');
+        var heroAbilityCodeName = $(this).attr('data-ability-codename');
+
         var abilityTooltipEl = $('#abilityTooltip');
         if (typeof window.abilityData[heroAbilityCodeName] != 'undefined')
         {
@@ -105,7 +107,7 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
             window.tooltipCurYoffset = -25;
 
             var heroAbilityCodeName = $(this).attr('data-ability-codename');
-            var heroCodenameLength = $('#editHeroTagPopup').attr('data-hero-codename').length;
+            var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
 
             // cut from lone_druid_true_form_battle_cry hero namecode to leave: true_form_battle_cry
             var abilityNameFromAbilityCodeName = heroAbilityCodeName.substring(heroCodenameLength+1);
@@ -115,7 +117,7 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
     }).mouseleave(function ()
     {
         window.tooltipBox.html('');
-        window.tooltipCurYoffset = window.tooltipDefaultYOffset;        
+        window.tooltipCurYoffset = window.tooltipDefaultYOffset;
     });
 }
 
@@ -169,7 +171,7 @@ function confirmDialog(paramObj)
         paramObj.btnDeleteColorClass = 'btn-danger';
     }
     $('#btnConfirmDialogDelete').attr('class','').addClass('btn').addClass(paramObj.btnDeleteColorClass);
-         
+
     if (typeof paramObj.allowBackClickClose == 'undefined')
     {
         paramObj.allowBackClickClose = false;
@@ -180,26 +182,26 @@ function confirmDialog(paramObj)
         paramObj.confirmTitle = getPreStr_js('GLOBAL', '_CONFIRM_ACTION_');
     }
 
-    if ((typeof paramObj.confirmHtml == 'undefined') || (paramObj.confirmHtml == 'default'))     
+    if ((typeof paramObj.confirmHtml == 'undefined') || (paramObj.confirmHtml == 'default'))
     {
         paramObj.confirmHtml = getPreStr_js('GLOBAL', '_CONFIRM_QUESTION_');
     }
 
-    if ((typeof paramObj.btnDeleteCaption == 'undefined') || (paramObj.btnDeleteCaption == 'default'))        
+    if ((typeof paramObj.btnDeleteCaption == 'undefined') || (paramObj.btnDeleteCaption == 'default'))
     {
         paramObj.btnDeleteCaption = getPreStr_js('GLOBAL', '_DELETE_');
     }
 
-    if ((typeof paramObj.btnOKCaption == 'undefined') || (paramObj.btnOKCaption == 'default'))        
+    if ((typeof paramObj.btnOKCaption == 'undefined') || (paramObj.btnOKCaption == 'default'))
     {
         paramObj.btnOKCaption = getPreStr_js('GLOBAL', '_CONFIRM_');
     }
 
-    if ((typeof paramObj.btnCancelCaption == 'undefined') || (paramObj.btnCancelCaption == 'default'))    
+    if ((typeof paramObj.btnCancelCaption == 'undefined') || (paramObj.btnCancelCaption == 'default'))
     {
         paramObj.btnCancelCaption = getPreStr_js('GLOBAL', '_CANCEL_');
     }
-   
+
     $('#confirmDialog #confirmDialogTitle').html(paramObj.confirmTitle);
     $('#confirmDialog #confirmDialogText').html(paramObj.confirmHtml);
 
@@ -244,7 +246,7 @@ function confirmDialog(paramObj)
     if (typeof paramObj.onAfterShow != 'undefined')
     {
         paramObj.onAfterShow();
-    }    
+    }
 }
 
 
@@ -263,7 +265,7 @@ function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan)
     var div = '<div class="heroListImg" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
     if (isNeedValueSpan)
     {
-        div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';        
+        div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
     }
     div += '<img src="'+getHeroImgPath(heroCodeName, 'vert')+'" /></div>';
     return div;
@@ -278,10 +280,10 @@ function buildHeroList(wrapId)
         if (typeof window.heroList != 'undefined')
         {
             var heroListHtml = '';
-            for (j = 1; j <= 3; j++)
+            for (var j = 1; j <= 3; j++)
             {
                 heroListHtml += '<div class="heroList">';
-                    for (i = 0; i < window.heroList.length; i++)
+                    for (var i = 0; i < window.heroList.length; i++)
                     {
                         if (window.heroList[i]['a'] == j)
                         {

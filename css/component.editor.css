@@ -22,22 +22,26 @@
 
 .heroList {
     width: 100%;
-    margin: 10px auto 10px auto;
+    /* margin: 10px auto 10px auto; */
     /* max-width: 702px; */
     clear: both;
 }
 
+#editAccordion{
+    /* margin: 10px auto 10px auto; */
+}
+
 .heroListImg {
     float: left;
-    width: 40px;
-    height: 46px;
+    width: 32px;
+    height: 36px;
     background-color: black;
     margin: 1px 1px 0 0;
 }
 
 .heroListImg img {
-    width: 36px;
-    height: auto;
+    width: 28px;
+    height: 32px;
     margin: 2px;
     cursor: pointer;
 }
@@ -79,7 +83,7 @@ hr {
 
 .blueBold {
     color: rgb(14, 109, 199);
-    font-weight: bold;    
+    font-weight: bold;
 }
 
 .selectedTag
@@ -88,7 +92,7 @@ hr {
 {
     font-weight: bold;
     color: rgb(18, 168, 23);
-}    
+}
 
 
 #editHeroTagPopup
@@ -147,9 +151,10 @@ hr {
 #editHeroTagAbilitiesImgWrap .heroAbilityImg
 {
     width: 50px;
-    height: auto;
+    height: 50px;
     border: 3px solid rgba(0, 0, 0, 0);
-    margin: 3px 0px;
+    margin: 3px 1px;
+    background-color: black;
 }
 
 #editHeroTagAbilitiesImgWrap .selectedAbility {
@@ -170,11 +175,10 @@ hr {
 #tagListWrap{
     line-height: 1;
 }
-
 /* #editInfoTagHeroNone{
     height: 33px!important;
     top: 214px!important;
     margin: 0!important;
     width: 418px!important;
-    display: inline-block!important;    
+    display: inline-block!important;
 } */
