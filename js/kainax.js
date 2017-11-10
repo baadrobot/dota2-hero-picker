@@ -39,6 +39,10 @@ $(document).ready(function ()
     // end of tooltips
 
 
+    // focus first text input on any modal window popup
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('input:not([type]):first').trigger('focus');
+    });
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -46,12 +50,6 @@ $(document).ready(function ()
 
 $(window).on("load",function()
 {
-    // focus input on any modal window popup
-    $('.modal').on('shown.bs.modal', function () {
-        $(this).find('input:first').trigger('focus');
-    });
-
-
     /*
     $('#examplePopup').on('show.bs.modal', function (event)
     {

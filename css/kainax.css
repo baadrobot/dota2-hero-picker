@@ -26,7 +26,7 @@ body > .container {
     color: rgb(18, 168, 23);
 }
 
-.balanceTag {
+.tagBalanceItem div {
     margin: 0 2px;
 	display: inline-block;
 	font-size: 12px;

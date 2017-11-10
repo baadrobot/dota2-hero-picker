@@ -56,14 +56,14 @@ hr {
     visibility: hidden;
 }
 
-.heroBalancePanel img{
+.heroBalancePanel img {
     width: 40px;
     height: auto;
     margin: 1px;
     cursor: pointer;
 }
 
-.heroBalance{
+.heroBalance {
     z-index: 99;
     position: absolute;
     font-weight: 700;
@@ -71,6 +71,45 @@ hr {
     margin: 8px 12px 0px 13px;
     font-size: .8em;
     pointer-events: none;
+}
+
+#balanceRadioWrap {
+    text-align: center;
+}
+
+
+.tagBalanceItem div:nth-child(1),
+.tagBalanceItem div:nth-child(5)
+{
+    width: 34px;
+}
+.tagBalanceItem div:nth-child(2),
+.tagBalanceItem div:nth-child(4)
+{
+    width: 124px;
+}
+.tagBalanceItem div:nth-child(3){
+    margin-left: auto;
+    margin-right: auto;
+    font-family: fantasy;
+    font-size: 19px;
+    color: #dadada;
+}
+.tagBalanceItem div {
+    text-align: center;
+    vertical-align: middle;
+}
+.tagBalanceItem {
+    background-color: rgb(243, 243, 243);
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    margin: 4px 1px;
+    padding: 3px 0;
+}
+.tagBalanceItem:hover {
+    border-color: rgb(104, 154, 208);
+    cursor: pointer;
 }
 
 .noticeRed {

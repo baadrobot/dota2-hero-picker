@@ -505,7 +505,6 @@ function colorizeAllHeroes()
     $('#btnRenameSelectedTagPopup').hide();
 }
 
-//nurax
 function rebuildEditorBalanceTags()
 {
     pleaseWaitOpen();
@@ -530,142 +529,78 @@ function rebuildEditorBalanceTags()
                 {
                     for (var i = 0; i < balanceTagsList.length; i++)
                     {
+                        var balanceSetType = balanceTagsList[i]['setType'];
+                        var firstBalanceTagValue = balanceTagsList[i]['value'];
+
+                        if (balanceSetType == 1)
+                        {
+                            // if counter pick
+                            var balanceSeparator = 'VS';
+                            // we bring with mysql only positive rows in first tags,
+                            // so first always green, second always red for counter
+                            var firstBalanceTagClass = 'noticeGreen';
+                            var secondBalanceTagClass = 'noticeRed';
+
+                            var secondBalanceTagValue = (firstBalanceTagValue * -1);
+                        } else {
+                            // if synergy
+                            var balanceSeparator = '+';
+                            if (firstBalanceTagValue > 0)
+                            {
+                                // if positive synergy, both green
+                                var firstBalanceTagClass = 'noticeGreen';
+                                var secondBalanceTagClass = 'noticeGreen';
+                            } else {
+                                // if negative synergy, both red
+                                var firstBalanceTagClass = 'noticeRed';
+                                var secondBalanceTagClass = 'noticeRed';
+                            }
+                            var secondBalanceTagValue = firstBalanceTagValue;
+                        }
+
                         var firstBalanceTagId = balanceTagsList[i]['firstTagId'];
                         var secondBalanceTagId = balanceTagsList[i]['secondTagId'];
-                        var balanceTagValue = balanceTagsList[i]['value'];
-
                         var firstBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+firstBalanceTagId+'"]').attr('data-tag-name');
                         var secondBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+secondBalanceTagId+'"]').attr('data-tag-name');
 
-                        if (result.balance_tag_array[i]['setType'] == 1)
-                        {
-                            if (balanceTagValue > 0)
-                            {
-                                tagBalanceListEl.append('<div><div class="balanceTag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeGreen"> [' + firstBalanceTagName + ']</div> <div class="balanceTag"><></div> <div class="balanceTag noticeGreen" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeGreen"> ('+balanceTagValue+')</div></div>');
-                            } else {
-                                tagBalanceListEl.append('<div><div class="balanceTag noticeRed" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeRed"> [' + firstBalanceTagName + ']</div> <div class="balanceTag"><></div> <div class="balanceTag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeRed"> ('+balanceTagValue+')</div></div>');
-                            }
-                        } else {
-                            tagBalanceListEl.append('<div><div class="balanceTag noticeGreen" data-tag-id="'+firstBalanceTagId+'" data-tag-value="'+balanceTagValue+'" data-tag-name="'+ firstBalanceTagName +'">('+ balanceTagValue +')</div><div class="balanceTag noticeGreen"> [' + firstBalanceTagName + ']</div> <div class="balanceTag">VS</div> <div class="balanceTag noticeRed" data-tag-id="' + secondBalanceTagId + '" data-tag-name="'+ secondBalanceTagName +'">[' + secondBalanceTagName + ']</div><div class="balanceTag noticeRed"> ('+(balanceTagValue * -1)+')</div></div>');
+                            var balanceRowHtml = '';
+                            balanceRowHtml += '<div class="tagBalanceItem">';
+
+                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'" data-tag-id="'+firstBalanceTagId+'" data-tag-name="'+firstBalanceTagName+'" data-tag-value="'+firstBalanceTagValue+'" data-tag-settype="'+balanceSetType+'">';
+                                    balanceRowHtml += '(' + firstBalanceTagValue + ')';
+                                balanceRowHtml += '</div>';
+                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'">';
+                                    balanceRowHtml += '[' + firstBalanceTagName + ']';
+                                balanceRowHtml += '</div>';
+
+                                balanceRowHtml += '<div>'+balanceSeparator+'</div>';
+
+                                balanceRowHtml += '<div class="'+secondBalanceTagClass+'" data-tag-id="'+secondBalanceTagId+'" data-tag-name="'+secondBalanceTagName+'">';
+                                    balanceRowHtml += '[' + secondBalanceTagName + ']';
+                                balanceRowHtml += '</div>';
+                                balanceRowHtml += '<div class="'+secondBalanceTagClass+'">';
+                                    balanceRowHtml += '(' + secondBalanceTagValue + ')';
+                                balanceRowHtml += '</div>';
+
+                            tagBalanceListEl.append(balanceRowHtml);
                         }
                     }
+
+                    $('#tagBalanceListWrap .tagBalanceItem').click(function ()
+                    {
+                        tagBalancePopupDo('edit', $(this));
+                    });
+
+                    // toDo Kainax: click for tag
+                    // $('#tagBalanceListWrap .tag:first').parent().click(function ()
+                    // {
+                    //     tagBalancePopupDo('edit', $(this));
+                    // });
                 }
-
-                // $('#tagBalanceListWrap .tag:first').parent().click(function ()
-                // {
-                //     tagBalancePopupDo('edit', $(this));
-                // });
-
-
-                $('#tagBalanceListWrap div').click(function ()
+                else if (result.php_result == 'ERROR')
                 {
-                    tagBalancePopupDo('edit', $(this));
-                });
-
-
-                // $('#tagBalanceListWrap [data-tag-name="'+ balanceTagsList[i] +'"]').attr('data-tag-name');
-
-                // add click listener
-                // tagListEl.find('.tag').click(function ()
-                // {
-                //     if ($(this).hasClass('selectedTag'))
-                //     {
-                //         // tag off
-                //         $(this).removeClass('selectedTag');
-
-                //         colorizeAllHeroes();
-
-                //     } else
-                //     {
-                //         // tag on
-                //         $('.selectedTag').removeClass('selectedTag');
-                //         $(this).addClass('selectedTag');
-
-                //         var selectedTagName = $(this).text();
-                //         $('.editHeroTagInfoText').each(function ()
-                //         {
-                //             $(this).html(
-                //                 $(this).attr('data-template-text').replace(/{TAG}/, '<span id="editHeroTagTagName" class="greenBold">'+selectedTagName+'</span>')
-                //             );
-                //         });
-
-                //         // show minus and rename btns
-                //         $('#btnDeleteSelectedTagPopup').show();
-                //         $('#btnRenameSelectedTagPopup').show();
-
-                //         pleaseWaitOpen();
-
-                //         $.ajax({
-                //             url: 'php/ajax.editor.php',
-                //             data: {  ajaxType: 'getHeroesWithSelectedTag'
-                //                       ,tagId : $(this).attr('data-tag-id')
-                //                     },
-                //             datatype: 'jsonp',
-                //             type: 'POST',
-                //             cache: false,
-                //             success: function (result)
-                //             {
-                //                 if (result.php_result == 'OK')
-                //                 {
-                //                     if (result.hero_id_and_value_array == "NONE")
-                //                     {
-                //                         $('.heroListImg').each(function ()
-                //                         {
-                //                             $(this).addClass('grayscale');
-                //                             $(this).find('.heroTagValue').html('');
-                //                         });
-                //                     } else
-                //                     {
-                //                         $('.heroListImg').each(function ()
-                //                         {
-                //                             var isFound = false;
-                //                             for (var i = 0; i < result.hero_id_and_value_array.length; i++)
-                //                             {
-                //                                 if ($(this).attr('data-hero-id') == (result.hero_id_and_value_array[i]['id']))
-                //                                 {
-                //                                     isFound = true;
-                //                                     break;
-                //                                 }
-                //                             }
-
-                //                             var heroTagValueSpan = $(this).find('.heroTagValue');
-                //                             if (isFound)
-                //                             {
-                //                                 heroTagValueSpan.html(result.hero_id_and_value_array[i]['value']);
-                //                                 heroTagValueSpan.css('margin-left', ($(this).width() / 2) - (heroTagValueSpan.width() / 2) + 'px');
-                //                                 $(this).removeClass('grayscale');
-                //                             } else {
-                //                                 heroTagValueSpan.html('');
-                //                                 $(this).addClass('grayscale');
-                //                             }
-                //                         });
-                //                     }
-                //                     // callbackNextFunction(result.tag_array);
-                //                 }
-                //                 else if (result.php_result == 'ERROR')
-                //                 {
-                //                     console.log(result.php_error_msg);
-                //                 };
-                //             },
-                //             complete: function (result)
-                //             {
-                //                 pleaseWaitClose();
-                //             },
-                //             error: function (request, status, error)
-                //             {
-                //                 // we recieved NOT json
-                //                 console.log(error);
-                //             }
-                //         });
-
-                //     }
-
-                // });
-            }
-            else if (result.php_result == 'ERROR')
-            {
-                console.log(result.php_error_msg);
-            };
+                    console.log(result.php_error_msg);
+                };
         },
         complete: function (result)
         {
@@ -926,55 +861,69 @@ function bindInputTagAlreadyExists(inputSelector)
 
 function editBalancePopupDecideBtnCreate()
 {
-    if (($('#combobox1 input').val() != '') && ($('#combobox2 input').val() != '')
-    && ($('#combobox1 input').val() != $('#combobox2 input').val())
-    )
-    {
-        var var1 = true;
-    } else {
-        var var1 = false;
-    }
+    var editBalancePopupEl = $('#editBalancePopupHtml');
+    var combo1Val = editBalancePopupEl.find('#combobox1 input').val();
+    var combo2Val = editBalancePopupEl.find('#combobox2 input').val();
+    var sliderValue = $("#editBalanceTagSlider").slider('value');
+    var isCounterPick = ($('[name="counterpickOrSynergy"]:checked').val() == 1);
 
-    // for synergy
-    if (($('#combobox1 input').val() != '') && ($('#combobox2 input').val() != '')
-    && ($('#combobox1 input').val() == $('#combobox2 input').val())
-    )
-    {
-        var var3 = true;
-    } else {
-        var var3 = false;
-    }
+    console.log('A:'+$('[name="counterpickOrSynergy"]').val());
+    console.log('B:'+$('[name="counterpickOrSynergy"]:checked').val());
 
-    if (($( "#editBalanceTagSlider" ).slider('value') != 0))
+    if (sliderValue > 0)
     {
-        var var2 = true;
-    } else {
-        var var2 = false;
-    }
-
-    if ($('[name="counterpickOrSynergy"]:checked').val() == 1)
-    {
-        if (var2 && var3)
+        editBalancePopupEl.removeClass('sliderLess').addClass('sliderMore');
+        if (isCounterPick)
         {
-            $('#btnConfirmDialogOK').removeAttr('disabled');
-        } else {
-            $('#btnConfirmDialogOK').attr('disabled', 'disable');
+            editBalancePopupEl.removeClass('rrred').removeClass('gggreen');
+        } else
+        {
+            editBalancePopupEl.removeClass('rrred').addClass('gggreen');
         }
-    } else {
-        if (var1 && var2)
+    } else if (sliderValue < 0)
+    {
+        if (isCounterPick)
         {
-            $('#btnConfirmDialogOK').removeAttr('disabled');
-        } else {
-            $('#btnConfirmDialogOK').attr('disabled', 'disable');
-        } 
+            editBalancePopupEl.removeClass('rrred').removeClass('gggreen');
+        } else
+        {
+            editBalancePopupEl.removeClass('gggreen').addClass('rrred');
+        }
+        editBalancePopupEl.removeClass('sliderMore').addClass('sliderLess');
+    } else {
+        editBalancePopupEl.removeClass('sliderLess').removeClass('sliderMore').removeClass('rrred').removeClass('gggreen').removeClass('cccolorForSynergy');
     }
 
-    // if (var1 && var2)
-    // {
-    //     $('#btnConfirmDialogOK').removeAttr('disabled');
-    // } else {
-    //     $('#btnConfirmDialogOK').attr('disabled', 'disable');
-    // }
+    var isBothComboboxNotEmpty = ((combo1Val != '') && (combo2Val != ''));
+    var isBothComboboxDifferent = (combo1Val != combo2Val);
+    var isSliderValueZero = (sliderValue == 0);
+
+    var isBtnEnabled;
+
+    if ((isSliderValueZero) || (!isBothComboboxNotEmpty))
+    {
+        isBtnEnabled = false;
+    } else {
+        if (isCounterPick)
+        {
+            if (isBothComboboxDifferent)
+            {
+                isBtnEnabled = true;
+            } else {
+                isBtnEnabled = false;
+            }
+        } else {
+            // if synergy
+            isBtnEnabled = true;
+        }
+    }
+
+    if (isBtnEnabled)
+    {
+        $('#btnConfirmDialogOK').removeAttr('disabled');
+    } else {
+        $('#btnConfirmDialogOK').attr('disabled', 'disable');
+    }
 }
 
 function rebuildAll(tagsArray)
@@ -986,16 +935,17 @@ function rebuildAll(tagsArray)
 function tagBalancePopupDo(addOrEdit, clickedEl)
 {
     var question = '';
-
-    question += '<div class="form-check form-check-inline">';
-        question += '<label class="form-check-label">';
-        question += '<input class="form-check-input" type="radio" name="counterpickOrSynergy" checked="checked" value="0"> Контрпик';
-        question += '</label>';
-    question += '</div>';
-    question += '<div class="form-check form-check-inline">';
-       question += ' <label class="form-check-label">';
-       question += ' <input class="form-check-input" type="radio" name="counterpickOrSynergy" value="1"> Синергия';
-       question += '</label>';
+    question += '<div id="balanceRadioWrap">';
+        question += '<div class="form-check form-check-inline">';
+            question += '<label class="form-check-label">';
+                question += '<input class="form-check-input" type="radio" name="counterpickOrSynergy" value="1"> Контрпик';
+            question += '</label>';
+        question += '</div>';
+        question += '<div class="form-check form-check-inline">';
+            question += ' <label class="form-check-label">';
+                question += ' <input class="form-check-input" type="radio" name="counterpickOrSynergy" value="0"> Синергия';
+            question += '</label>';
+        question += '</div>';
     question += '</div>';
 
     question += '<div id="editBalancePopupHtml" class="form-group ui-widget">';
@@ -1042,15 +992,12 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
             {
                 if ($(this).val() == 1)
                 {
-                    $('#editBalancePopupHtml').addClass('cccolorForSynergy');                
+                    $('#editBalancePopupHtml').addClass('cccolorForSynergy');
                 } else {
                     $('#editBalancePopupHtml').removeClass('cccolorForSynergy');
                 }
-                // console.log( $(this).val() );
-                
-                // Написать чтоб при клике на радио кнопки срабатывал слайд или чендж, 
-                // чтобы менялся дизейблд у кнопки назначения, а пока просто при клике отключаем кнопку
-                $('#btnConfirmDialogOK').attr('disabled', 'disable');
+                editBalancePopupDecideBtnCreate();
+                //$('#btnConfirmDialogOK').attr('disabled', 'disable');
             });
 
             // console.log($('[name="counterpickOrSynergy"]:checked').val());
@@ -1068,82 +1015,61 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                     editBalancePopupDecideBtnCreate();
                 }
             });
-            //$("#combobox2 select").combobox();
-            $('#combobox1 a, #combobox2 a').tooltip({
-                disabled: true
-              });
+
+            $('#combobox1 a, #combobox2 a').tooltip({disabled: true});
 
             var handle2 = $( "#custom-handle2" );
-            $( "#editBalanceTagSlider" ).slider({
-              max: 50,
-              min: -50,
-              value: 0,
-              range: "min",
-              create: function() {
-                handle2.text( $( this ).slider( "value" ) );
-              },
-              change: function( event, ui )
-              {
-                handle2.text( ui.value );
-                $(this).slider('option', 'slide').call($(this), event, ui);
-              },
-              slide: function( event, ui )
-              {
-                handle2.text( ui.value );
+            $("#editBalanceTagSlider").slider({
+                max: 50,
+                min: -50,
+                value: 0,
+                range: "min",
+                create: function() {
+                    handle2.text( $( this ).slider( "value" ) );
+                },
+                change: function( event, ui )
+                {
+                    handle2.text( ui.value );
+                    $(this).slider('option', 'slide').call($(this), event, ui);
+                },
+                slide: function( event, ui )
+                {
+                    handle2.text( ui.value );
 
-                if (ui.value > 0)
-                {
-                    $('#editBalancePopupHtml').removeClass('sliderLess').addClass('sliderMore');
-                    if ($('[name="counterpickOrSynergy"]:checked').val() == 1) 
-                    {
-                        $('#editBalancePopupHtml').removeClass('rrred').addClass('gggreen');
-                    } else 
-                    {
-                        $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
-                    }
-                } else if (ui.value < 0)
-                {
-                    if ($('[name="counterpickOrSynergy"]:checked').val() == 1) 
-                    {
-                        $('#editBalancePopupHtml').removeClass('gggreen').addClass('rrred');
-                    } else 
-                    {
-                        $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
-                    }
-                    $('#editBalancePopupHtml').removeClass('sliderMore').addClass('sliderLess');
-                    // $('#editBalancePopupHtml').removeClass('gggreen').addClass('rrred');
-                } else {
-                    $('#editBalancePopupHtml').removeClass('sliderLess').removeClass('sliderMore');
-                    // $('#editBalancePopupHtml').removeClass('rrred').removeClass('gggreen');
+                    editBalancePopupDecideBtnCreate();
                 }
-
-                editBalancePopupDecideBtnCreate();
-              }
             });
 
-            // if (addOrEdit == 'new')
-            // {
-            //     $('#btnConfirmDialogDelete').hide();
-            // }
-
-            if (addOrEdit == 'edit')
+            if (addOrEdit == 'new')
             {
+                $("#balanceRadioWrap input:first").prop('checked', true);
+            }
+            else if (addOrEdit == 'edit')
+            {
+                $("#balanceRadioWrap input").attr('disabled', 'disabled');
                 $("#combobox1 select, #combobox2 select").combobox('disable');
 
-                $('#combobox1 select').combobox('value', clickedEl.find('span:first').attr('data-tag-id'));
-                $('#combobox2 select').combobox('value', clickedEl.find('span:last').attr('data-tag-id'));
+                $('#combobox1 select').combobox('value', clickedEl.find('[data-tag-id]:first').attr('data-tag-id'));
+                $('#combobox2 select').combobox('value', clickedEl.find('[data-tag-id]:last').attr('data-tag-id'));
 
-                $( "#editBalanceTagSlider" ).slider('value', clickedEl.find('span:first').attr('data-tag-value'));
+                $("#editBalanceTagSlider").slider('value', clickedEl.find('[data-tag-value]').attr('data-tag-value'));
+
+                if (clickedEl.find('[data-tag-settype]').attr('data-tag-settype') == 1)
+                {
+                    // editing counterPick
+                    $("#balanceRadioWrap input:first").prop('checked', true);
+                } else {
+                    // editing synergy
+                    $("#balanceRadioWrap input:last").prop('checked', true);
+                }
 
                 // console.log($('#combobox1 option:selected').val());
                 $('#btnConfirmDialogDelete').show();
-                //todo: add delete button
+
+                editBalancePopupDecideBtnCreate();
             }
 
-            // $('#inputCreateNewTagName').val('');
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
-            // bindInputTagAlreadyExists('#inputCreateNewTagName');
-            // $('#noticeTagExist').hide();
         }
         ,onAfterShow : function ()
         {
