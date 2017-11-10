@@ -5,6 +5,7 @@
                     ,cf_d2HeroList_name_en_US as `n`
                     ,cf_d2HeroList_codename as `cn`
                     ,cf_d2HeroList_primary_attr as `a`
+                    ,cf_d2HeroList_name_aliases as `na`
                     -- ,cf_d2HeroList_icon as `icon`
                 FROM tb_dota2_hero_list ORDER BY cf_d2HeroList_name_en_US;';
 
@@ -37,6 +38,7 @@
     //echo '<div class="container-fluid">';
         echo '<div class="row">';
             echo '<div id="heroListWrap" class="col-8">';
+                echo '<input type="text" id="nameAliasesInput">';
                 // hero list >>>>>>>>>>>>>>>>>
             echo '</div>';
 
@@ -257,6 +259,7 @@ echo '<script>';
     echo 'window.LangPreStr["EDITOR"]["_SET_"] = "Назначить";';
 
     echo 'window.LangPreStr["EDITOR"]["_SET_BALANCE_"] = "Назначение баланса между тэгами";';
+
 
 echo '</script>';
 

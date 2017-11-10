@@ -1,7 +1,7 @@
 $(document).ready(function ()
 {
     buildHeroList('#heroListWrap');
-
+    
 
     $('#editAccordion i').click(function ()
     {
@@ -487,7 +487,36 @@ $(document).ready(function ()
 
 $(window).on("load",function()
 {
+    $('#nameAliasesInput').keyup(function() {
+        if ($(this).val() != '')
+        {
+            $('[data-hero-name-aliases]').each(function () 
+            {
+                $(this).addClass('heroListImgOpacity');
 
+                if ( $('#nameAliasesInput').val() == $(this).attr('data-hero-name-aliases') )
+                {
+                    $(this).removeClass('heroListImgOpacity');
+                }
+            });
+        } else {
+            $('[data-hero-name-aliases]').each(function () 
+            {
+                $(this).removeClass('heroListImgOpacity');
+            });
+        }
+
+        // alert( "Handler for .keyup() called." );
+    });
+
+    $('#nameAliasesInput').blur( function () 
+    {
+        $(this).val('');
+        $('[data-hero-name-aliases]').each(function () 
+        {
+            $(this).removeClass('heroListImgOpacity');
+        });
+    });
 });
 // - END WINDOW LOAD////////////////////////////////////
 

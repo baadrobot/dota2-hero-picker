@@ -117,7 +117,7 @@
             }
 
 
-            global $dbClass;
+            // global $dbClass;
 
             foreach ($heroes as $key => $value)
             {
@@ -301,6 +301,12 @@
                             // AbilityUnitTargetFlags // looks like important thing (no basic value)
                             // AbilityUnitTargetFlag // need to find difference btwn this and previous one
 
+                            global $dbClass;
+                            $myQuery = 'INSERT INTO tb_dota2_hero_list 
+                                                SET cf_d2HeroList_name_aliases = ?
+                                                ON DUPLICATE KEY UPDATE cf_d2HeroList_name_aliases = ?;';
+                            $isNameAliasesInsertOk = $dbClass->insert($myQuery, $heroNameAliases, $heroNameAliases);
+
 
                             $query = 'INSERT INTO tb_dota2_hero_ability_list SET
                                 cf_d2HeroAbilityList_id = ?
@@ -348,7 +354,7 @@
                                 ,cf_d2HeroAbilityList_orderPosition = ?
                                 ,cf_d2HeroAbilityList_isAbilityForbidden = 0;';
 
-                            global $dbClass;
+                            // global $dbClass;
                             $isInsertOk = $dbClass->insert($query
                                                         ,$abilityId
                                                         ,$heroId

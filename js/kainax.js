@@ -268,9 +268,9 @@ function getHeroImgPath(heroCodeName, type)
     }
 }
 
-function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan)
+function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNameAliases)
 {
-    var div = '<div class="heroListImg" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
+    var div = '<div class="heroListImg" data-hero-name-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
     if (isNeedValueSpan)
     {
         div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
@@ -296,7 +296,7 @@ function buildHeroList(wrapId)
                         if (window.heroList[i]['a'] == j)
                         {
                             //heroListHtml += '<div>';
-                            heroListHtml += getHeroImg(window.heroList[i]['n'], window.heroList[i]['id'], window.heroList[i]['cn'], isNeedValueSpan);
+                            heroListHtml += getHeroImg(window.heroList[i]['n'], window.heroList[i]['id'], window.heroList[i]['cn'], isNeedValueSpan, window.heroList[i]['na']);
                             //heroListHtml += '</div>';
                         }
                     }

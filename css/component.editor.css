@@ -1,3 +1,7 @@
+.heroListImgOpacity {
+    opacity: 0.3;
+}
+
 .acrdHdrBtn {
     cursor: pointer;
     margin: 5px 0 0 5px;
