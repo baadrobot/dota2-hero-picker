@@ -2,6 +2,11 @@ $(document).ready(function ()
 {
     window.isMobile = false;
 
+
+    // $.fn.valAndTrigger = function (element) {
+    //     return $(this).val(element).trigger('change');
+    // }
+
     // $('[name="counterpickOrSynergy"]').click(function()
     // {
     //     console.log( $(this).val() );

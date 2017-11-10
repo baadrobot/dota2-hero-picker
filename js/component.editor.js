@@ -867,9 +867,6 @@ function editBalancePopupDecideBtnCreate()
     var sliderValue = $("#editBalanceTagSlider").slider('value');
     var isCounterPick = ($('[name="counterpickOrSynergy"]:checked').val() == 1);
 
-    console.log('A:'+$('[name="counterpickOrSynergy"]').val());
-    console.log('B:'+$('[name="counterpickOrSynergy"]:checked').val());
-
     if (sliderValue > 0)
     {
         editBalancePopupEl.removeClass('sliderLess').addClass('sliderMore');
@@ -1005,13 +1002,10 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
             $("#combobox1 select, #combobox2 select").combobox();
 
             $('#combobox1 input, #combobox2 input').autocomplete({
-                select: function()
+                select: function(event, ui)
                 {
-                    //console.log($('#combobox1 option:selected').val());
-                    editBalancePopupDecideBtnCreate();
-                },
-                search: function()
-                {
+                    //$(this).parent().siblings('select').val($(ui.item.option).val());
+                    $(this).val($(ui.item.option).text());
                     editBalancePopupDecideBtnCreate();
                 }
             });

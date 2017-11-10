@@ -33,11 +33,11 @@ $( function() {
         this._on( this.input, {
           autocompleteselect: function( event, ui ) {
             ui.item.option.selected = true;
+            //this.trigger( "kainaxItemSelect",
             this._trigger( "select", event, {
               item: ui.item.option
             });
           },
- 
           autocompletechange: "_removeIfInvalid"
         });
       },
@@ -142,6 +142,7 @@ $( function() {
         this.element.val(myVal); // set select
         var mySelectedEl = this.element.children( ":selected" );
         this.input.val( mySelectedEl.val() ? mySelectedEl.text() : "" );
+        //
       }
     });
  
