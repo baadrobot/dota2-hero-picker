@@ -90,7 +90,7 @@ hr {
 .tagBalanceItem div:nth-child(2),
 .tagBalanceItem div:nth-child(4)
 {
-    width: 124px;
+    width: 119px;
 }
 .tagBalanceItem div:nth-child(3){
     margin-left: auto;
@@ -98,6 +98,7 @@ hr {
     font-family: fantasy;
     font-size: 19px;
     color: #dadada;
+    width: 30px;
 }
 .tagBalanceItem div {
     text-align: center;
@@ -206,18 +207,34 @@ hr {
 
 #editHeroTagAbilitiesImgWrap .heroAbilityImg
 {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     border: 3px solid rgba(0, 0, 0, 0);
     margin: 3px 1px;
     background-color: black;
+    display: inline-block;
 }
-
-#editHeroTagAbilitiesImgWrap .selectedAbility {
+#editHeroTagAbilitiesImgWrap .heroAbilityImg.selectedAbility {
     border: 6px double rgb(18, 168, 23);
 }
 
-#editHeroTagHeroImgWrap .selectedAbility {
+
+#editHeroTagAbilitiesImgWrap .heroAbilityImg img
+{
+    width: 50px;
+    height: 50px;
+    border: none;
+}
+#editHeroTagAbilitiesImgWrap .heroAbilityImg.selectedAbility img
+{
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+}
+
+
+
+#editHeroTagHeroImgWrap.selectedAbility img {
     border: 6px double rgb(18, 168, 23);
 }
 
@@ -230,6 +247,18 @@ hr {
 
 #tagListWrap{
     line-height: 1;
+}
+.smlGrp{
+    width: 219px;
+    height: 25px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.smlGrp .input-group-addon,
+.smlGrp input
+{
+    font-size: 11px;
 }
 /* #editInfoTagHeroNone{
     height: 33px!important;

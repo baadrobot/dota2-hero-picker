@@ -1,5 +1,5 @@
 <?php
-    require_once('php/a_functions.php');
+    //require_once('php/a_functions.php');
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, "https://api.opendota.com/api/heroStats");
@@ -18,6 +18,18 @@
 
     for ($i=0; $i < count($hero_data_array); $i++)
     {
+        $heroFullCodename = $hero_data_array[$i]['name'];
+        $heroCodename = substr($heroFullCodename, strlen($heroKeyPrefix));
+
+                                // getting some data from npc_heroes.txt
+                                if ((isset($heroesFile[$heroFullCodename])) && (isset($heroesFile[$heroFullCodename]['NameAliases'])))
+                                {
+                                    $heroNameAliases = $heroesFile[$heroFullCodename]['NameAliases'];
+                                } else {
+                                    $heroNameAliases = '';
+                                }
+
+        // getting all other from OpenDota Heroes API
         if ($hero_data_array[$i]['primary_attr'] == 'str')
         {
             $primary_attr = 1;
@@ -52,12 +64,13 @@
             $pro_win = $hero_data_array[$i]['pro_win'];
         }
 
-        $codename = substr($hero_data_array[$i]['name'], 14);
+
 
         $myQuery = 'INSERT INTO tb_dota2_hero_list
         (cf_d2HeroList_id,
         cf_d2HeroList_codename,
         cf_d2HeroList_name_en_US,
+        cf_d2HeroList_name_aliases,
         cf_d2HeroList_primary_attr,
         cf_d2HeroList_attack_type,
         cf_d2HeroList_attack_range,
@@ -78,38 +91,40 @@
         cf_d2HeroList_4000_win,
         cf_d2HeroList_5000_pick,
         cf_d2HeroList_5000_win)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON DUPLICATE KEY UPDATE
-        cf_d2HeroList_codename,
-        cf_d2HeroList_name_en_US,
-        cf_d2HeroList_primary_attr,
-        cf_d2HeroList_attack_type,
-        cf_d2HeroList_attack_range,
-        cf_d2HeroList_img,
-        cf_d2HeroList_icon,
-        cf_d2HeroList_move_speed,
-        cf_d2HeroList_cm_enabled,
-        cf_d2HeroList_pro_ban,
-        cf_d2HeroList_pro_pick,
-        cf_d2HeroList_pro_win,
-        cf_d2HeroList_1000_pick,
-        cf_d2HeroList_1000_win,
-        cf_d2HeroList_2000_pick,
-        cf_d2HeroList_2000_win,
-        cf_d2HeroList_3000_pick,
-        cf_d2HeroList_3000_win,
-        cf_d2HeroList_4000_pick,
-        cf_d2HeroList_4000_win,
-        cf_d2HeroList_5000_pick,
-        cf_d2HeroList_5000_win
+        cf_d2HeroList_codename = ?,
+        cf_d2HeroList_name_en_US = ?,
+        cf_d2HeroList_name_aliases = ?,
+        cf_d2HeroList_primary_attr = ?,
+        cf_d2HeroList_attack_type = ?,
+        cf_d2HeroList_attack_range = ?,
+        cf_d2HeroList_img = ?,
+        cf_d2HeroList_icon = ?,
+        cf_d2HeroList_move_speed = ?,
+        cf_d2HeroList_cm_enabled = ?,
+        cf_d2HeroList_pro_ban = ?,
+        cf_d2HeroList_pro_pick = ?,
+        cf_d2HeroList_pro_win = ?,
+        cf_d2HeroList_1000_pick = ?,
+        cf_d2HeroList_1000_win = ?,
+        cf_d2HeroList_2000_pick = ?,
+        cf_d2HeroList_2000_win = ?,
+        cf_d2HeroList_3000_pick = ?,
+        cf_d2HeroList_3000_win = ?,
+        cf_d2HeroList_4000_pick = ?,
+        cf_d2HeroList_4000_win = ?,
+        cf_d2HeroList_5000_pick = ?,
+        cf_d2HeroList_5000_win = ?
         ;';
 
 
 
         $result = $dbClass->insert($myQuery,
             $hero_data_array[$i]['id'],
-            $codename,
+            $heroCodename,
             $hero_data_array[$i]['localized_name'],
+            $heroNameAliases,
             $primary_attr,
             $hero_data_array[$i]['attack_type'],
             $hero_data_array[$i]['attack_range'],
@@ -131,9 +146,9 @@
             $hero_data_array[$i]['5000_pick'],
             $hero_data_array[$i]['5000_win'],
             // on update
-            $hero_data_array[$i]['id'],
-            $codename,
+            $heroCodename,
             $hero_data_array[$i]['localized_name'],
+            $heroNameAliases,
             $primary_attr,
             $hero_data_array[$i]['attack_type'],
             $hero_data_array[$i]['attack_range'],
@@ -158,13 +173,11 @@
 
         if ($result)
         {
-            //echo $codename.' successfully updated<br/>';
+            //echo $heroCodename.' successfully updated<br/>';
         } else {
-            //echo 'NO!!!!! '.$codename.'<br />';
+            //echo 'NO!!!!! '.$heroCodename.'<br />';
         }
     }
-
-
 
 // ****************** download and save hero_abilities_en_US.json
 

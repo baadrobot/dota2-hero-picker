@@ -149,7 +149,8 @@
         $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`, cf_d2TagBalanceSet_set_type as `setType`
                     FROM tb_dota2_tag_balance_set
                     WHERE (cf_d2TagBalanceSet_set_type = 1 AND cf_d2TagBalanceSet_balance_value > 0)
-                    OR    (cf_d2TagBalanceSet_set_type = 0);';
+                    OR    (cf_d2TagBalanceSet_set_type = 0)
+                    ORDER BY cf_d2TagBalanceSet_balance_value DESC;';
         $allBalanceTags = $dbClass->select($query);
 
         // $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
@@ -199,7 +200,7 @@
             $isInsertOk2 = $dbClass->insert($query
                 , $_POST['secondTagId'], $_POST['firstTagId'], $_POST['balanceValue'] * -1, $_POST['setType']
                 , $_POST['secondTagId'], $_POST['firstTagId'], $_POST['balanceValue'] * -1
-            );            
+            );
         }
 
         if ($isInsertOk1 && $isInsertOk2)

@@ -270,12 +270,12 @@ function getHeroImgPath(heroCodeName, type)
 
 function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNameAliases)
 {
-    var div = '<div class="heroListImg" data-hero-name-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
+    var div = '<div class="heroListImg" data-hero-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
     if (isNeedValueSpan)
     {
         div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
     }
-    div += '<img src="'+getHeroImgPath(heroCodeName, 'vert')+'" /></div>';
+    div += '<img data-img-src="'+getHeroImgPath(heroCodeName, 'vert')+'" /></div>';
     return div;
 }
 
@@ -305,6 +305,14 @@ function buildHeroList(wrapId)
             }
         }
         wrapEl.append(heroListHtml);
+        kainaxPreloadImages({wrapElement: wrapEl
+            , gifNameOrFalse: 'spinner.gif'
+            //, gifNameOrFalse: 'eco-ajax-loader-01.gif'
+            , opacity: 0.6
+            , loaderIntH: 10
+            , loaderIntW: 10
+            //, missingPicOrFalse: false
+        });
     }
 }
 
@@ -317,5 +325,68 @@ function getPreStr_js(component, preStr)
         return window.LangPreStr[component][preStr];
     } else {
         return preStr;
+    }
+}
+
+function kainaxPreloadImages(paramObj)
+{
+    wrapEl = paramObj.wrapElement;
+
+    if ((typeof paramObj.missingPicOrFalse == 'undefined') || (paramObj.missingPicOrFalse == 'default'))
+    {
+        // empty ability
+        paramObj.missingPicOrFalse = "//cdn.dota2.com/apps/dota2/images/abilities/rubick_empty1_hp1.png?v=4195662";
+    }
+
+    if (wrapEl.length)
+    {
+        wrapEl.find('img[data-img-src]').each(function ()
+        {
+            $(this)
+                .css('visibility', 'hidden')
+                .on('load', function ()
+                {
+                    $(this).hide().css('visibility', '').fadeIn(700);
+                    if (paramObj.gifNameOrFalse !== false)
+                    {
+                        $(this).siblings('.kainaxImgPreloader').fadeOut(400, function () {
+                            $(this).remove();
+                        });
+                    }
+                })
+                .on('error', function ()
+                {
+                    if (paramObj.missingPicOrFalse !== false)
+                    {
+                        // loasd default missing pic
+                        $(this).attr("src", paramObj.missingPicOrFalse);
+                    } else {
+                        // just remove loader
+                        $(this).siblings('.kainaxImgPreloader').fadeOut(400, function () {
+                            $(this).remove();
+                        });
+                    }
+                })
+                .attr('src', $(this).attr('data-img-src'))
+                .removeAttr('data-img-src');
+
+            if (paramObj.gifNameOrFalse !== false)
+            {
+                // add loader exactly in center
+                var loaderMarginLeftAndRight = Math.round($(this).parent().width() / 2) - (paramObj.loaderIntW / 2);
+                var loaderMarginTopAndBottom = Math.round($(this).parent().height() / 2) - (paramObj.loaderIntH / 2);
+                $(this).parent().prepend(
+                    '<i class="kainaxImgPreloader" style="'
+                        + 'margin:' + loaderMarginTopAndBottom + 'px' + ' ' + loaderMarginLeftAndRight + 'px;'
+                        + 'opacity:' + paramObj.opacity + ';'
+                        + 'width:' + paramObj.loaderIntW + 'px;'
+                        + 'height:' + paramObj.loaderIntH + 'px;'
+                        + 'position:absolute!important;'
+                        + 'background:transparent url(/images/loaders/' + paramObj.gifNameOrFalse + ') no-repeat!important;'
+                        + 'background-size: 100% 100%!important;'
+                    + '"></i>'
+                );
+            }
+        });
     }
 }

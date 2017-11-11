@@ -13,10 +13,10 @@
 
             // // For tests!
             // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
-            // $heroes = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
+            // $heroesFile = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
             // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt';
             // $abilities = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
-            // echo '<pre>',print_r($heroes),'</pre>';
+            // echo '<pre>',print_r($heroesFile),'</pre>';
             // echo '<br>----------------------------------<br>';
             // echo '<br>----------------------------------<br>';
             // echo '<br>----------------------------------<br>';
@@ -55,7 +55,6 @@
             require 'php/template_d2_hero_ability_tooltip.php';
 
         } else {
-            require_once(__DIR__.'/get_hero_data.php');
 
                                     // prepare temp array for forbidden abilities
                                     $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
@@ -75,38 +74,40 @@
             // ****************** read hero info
 
             $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
-            $heroes = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
+            $heroesFile = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
 
             $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_abilities.txt';
             $abilities = getParamsFromDotaFile($heroAbilitiesDota2FilePathName);
 
             $heroKeyPrefix = 'npc_dota_hero_';
 
+            require(__DIR__.'/get_hero_data.php');
 
-            function getHeroAbilityNameIfLegal($heroes, $heroFullCodename, $heroCodename, $abilityIndex)
+
+            function getHeroAbilityNameIfLegal($heroesFile, $heroFullCodename, $heroCodename, $abilityIndex)
             {
 
-                if (isset($heroes[$heroFullCodename]['Ability'.$abilityIndex]))
+                if (isset($heroesFile[$heroFullCodename]['Ability'.$abilityIndex]))
                 {
-                    
+
                     if ($heroCodename == 'sand_king')
                     {
-                        $heroTrickCodename = 'sandking';                       
+                        $heroTrickCodename = 'sandking';
                     } else {
-                        $heroTrickCodename = $heroCodename;                        
+                        $heroTrickCodename = $heroCodename;
                     }
 
                     // if ability name begins with hero codename,
                     // example yeah: ["npc_dota_hero_invoker"]["Ability12"]["invoker_chaos_meteor"]
                     // example nope: ["npc_dota_hero_invoker"]["Ability17"]["special_bonus_unique_invoker_8"]
-                    if ((substr($heroes[$heroFullCodename]['Ability'.$abilityIndex], 0, strlen($heroTrickCodename)) == $heroTrickCodename)
-                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'generic_hidden')
-                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden1')
-                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden2')
-                     && ($heroes[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden3')
+                    if ((substr($heroesFile[$heroFullCodename]['Ability'.$abilityIndex], 0, strlen($heroTrickCodename)) == $heroTrickCodename)
+                     && ($heroesFile[$heroFullCodename]['Ability'.$abilityIndex] != 'generic_hidden')
+                     && ($heroesFile[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden1')
+                     && ($heroesFile[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden2')
+                     && ($heroesFile[$heroFullCodename]['Ability'.$abilityIndex] != 'rubick_hidden3')
                      )
                     {
-                        return $heroes[$heroFullCodename]['Ability'.$abilityIndex];
+                        return $heroesFile[$heroFullCodename]['Ability'.$abilityIndex];
                     } else {
                         return false;
                     }
@@ -119,30 +120,23 @@
 
             // global $dbClass;
 
-            foreach ($heroes as $key => $value)
+            foreach ($heroesFile as $key => $value)
             {
                 if ((substr($key, 0, strlen($heroKeyPrefix)) == $heroKeyPrefix) && ($key != $heroKeyPrefix.'target_dummy' ))
                 {
                     $heroCodename = substr($key, strlen($heroKeyPrefix));
 
-                    $heroId = $heroes[$key]['HeroID'];
-                    $heroRole = $heroes[$key]['Role'];
+                    $heroId = $heroesFile[$key]['HeroID'];
+                    $heroRole = $heroesFile[$key]['Role'];
 
-                    $heroRolelevels = $heroes[$key]['Rolelevels'];
-                    $heroComplexity = $heroes[$key]['Complexity'];
-                    $heroCMEnabled = $heroes[$key]['CMEnabled'];
-
-                    if (isset($heroes[$key]['NameAliases']))
-                    {
-                        $heroNameAliases = $heroes[$key]['NameAliases'];
-                    } else {
-                        $heroNameAliases = '';
-                    }
+                    $heroRolelevels = $heroesFile[$key]['Rolelevels'];
+                    $heroComplexity = $heroesFile[$key]['Complexity'];
+                    $heroCMEnabled = $heroesFile[$key]['CMEnabled'];
 
                     $abilityOrderPosition = -1;
                     for ($i = 1; $i <= 20; $i++) // Kainax: maxed from 9 to 20 for Invoker
                     {
-                        $abilityCodename = getHeroAbilityNameIfLegal($heroes, $key, $heroCodename, $abilityIndex = $i);
+                        $abilityCodename = getHeroAbilityNameIfLegal($heroesFile, $key, $heroCodename, $abilityIndex = $i);
                         if ($abilityCodename !== false)
                         {
                             if (isset($abilities[$abilityCodename]) && (isset($abilities[$abilityCodename]['ID'])))
@@ -300,12 +294,6 @@
                             // AbilityUnitTargetType // not sure if needed
                             // AbilityUnitTargetFlags // looks like important thing (no basic value)
                             // AbilityUnitTargetFlag // need to find difference btwn this and previous one
-
-                            global $dbClass;
-                            $myQuery = 'INSERT INTO tb_dota2_hero_list 
-                                                SET cf_d2HeroList_name_aliases = ?
-                                                ON DUPLICATE KEY UPDATE cf_d2HeroList_name_aliases = ?;';
-                            $isNameAliasesInsertOk = $dbClass->insert($myQuery, $heroNameAliases, $heroNameAliases);
 
 
                             $query = 'INSERT INTO tb_dota2_hero_ability_list SET

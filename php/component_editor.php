@@ -32,14 +32,18 @@
 
     function getHeroImg($heroNameLocal, $heroId, $heroCodeName)
     {
-        return '<div class="heroListImg" data-hero-id="'.$heroId.'" data-hero-codename="'.$heroCodeName.'" data-hero-name="'.$heroNameLocal.'"><img src="'.getHeroImgPath($heroCodeName).'" /></div>';
+        return '<div class="heroListImg" data-hero-id="'.$heroId.'" data-hero-codename="'.$heroCodeName.'" data-hero-name="'.$heroNameLocal.'"><img data-img-src="'.getHeroImgPath($heroCodeName).'" /></div>';
     }
 
     //echo '<div class="container-fluid">';
         echo '<div class="row">';
+
             echo '<div id="heroListWrap" class="col-8">';
-                echo '<input type="text" id="nameAliasesInput">';
-                // hero list >>>>>>>>>>>>>>>>>
+                echo
+                '<div class="input-group smlGrp">
+                    <input id="nameAliasesInput" type="text" class="form-control" placeholder="Поиск героев"/>
+                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                </div>';
             echo '</div>';
 
 
@@ -94,7 +98,9 @@
 
                         echo '<div id="editAccordion1" class="collapse show" role="tabpanel">';
                             echo '<p id="tagListWrap" class="mb-3">';
-                                // Tag List >>>>>>>>>>>>>>>>>>>>
+
+                                echo '<span>Загрузка...</span>';
+
                             echo '</p>';
                         echo '</div>';
                     echo '</div>';
@@ -107,7 +113,9 @@
 
                         echo '<div id="editAccordion2" class="collapse" role="tabpanel">';
                             echo '<p id="tagBalanceListWrap" class="mb-3">';
-                                echo '<span>Test Span</span>';
+
+                                echo '<span>Загрузка...</span>';
+
                             echo '</p>';
                         echo '</div>';
                     echo '</div>';

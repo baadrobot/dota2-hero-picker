@@ -7,6 +7,12 @@ body > .container {
 	padding: 10px 2px;
 }
 
+*:focus {
+	outline: none!important;
+    border-color: #ced4da!important;
+    box-shadow: none!important;
+}
+
 .plus {
     color: #36ff04;
 }
