@@ -254,6 +254,13 @@ hr {
     margin-bottom: 8px;
     font-size: 11px;
 }
+#heroListWrap .smlGrp{
+    display: inline-flex;
+    float: left;
+}
+#heroListWrap .smlGrp:nth-child(2){
+    float: right;
+}
 
 .smlGrp .input-group-addon,
 .smlGrp input

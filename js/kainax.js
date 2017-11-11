@@ -1,16 +1,8 @@
 $(document).ready(function ()
 {
     window.isMobile = false;
+    window.curUserLang = $('meta[name=language]').attr("content");
 
-
-    // $.fn.valAndTrigger = function (element) {
-    //     return $(this).val(element).trigger('change');
-    // }
-
-    // $('[name="counterpickOrSynergy"]').click(function()
-    // {
-    //     console.log( $(this).val() );
-    // });
 
     //''''''''''''''''' Tooltips
     if (!window.isMobile)
@@ -87,7 +79,7 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
     $(wrapIdEl).find('[data-ability-codename]')
     .mouseenter(function ()
     {
-        var heroAbilityCodeName = $(this).attr('data-ability-codename');
+        //var heroAbilityCodeName = $(this).attr('data-ability-codename');
         var heroAbilityCodeName = $(this).attr('data-ability-codename');
 
         var abilityTooltipEl = $('#abilityTooltip');
@@ -106,9 +98,6 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
             abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
             abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
             abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
-            //abilityTooltipEl.find('#abilityNotes').html(window.abilityData[heroAbilityCodeName]['dname']);
-            //abilityTooltipEl.find('#abilityNotes').html(window.abilityData[heroAbilityCodeName]['dname']);
-            //abilityTooltipEl.find('#abilityNotes').html(window.abilityData[heroAbilityCodeName]['dname']);
             window.tooltipBox.html(abilityTooltipEl.html());
         } else {
             // make tooltip Y position higher
@@ -270,7 +259,8 @@ function getHeroImgPath(heroCodeName, type)
 
 function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNameAliases)
 {
-    var div = '<div class="heroListImg" data-hero-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-name="'+heroNameLocal+'">';
+    var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
+    var div = '<div data-inactive-tooltip="'+tooltip+'" class="heroListImg" data-hero-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-namelocal="'+heroNameLocal+'">';
     if (isNeedValueSpan)
     {
         div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
@@ -313,6 +303,8 @@ function buildHeroList(wrapId)
             , loaderIntW: 10
             //, missingPicOrFalse: false
         });
+
+        eXoActivateInactiveTooltips();
     }
 }
 

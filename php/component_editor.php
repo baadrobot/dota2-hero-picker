@@ -15,25 +15,6 @@
         echo 'window.heroList = '.json_encode($hero_array).';';
     echo '</script>';
 
-    // $query = 'SELECT cf_d2TagList_id, cf_d2TagList_name_en_US
-    //             FROM tb_dota2_tag_list ORDER BY cf_d2TagList_name_en_US;';
-
-    // $tag_array = $dbClass->select($query);
-
-    function getHeroImgPath($heroCodeName, $type = 'vert')
-    {
-        if ($type == 'vert')
-        {
-            return '//cdn.dota2.com/apps/dota2/images/heroes/'.$heroCodeName.'_vert.jpg?v=4195662';
-        } else if ($type == 'full') {
-            return '//cdn.dota2.com/apps/dota2/images/heroes/'.$heroCodeName.'_full.png?v=4195662';
-        }
-    }
-
-    function getHeroImg($heroNameLocal, $heroId, $heroCodeName)
-    {
-        return '<div class="heroListImg" data-hero-id="'.$heroId.'" data-hero-codename="'.$heroCodeName.'" data-hero-name="'.$heroNameLocal.'"><img data-img-src="'.getHeroImgPath($heroCodeName).'" /></div>';
-    }
 
     //echo '<div class="container-fluid">';
         echo '<div class="row">';
@@ -41,7 +22,13 @@
             echo '<div id="heroListWrap" class="col-8">';
                 echo
                 '<div class="input-group smlGrp">
-                    <input id="nameAliasesInput" type="text" class="form-control" placeholder="Поиск героев"/>
+                    <input id="SearchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>
+                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                </div>';
+
+                echo
+                '<div class="input-group smlGrp">
+                    <input id="SearchAbilityInput" type="text" class="form-control" placeholder="Поиск по способностям"/>
                     <span class="input-group-addon"><i class="fa fa-search"></i></span>
                 </div>';
             echo '</div>';
@@ -50,42 +37,6 @@
 // ----------------------------- Editor panel
 
             echo '<div class="col-4">';
-
-                // echo '<div class="row">';
-                //     echo '<div class="card col-12">';
-                //         echo '<div class="card-body">';
-                //             echo '<span class="h4 text-secondary">Список тэгов</span>';
-                //             echo '<i id="btnCreateNewTagPopup" class="fa fa-plus-square text-secondary" aria-hidden="true"></i>';
-                //             echo '<i id="btnDeleteSelectedTagPopup" class="fa fa-minus-square text-secondary" aria-hidden="true"></i>';
-
-                //             echo '<p id="tagListWrap">';
-                //                 // for ($i=0; $i < count($tag_array); $i++)
-                //                 // {
-                //                 //     echo '<span class="tag">['.$tag_array[$i]['cf_d2TagList_name_en_US'].']</span>';
-                //                 // }
-                //             echo '</p>';
-                //         echo '</div>';
-                //     echo '</div>';
-                // echo '</div>';
-
-                // echo '<div class="row">';
-                //     echo '<div class="card col-12">';
-                //         echo '<div class="card-body">';
-                //             echo '<span class="h4 text-secondary">Список тэгов</span>';
-                //             echo '<i id="btnCreateNewTagPopup" class="fa fa-plus-square text-secondary" aria-hidden="true"></i>';
-                //             echo '<i id="btnDeleteSelectedTagPopup" class="fa fa-minus-square text-secondary" aria-hidden="true"></i>';
-
-                //             echo '<p id="tagListWrap">';
-                //                 // for ($i=0; $i < count($tag_array); $i++)
-                //                 // {
-                //                 //     echo '<span class="tag">['.$tag_array[$i]['cf_d2TagList_name_en_US'].']</span>';
-                //                 // }
-                //             echo '</p>';
-                //         echo '</div>';
-                //     echo '</div>';
-                // echo '</div>';
-
-
 
                 echo '<div id="editAccordion" data-children=".item">';
                     echo '<div class="item">';
@@ -121,39 +72,6 @@
                     echo '</div>';
                 echo '</div>';
 
-/*
-                echo '<div class="row">';
-                    echo '<div class="card col-12">';
-                        echo '<div class="card-body">';
-                            echo '<h6 class="text-secondary">Баланс с вражескими героями:</h6>';
-                            echo '<p class="heroBalancePanel">';
-                                echo '<span><span class="heroBalance plus">+70</span><img src="'.getHeroImgPath('beastmaster', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+70</span><img src="'.getHeroImgPath('mirana', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+70</span><img src="'.getHeroImgPath('batrider', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+70</span><img src="'.getHeroImgPath('bane', 'full').'"></span>';
-                                echo '<span><span class="heroBalance minus">-40</span><img src="'.getHeroImgPath('axe', 'full').'"></span>';
-                                echo '<span><span class="heroBalance minus">-80</span><img src="'.getHeroImgPath('ancient_apparition', 'full').'"></span>';
-                            echo '</p>';
-                        echo '</div>';
-                    echo '</div>';
-                echo '</div>';
-
-                echo '<div class="row">';
-                    echo '<div class="card col-12">';
-                        echo '<div class="card-body">';
-                            echo '<h6 class="text-secondary">Синергия с союзными героями:</h6>';
-                            echo '<p class="heroBalancePanel">';
-                                echo '<span><span class="heroBalance plus">+30</span><img src="'.getHeroImgPath('ember_spirit', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+30</span><img src="'.getHeroImgPath('weaver', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+30</span><img src="'.getHeroImgPath('night_stalker', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+20</span><img src="'.getHeroImgPath('bristleback', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+20</span><img src="'.getHeroImgPath('slardar', 'full').'"></span>';
-                                echo '<span><span class="heroBalance plus">+20</span><img src="'.getHeroImgPath('viper', 'full').'"></span>';
-                            echo '</p>';
-                        echo '</div>';
-                    echo '</div>';
-                echo '</div>';
-*/
             echo '</div>';
         echo '</div>';
     //echo '</div>';
@@ -230,10 +148,8 @@ echo '
                     <div id="custom-handle" class="ui-slider-handle"></div>
                 </div>
             </div>';
-        //   <div class="form-group">
-        //     <label for="message-text" class="col-form-label">Message:</label>
-        //     <textarea class="form-control" id="message-text"></textarea>
-        //   </div>
+
+
 echo
       '</div>
       <div class="modal-footer">

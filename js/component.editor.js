@@ -251,16 +251,16 @@ $(document).ready(function ()
                 .attr('data-hero-id', clickedheroId )
                 .attr('data-hero-codename', curSelectedHeroEl.attr('data-hero-codename') );
 
-            $('#editHeroTagHeroName').text( curSelectedHeroEl.attr('data-hero-name') );
+            $('#editHeroTagHeroName').text( curSelectedHeroEl.attr('data-hero-namelocal') );
             //     .attr( 'data-hero-id', clickedheroId )
             //     .attr( 'data-hero-codename', curSelectedHeroEl.attr('data-hero-codename'));
 
-            mainHeroImgPrapEl = $('#editHeroTagHeroImgWrap');
-            mainHeroImgPrapEl.find('img')
+            mainHeroImgWrapEl = $('#editHeroTagHeroImgWrap');
+            mainHeroImgWrapEl.find('img')
                 .removeAttr('src')
                 .attr('data-img-src', '//cdn.dota2.com/apps/dota2/images/heroes/' + curSelectedHeroEl.attr('data-hero-codename') + '_full.png?v=4212550');
 
-            kainaxPreloadImages({wrapElement: mainHeroImgPrapEl
+            kainaxPreloadImages({wrapElement: mainHeroImgWrapEl
                 //, gifNameOrFalse: 'spinner.gif'
                 , gifNameOrFalse: 'eco-ajax-loader-01.gif'
                 , opacity: 0.8
@@ -294,7 +294,7 @@ $(document).ready(function ()
                         $('.heroAbilityImg').click(function ()
                         {
                             // remove from hero picture
-                            $('#editHeroTagHeroImgWrap').removeClass('selectedAbility');
+                            mainHeroImgWrapEl.removeClass('selectedAbility');
 
                             // toggle on ability
                             $(this).toggleClass('selectedAbility');
@@ -308,18 +308,18 @@ $(document).ready(function ()
 
                         if (result.tag_result == 'NONE')
                         {
-                            $('#editHeroTagHeroImgWrap .selectedAbility').removeClass('selectedAbility');
+                            $('#editHeroTagHeroImgWrap.selectedAbility').removeClass('selectedAbility');
                             $('#btnEditHeroTagUnset').hide();
                             //tagValue
                         } else if (result.tag_result == 'HERO')
                         {
                             //$('#editHeroTagAbilitiesImgWrap .selectedAbility').removeClass('selectedAbility');
-                            $('#editHeroTagHeroImgWrap .selectedAbility').addClass('selectedAbility');
+                            $('#editHeroTagHeroImgWrap.selectedAbility').addClass('selectedAbility');
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);
                             $('#btnEditHeroTagUnset').show();
                         } else {
-                            $('#editHeroTagHeroImgWrap .selectedAbility').removeClass('selectedAbility');
+                            $('#editHeroTagHeroImgWra.selectedAbility').removeClass('selectedAbility');
 
                             var selectedTagsIdArray = result.tag_result.split(' ');
                             for (var i = 0; i < selectedTagsIdArray.length; i++)
@@ -489,23 +489,18 @@ $(document).ready(function ()
       }
     });
 
-    $('#btnEditHeroTagUnsetCancel').click(function ()
+    // hero search
+    $('#SearchHeroAliasInput')
+    .on('keyup', function ()
     {
-        $('#editHeroTagPopup').modal();
-    });
-
-
-
-    $('#nameAliasesInput').keyup(function ()
-    {
-        var heroSearchVal = $(this).val();
+        var heroSearchVal = $(this).val().toLowerCase();
         if (heroSearchVal != '')
         {
             $('[data-hero-aliases]').each(function ()
             {
-                var allAliases = $(this).attr('data-hero-aliases')
-                    //+ '|' + $(this).attr('data-localized-name')
-                    + '|' + $(this).attr('data-hero-codename');
+                var allAliases = ($(this).attr('data-hero-aliases')
+                    + '|' + $(this).attr('data-hero-namelocal')
+                    + '|' + $(this).attr('data-hero-codename')).toLowerCase();
 
                 if (allAliases.indexOf($.trim(heroSearchVal)) !== -1)
                 {
@@ -515,23 +510,102 @@ $(document).ready(function ()
                 }
             });
         } else {
-            $('[data-hero-aliases]').each(function ()
-            {
-                $(this).removeClass('heroListImgOpacity');
-            });
+            $('.heroListImgOpacity').removeClass('heroListImgOpacity');
         }
-
-        // alert( "Handler for .keyup() called." );
-    });
-
-    $('#nameAliasesInput').blur( function ()
+    }).on('blur', function ()
     {
         $(this).val('');
-        $('[data-hero-aliases]').each(function ()
-        {
-            $(this).removeClass('heroListImgOpacity');
-        });
+        $('.heroListImgOpacity').removeClass('heroListImgOpacity');
     });
+
+
+
+
+    function abilityTextConcatForHero(abilityObj, curHeroCodename)
+    {
+        var resultText = '';
+        Object.keys(abilityObj).forEach(function(keyAbilityCodename)
+        {
+            if (keyAbilityCodename.startsWith(curHeroCodename))
+            {
+                resultText += ('|'+window.abilityData[keyAbilityCodename]['dname']
+                +'|'+ abilityObj[keyAbilityCodename]['affects']
+                +'|'+ abilityObj[keyAbilityCodename]['desc']
+                +'|'+ abilityObj[keyAbilityCodename]['notes']).toLowerCase();
+            // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
+            // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
+            // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
+            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);                
+            }
+        });
+        return resultText;
+    }
+
+    function searchAllAbilitiesTextDo()
+    {
+        var abilitySearchVal = $('#SearchAbilityInput').val().toLowerCase();
+        if (abilitySearchVal != '')
+        {
+                $('[data-hero-codename]').each(function ()
+                {
+                    var curHeroCodename = $(this).attr('data-hero-codename');
+                    if (curHeroCodename == 'sand_king')
+                    {
+                        curHeroCodename = 'sandking';
+                    }
+                    var curHeroAllAbilitiesString = '';
+                    if (typeof window.abilityData != 'undefined')
+                    {
+                        curHeroAllAbilitiesString += abilityTextConcatForHero(window.abilityData, curHeroCodename);
+                    }
+
+                    if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined'))
+                    {
+                        curHeroAllAbilitiesString += abilityTextConcatForHero(window.abilityDataEnglish, curHeroCodename);
+                    }
+
+                    if (curHeroAllAbilitiesString.indexOf($.trim(abilitySearchVal)) !== -1)
+                    {
+                        $(this).removeClass('heroListImgOpacity');
+                    } else {
+                        $(this).addClass('heroListImgOpacity');
+                    }                    
+                });
+        } else {
+            $('.heroListImgOpacity').removeClass('heroListImgOpacity');
+        }
+    }    
+
+    // ability search
+    $('#SearchAbilityInput')
+    .on('keyup', function ()
+    {
+        if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
+        {
+            $(this).blur();
+            var textBeforeBlur = $(this).val();
+
+                pleaseWaitOpen();
+                $.ajax({
+                    url: 'https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=loretwo&l=english'
+                    ,dataType:  'jsonp'
+                    ,jsonpCallback: 'loretwo'
+                    ,success: function(data)
+                    {
+                        pleaseWaitClose();
+                        window.abilityDataEnglish = data["abilitydata"];
+                        $('#SearchAbilityInput').val(textBeforeBlur).focus();
+                        searchAllAbilitiesTextDo();
+                    }
+                });
+        } else {
+            searchAllAbilitiesTextDo();
+        }
+    }).on('blur', function ()
+    {
+        $(this).val('');
+        $('.heroListImgOpacity').removeClass('heroListImgOpacity');
+    });    
 
 });
 // - END DOC READY//////////////////////////////////////
