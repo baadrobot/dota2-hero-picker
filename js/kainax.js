@@ -127,8 +127,13 @@ function eXoActivateInactiveTooltips()
         jQuery(this).attr('data-active-tooltip', jQuery(this).attr('data-inactive-tooltip')).removeAttr('data-inactive-tooltip');
 
         if (!window.isMobile) {
-            jQuery(this).hover(function () {
+            jQuery(this).hover(function ()
+            {
                 var tooltipOrTooltipDiv = jQuery(this).attr('data-active-tooltip');
+                if (typeof jQuery(this).attr('data-extra-tooltip') != 'undefined')
+                {
+                    tooltipOrTooltipDiv += jQuery(this).attr('data-extra-tooltip');
+                }
 
                 if (tooltipOrTooltipDiv[0] == '#')
                 {

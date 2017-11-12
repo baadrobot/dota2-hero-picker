@@ -20,17 +20,17 @@
         echo '<div class="row">';
 
             echo '<div id="heroListWrap" class="col-8">';
-                echo
-                '<div class="input-group smlGrp">
-                    <input id="SearchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>
-                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                </div>';
 
-                echo
-                '<div class="input-group smlGrp">
-                    <input id="SearchAbilityInput" type="text" class="form-control" placeholder="Поиск по способностям"/>
-                    <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                </div>';
+                echo '<div class="input-group smlGrp">';
+                    echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
+                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                echo '</div>';
+
+                echo '<div class="input-group smlGrp">';
+                    echo '<input id="searchAbilityInput" type="text" class="form-control" placeholder="Поиск по способностям"/>';
+                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                echo '</div>';
+
             echo '</div>';
 
 
@@ -115,51 +115,51 @@
 // </div>';
 
 //**************************************************/
-echo
-'<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Назначение тэга</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-            <span id="editHeroTagHeroName" class="blueBold"></span>
-            <div id="editHeroTagHeroImgWrap">
-                <img>
-            </div>
 
-            <div id="editHeroTagAbilitiesImgWrap">
+echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-hidden="true">';
+  echo '<div class="modal-dialog" role="document">';
+    echo '<div class="modal-content">';
+      echo '<div class="modal-header">';
+        echo '<h5 class="modal-title">Назначение тэга</h5>';
+        echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+          echo '<span aria-hidden="true">&times;</span>';
+        echo '</button>';
+      echo '</div>';
+      echo '<div class="modal-body">';
+            echo '<span id="editHeroTagHeroName" class="blueBold"></span>';
+            echo '<div id="editHeroTagHeroImgWrap">';
+                echo '<img>';
+            echo '</div>';
 
-            </div>
+            echo '<div id="editHeroTagAbilitiesImgWrap">';
 
-            <div class="form-group">
-                <span id="editHeroTagInfoNone" class="editHeroTagInfoText col-form-label" data-template-text="Выберите героя или способности для тега {TAG}"></span>
-                <span id="editHeroTagInfoHero" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на героя"></span>
-                <span id="editHeroTagInfoAbilities" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на выбранные способности"></span>';
+            echo '</div>';
 
-echo '
-            </div>
-
-            <div class="form-group">
-                <div id="editHeroTagSlider">
-                    <div id="custom-handle" class="ui-slider-handle"></div>
-                </div>
-            </div>';
+            echo '<div class="form-group">';
+                echo '<span id="editHeroTagInfoNone" class="editHeroTagInfoText col-form-label" data-template-text="Выберите героя или способности для тега {TAG}"></span>';
+                echo '<span id="editHeroTagInfoHero" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на героя"></span>';
+                echo '<span id="editHeroTagInfoAbilities" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на выбранные способности"></span>';
 
 
-echo
-      '</div>
-      <div class="modal-footer">
-        <button id="btnEditHeroTagUnset" type="button" class="btn btn-danger" >Снять тэг</button>
-        <button id="btnEditHeroTagDo" type="button" class="btn btn-primary">Назначить</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-      </div>
-    </div>
-  </div>
-</div>';
+            echo '</div>';
+
+            echo '<div class="form-group">';
+                echo '<div id="editHeroTagSlider">';
+                    echo '<div id="custom-handle" class="ui-slider-handle"></div>';
+                echo '</div>';
+            echo '</div>';
+
+
+
+      echo '</div>';
+      echo '<div class="modal-footer">';
+        echo '<button id="btnEditHeroTagUnset" type="button" class="btn btn-danger" >Снять тэг</button>';
+        echo '<button id="btnEditHeroTagDo" type="button" class="btn btn-primary">Назначить</button>';
+        echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>';
+      echo '</div>';
+    echo '</div>';
+  echo '</div>';
+echo '</div>';
 
 
 

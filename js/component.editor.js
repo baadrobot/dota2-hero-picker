@@ -490,7 +490,7 @@ $(document).ready(function ()
     });
 
     // hero search
-    $('#SearchHeroAliasInput')
+    $('#searchHeroAliasInput')
     .on('keyup', function ()
     {
         var heroSearchVal = $(this).val().toLowerCase();
@@ -521,69 +521,93 @@ $(document).ready(function ()
 
 
 
-    function abilityTextConcatForHero(abilityObj, curHeroCodename)
-    {
-        var resultText = '';
-        Object.keys(abilityObj).forEach(function(keyAbilityCodename)
-        {
-            if (keyAbilityCodename.startsWith(curHeroCodename))
-            {
-                resultText += ('|'+window.abilityData[keyAbilityCodename]['dname']
-                +'|'+ abilityObj[keyAbilityCodename]['affects']
-                +'|'+ abilityObj[keyAbilityCodename]['desc']
-                +'|'+ abilityObj[keyAbilityCodename]['notes']).toLowerCase();
-            // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
-            // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
-            // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
-            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);                
-            }
-        });
-        return resultText;
-    }
-
     function searchAllAbilitiesTextDo()
     {
-        var abilitySearchVal = $('#SearchAbilityInput').val().toLowerCase();
+        var abilitySearchVal = $.trim($('#searchAbilityInput').val().toLowerCase());
         if (abilitySearchVal != '')
         {
+            if (typeof window.abilityData != 'undefined')
+            {            
                 $('[data-hero-codename]').each(function ()
                 {
-                    var curHeroCodename = $(this).attr('data-hero-codename');
+                    var heroEl = $(this);
+                    var curHeroCodename = heroEl.attr('data-hero-codename');
                     if (curHeroCodename == 'sand_king')
                     {
                         curHeroCodename = 'sandking';
                     }
-                    var curHeroAllAbilitiesString = '';
-                    if (typeof window.abilityData != 'undefined')
+                    var heroTooltipAllFoundAbilitiesText = '';
+                    Object.keys(window.abilityData).forEach(function(keyAbilityCodename)
                     {
-                        curHeroAllAbilitiesString += abilityTextConcatForHero(window.abilityData, curHeroCodename);
-                    }
+                        if (keyAbilityCodename.startsWith(curHeroCodename))
+                        {
+                            var tooltipText = '';
+            
+                            if (((window.abilityData[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)
+                            ||
+                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
+                            ((window.abilityDataEnglish[keyAbilityCodename]['dname']).toLowerCase().indexOf($.trim(abilitySearchVal)) !== -1)))
+                            {
+                                tooltipText += ' ';
+                            }
+            
+                            if ((window.abilityData[keyAbilityCodename]['affects'].toLowerCase().indexOf(abilitySearchVal) != -1)
+                            ||
+                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
+                            (window.abilityDataEnglish[keyAbilityCodename]['affects'].toLowerCase().indexOf($.trim(abilitySearchVal)) !== -1)))
+                            {
+                                tooltipText += '<div class="abilityTarget">'+window.abilityData[keyAbilityCodename]['affects']+'</div>';
+                            }
+            
+                            if (((window.abilityData[keyAbilityCodename]['desc']).toLowerCase().indexOf(abilitySearchVal) !== -1)
+                            ||
+                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
+                            ((window.abilityDataEnglish[keyAbilityCodename]['desc']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
+                            {
+                                tooltipText += '<div class="abilityDesc">'+window.abilityData[keyAbilityCodename]['desc']+'</div>';
+                            }
+            
+                            if (((window.abilityData[keyAbilityCodename]['notes']).toLowerCase().indexOf(abilitySearchVal) !== -1)
+                            ||
+                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
+                            ((window.abilityDataEnglish[keyAbilityCodename]['notes']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
+                            {
+                                tooltipText += '<div class="abilityNotes">'+window.abilityData[keyAbilityCodename]['notes']+'</div>';
+                            }
+            
+                            if (tooltipText != '')
+                            {
+                                heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip"><div class="iconTooltip iconTooltip_ability">'+window.abilityData[keyAbilityCodename]['dname']+tooltipText+'</div></div>';
+                            }
+            
+                            // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
+                            // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
+                            // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
+                            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);                
+                        }
+                    });
 
-                    if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined'))
+                    if (heroTooltipAllFoundAbilitiesText != '')
                     {
-                        curHeroAllAbilitiesString += abilityTextConcatForHero(window.abilityDataEnglish, curHeroCodename);
-                    }
-
-                    if (curHeroAllAbilitiesString.indexOf($.trim(abilitySearchVal)) !== -1)
-                    {
-                        $(this).removeClass('heroListImgOpacity');
+                        heroEl.removeClass('heroListImgOpacity').attr('data-extra-tooltip', heroTooltipAllFoundAbilitiesText);
                     } else {
-                        $(this).addClass('heroListImgOpacity');
+                        heroEl.addClass('heroListImgOpacity').removeAttr('data-extra-tooltip');
                     }                    
                 });
+            }                
         } else {
             $('.heroListImgOpacity').removeClass('heroListImgOpacity');
         }
     }    
 
     // ability search
-    $('#SearchAbilityInput')
+    $('#searchAbilityInput')
     .on('keyup', function ()
     {
         if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
         {
+            window.searchAbilityTextBeforeBlur = $(this).val();
             $(this).blur();
-            var textBeforeBlur = $(this).val();
 
                 pleaseWaitOpen();
                 $.ajax({
@@ -594,8 +618,8 @@ $(document).ready(function ()
                     {
                         pleaseWaitClose();
                         window.abilityDataEnglish = data["abilitydata"];
-                        $('#SearchAbilityInput').val(textBeforeBlur).focus();
-                        searchAllAbilitiesTextDo();
+                       $('#searchAbilityInput').val(window.searchAbilityTextBeforeBlur).focus();
+                       searchAllAbilitiesTextDo();                       
                     }
                 });
         } else {
