@@ -14,32 +14,42 @@ $(document).ready(function ()
         {
             if (window.tooltipBox.text() != (''))
             {
-                var windowHeight = $(window).height();
-                var windowWidth = $(window).width();
 
                 window.tooltipBox.css({
                     visibility: 'visible'
                 });
 
+                // count top
                 var tooltipH = window.tooltipBox.height();
-                var tooltipW = window.tooltipBox.width();
-
-                var topOffset = window.tooltipCurYoffset;
-
-                var tooltipTop = e.pageY - topOffset;
-                if ((tooltipTop + tooltipH + 3) > windowHeight)
+                var windowHeight = $(window).height();
+                var scrollTop = $(window).scrollTop();
+                var tooltipTop = e.pageY - 15;
+                if ((tooltipTop + tooltipH + 3) > (scrollTop + windowHeight + 3))
                 {
-                    tooltipTop = windowHeight - tooltipH - 3;
+                    tooltipTop = scrollTop + windowHeight - tooltipH - 3;
+                }
+                if (tooltipTop < (scrollTop + 1))
+                {
+                    tooltipTop = scrollTop + 1;
                 }
 
-                if (tooltipTop < 1)
+                // count left
+                var tooltipW = window.tooltipBox.width();
+                var windowWidth = $(window).width();
+                var scrollLeft = $(window).scrollLeft();
+                var tooltipLeft = e.pageX + 15;
+                if ((tooltipLeft + tooltipW + 3) > (scrollLeft + windowWidth + 3))
                 {
-                    tooltipTop = 1;
+                    tooltipLeft = scrollLeft + windowWidth - tooltipW - 3;
+                }
+                if (tooltipLeft < (scrollLeft + 1))
+                {
+                    tooltipLeft = scrollLeft + 1;
                 }
 
                 window.tooltipBox.css({
                     top: tooltipTop,
-                    left: e.pageX + 15
+                    left: tooltipLeft
                 });
 
             } else {
