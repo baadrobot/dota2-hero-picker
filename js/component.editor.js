@@ -519,7 +519,55 @@ $(document).ready(function ()
     });
 
 
+    function findAndUnderlineOrFalse(needle, stack)
+    {
+        var found = 0;
 
+        var found = false;
+        var needleObj = new RegExp(needle, "ig"); // ignore_case, global
+        replacedResult = stack.replace(needleObj, function ()
+        {
+            found = true;
+            return '<span style="text-decoration:underline red">'+needle+'</span>';
+        });
+
+        if (found)
+        {
+            return replacedResult;
+        } else {
+            return false;
+        }
+    }
+
+    function prepareHeroAbilityTooltipBySearch(tooltipFieldAffectsEtc, tooltipFieldClass, isNeedEnglish, abilitySearchVal, keyAbilityCodename)
+    {
+        resultCurLang = findAndUnderlineOrFalse(abilitySearchVal, window.abilityData[keyAbilityCodename][tooltipFieldAffectsEtc]);
+        if (isNeedEnglish) {
+            resultEnglishLang = findAndUnderlineOrFalse(abilitySearchVal, window.abilityDataEnglish[keyAbilityCodename][tooltipFieldAffectsEtc]);
+        }
+
+        var result = '';
+        if ((resultCurLang !== false) || (resultEnglishLang !== false)) {
+            if (isNeedEnglish && (resultEnglishLang !== false)) {
+                result += '<div class="doubleCol">'
+            }
+
+            // current
+            if (resultCurLang !== false)
+            {
+                result += '<div class="' + tooltipFieldClass + '">' + resultCurLang + '</div>';
+            } else {
+                result += '<div class="' + tooltipFieldClass + '">' +  window.abilityData[keyAbilityCodename][tooltipFieldAffectsEtc] + '</div>';
+            }
+
+            if (isNeedEnglish && (resultEnglishLang !== false)) {
+                result += '<div class="' + tooltipFieldClass + '" style="font-style:italic;opacity:0.6">' + resultEnglishLang + '</div>';
+                result += '</div>'
+            }
+        }
+
+        return result;
+    }
 
     function searchAllAbilitiesTextDo()
     {
@@ -527,11 +575,15 @@ $(document).ready(function ()
         if (abilitySearchVal != '')
         {
             if (typeof window.abilityData != 'undefined')
-            {            
+            {
+                var resultCurLang;
+                var resultEnglishLang = false;
                 $('[data-hero-codename]').each(function ()
                 {
                     var heroEl = $(this);
                     var curHeroCodename = heroEl.attr('data-hero-codename');
+                    var isNeedEnglish = (window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined');
+
                     if (curHeroCodename == 'sand_king')
                     {
                         curHeroCodename = 'sandking';
@@ -542,48 +594,28 @@ $(document).ready(function ()
                         if (keyAbilityCodename.startsWith(curHeroCodename))
                         {
                             var tooltipText = '';
-            
+
                             if (((window.abilityData[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)
                             ||
                             (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
-                            ((window.abilityDataEnglish[keyAbilityCodename]['dname']).toLowerCase().indexOf($.trim(abilitySearchVal)) !== -1)))
+                            ((window.abilityDataEnglish[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
                             {
                                 tooltipText += ' ';
                             }
-            
-                            if ((window.abilityData[keyAbilityCodename]['affects'].toLowerCase().indexOf(abilitySearchVal) != -1)
-                            ||
-                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
-                            (window.abilityDataEnglish[keyAbilityCodename]['affects'].toLowerCase().indexOf($.trim(abilitySearchVal)) !== -1)))
-                            {
-                                tooltipText += '<div class="abilityTarget">'+window.abilityData[keyAbilityCodename]['affects']+'</div>';
-                            }
-            
-                            if (((window.abilityData[keyAbilityCodename]['desc']).toLowerCase().indexOf(abilitySearchVal) !== -1)
-                            ||
-                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
-                            ((window.abilityDataEnglish[keyAbilityCodename]['desc']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
-                            {
-                                tooltipText += '<div class="abilityDesc">'+window.abilityData[keyAbilityCodename]['desc']+'</div>';
-                            }
-            
-                            if (((window.abilityData[keyAbilityCodename]['notes']).toLowerCase().indexOf(abilitySearchVal) !== -1)
-                            ||
-                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
-                            ((window.abilityDataEnglish[keyAbilityCodename]['notes']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
-                            {
-                                tooltipText += '<div class="abilityNotes">'+window.abilityData[keyAbilityCodename]['notes']+'</div>';
-                            }
-            
+
+                            tooltipText += prepareHeroAbilityTooltipBySearch('affects', 'abilityTarget', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+                            tooltipText += prepareHeroAbilityTooltipBySearch('desc', 'abilityDesc', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+                            tooltipText += prepareHeroAbilityTooltipBySearch('notes', 'abilityNotes', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+
                             if (tooltipText != '')
                             {
                                 heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip"><div class="iconTooltip iconTooltip_ability">'+window.abilityData[keyAbilityCodename]['dname']+tooltipText+'</div></div>';
                             }
-            
+
                             // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
                             // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
                             // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
-                            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);                
+                            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
                         }
                     });
 
@@ -592,13 +624,13 @@ $(document).ready(function ()
                         heroEl.removeClass('heroListImgOpacity').attr('data-extra-tooltip', heroTooltipAllFoundAbilitiesText);
                     } else {
                         heroEl.addClass('heroListImgOpacity').removeAttr('data-extra-tooltip');
-                    }                    
+                    }
                 });
-            }                
+            }
         } else {
             $('.heroListImgOpacity').removeClass('heroListImgOpacity');
         }
-    }    
+    }
 
     // ability search
     $('#searchAbilityInput')
@@ -619,7 +651,7 @@ $(document).ready(function ()
                         pleaseWaitClose();
                         window.abilityDataEnglish = data["abilitydata"];
                        $('#searchAbilityInput').val(window.searchAbilityTextBeforeBlur).focus();
-                       searchAllAbilitiesTextDo();                       
+                       searchAllAbilitiesTextDo();
                     }
                 });
         } else {
@@ -629,7 +661,7 @@ $(document).ready(function ()
     {
         $(this).val('');
         $('.heroListImgOpacity').removeClass('heroListImgOpacity');
-    });    
+    });
 
 });
 // - END DOC READY//////////////////////////////////////
