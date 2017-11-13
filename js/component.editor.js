@@ -629,6 +629,7 @@ $(document).ready(function ()
             }
         } else {
             $('.heroListImgOpacity').removeClass('heroListImgOpacity');
+            $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
         }
     }
 
@@ -661,6 +662,7 @@ $(document).ready(function ()
     {
         $(this).val('');
         $('.heroListImgOpacity').removeClass('heroListImgOpacity');
+        $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
     });
 
 });
