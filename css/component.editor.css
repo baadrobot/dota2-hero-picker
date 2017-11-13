@@ -245,6 +245,9 @@ hr {
     margin: auto;
 }
 
+#heroListWrap{
+    max-width: 756px;
+}
 #tagListWrap{
     line-height: 1;
 }

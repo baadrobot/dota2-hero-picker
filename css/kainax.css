@@ -3,6 +3,11 @@ html body {
     font-family: "Radiance",Verdana;
 }
 
+html {
+    overflow: -moz-scrollbars-vertical;
+    overflow-y: scroll;
+}
+
 body > .container {
 	padding: 10px 2px;
 }
@@ -62,7 +67,10 @@ body > .container {
 #tooltipBox {
     position: absolute;
     z-index: 99999;
-    max-width: 600px;
+	max-width: 600px;
+	pointer-events: none;
+	display: block;
+
     /*background-color: rgba(42, 52, 58, 0.72);*/
     /* padding: 7px 15px;
     /*opacity: 0.92;*/

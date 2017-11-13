@@ -7,21 +7,43 @@ $(document).ready(function ()
     //''''''''''''''''' Tooltips
     if (!window.isMobile)
     {
-        window.tooltipBox = jQuery('<div id="tooltipBox"></div>').appendTo('body').hide();
+        window.tooltipBox = jQuery('<div id="tooltipBox" style="visibility:hidden"></div>').appendTo('body');
         window.tooltipDefaultYOffset = 15;
         window.tooltipCurYoffset = window.tooltipDefaultYOffset;
         jQuery(document).on('mousemove', function (e)
         {
             if (window.tooltipBox.text() != (''))
             {
+                var windowHeight = $(window).height();
+                var windowWidth = $(window).width();
+
                 window.tooltipBox.css({
-                    left: e.pageX + 15,
-                    top: e.pageY + window.tooltipCurYoffset,
-                    display: ''
+                    visibility: 'visible'
                 });
-            } else
-            {
-                window.tooltipBox.hide();
+
+                var tooltipH = window.tooltipBox.height();
+                var tooltipW = window.tooltipBox.width();
+
+                var topOffset = window.tooltipCurYoffset;
+
+                var tooltipTop = e.pageY - topOffset;
+                if ((tooltipTop + tooltipH + 3) > windowHeight)
+                {
+                    tooltipTop = windowHeight - tooltipH - 3;
+                }
+
+                if (tooltipTop < 1)
+                {
+                    tooltipTop = 1;
+                }
+
+                window.tooltipBox.css({
+                    top: tooltipTop,
+                    left: e.pageX + 15
+                });
+
+            } else {
+                window.tooltipBox.css('visibility', 'hidden');
             }
         });
     }
@@ -37,7 +59,8 @@ $(document).ready(function ()
 
 
     // focus first text input on any modal window popup
-    $('.modal').on('shown.bs.modal', function () {
+    $('.modal').on('shown.bs.modal', function ()
+    {
         $(this).find('input:not([type]):first').trigger('focus');
     });
 });
