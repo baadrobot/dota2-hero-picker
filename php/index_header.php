@@ -84,7 +84,10 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             echo 'window.LangPreStr["GLOBAL"]["_DELETE_"] = "Удалить";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_ACTION_"] = "Подтвердите действие";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_QUESTION_"] = "Вы уверены что хотите выполнить данное действие?";';
-
+            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_"] = "Стандартное";';
+            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_STRONG_"] = "Только сильное";';
+            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_NO_"] = "Невозможно развеять";';
+            
         echo '</script>';
 
         echo '<link rel="stylesheet" href="css/kainax.css">';

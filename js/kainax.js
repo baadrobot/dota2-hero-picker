@@ -115,6 +115,36 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
             abilityTooltipEl.find('.abilityHR1').html('');
             abilityTooltipEl.find('.abilityTarget').html(window.abilityData[heroAbilityCodeName]['affects']);
             abilityTooltipEl.find('.abilityHR2').html('');
+
+            var abilityId = $(this).attr('data-ability-id');
+            var abilityDispellableSpanEl = abilityTooltipEl.find('#abilityDispellable span');
+
+            if ((typeof window.abilityTypeList != 'undefined') && (typeof window.abilityTypeList[abilityId] != 'undefined'))
+            {
+                if (window.abilityTypeList[abilityId] == 1)
+                {
+                    var isDispellabletext = getPreStr_js('GLOBAL', '_DISPELLABLE_YES_');
+                    abilityDispellableSpanEl.addClass('dispYes').removeClass('dispStrong').removeClass('dispCant');
+                } else if (window.abilityTypeList[abilityId] == 2)
+                {
+                    var isDispellabletext = getPreStr_js('GLOBAL', '_DISPELLABLE_YES_STRONG_');
+                    abilityDispellableSpanEl.addClass('dispStrong').removeClass('dispYes').removeClass('dispCant');
+                } else if (window.abilityTypeList[abilityId] == 0)
+                {
+                    var isDispellabletext = getPreStr_js('GLOBAL', '_DISPELLABLE_NO_');
+                    abilityDispellableSpanEl.addClass('dispCant').removeClass('dispYes').removeClass('dispStrong');
+                } else {
+                    var isDispellabletext = window.abilityTypeList[abilityId];
+                    abilityDispellableSpanEl.addClass('dispStrong').removeClass('dispYes').removeClass('dispCant');
+                }
+
+                // todo: rename normally window.abilityTypeList[abilityId]
+                abilityDispellableSpanEl.html(isDispellabletext).parent().show();
+            } else {
+                abilityDispellableSpanEl.html('').parent().hide();
+            }
+            
+
             abilityTooltipEl.find('.abilityDesc').html(window.abilityData[heroAbilityCodeName]['desc']);
             abilityTooltipEl.find('.abilityNotes').html(window.abilityData[heroAbilityCodeName]['notes']);
             abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);

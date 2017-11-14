@@ -246,7 +246,9 @@ body > .container {
 .iconTooltip .abilityHR2 {
 	background-image:url( 'http://cdn.dota2.com/apps/dota2/images/tooltips/abil_hr_2.png' );
 }
-.iconTooltip .abilityTarget {
+.iconTooltip .abilityTarget,
+#abilityDispellable
+{
 	color:#ffffff;
 	font-size:12px;
 	font-family:KoreanFont,arial, helvetica, sans-serif;
@@ -254,6 +256,18 @@ body > .container {
 	line-height:20px;
 	padding: 7px 0;
 }
+
+/* Is dispallabe type in tooltip */
+.dispCant{
+	color: #dc3545!important;
+}
+span.dispYes{
+	color: #ffc107!important;	
+}
+span.dispStrong{
+	color: #fd7e14!important;
+}
+
 .iconTooltip .abilityTarget .attribVal {
 	color:#ffffff;
 }

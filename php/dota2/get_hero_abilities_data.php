@@ -118,13 +118,15 @@
             }
 
 
-            // global $dbClass;
+            //$autoTagSetForDispellableAbilities = [];
 
             foreach ($heroesFile as $key => $value)
             {
                 if ((substr($key, 0, strlen($heroKeyPrefix)) == $heroKeyPrefix) && ($key != $heroKeyPrefix.'target_dummy' ))
                 {
                     $heroCodename = substr($key, strlen($heroKeyPrefix));
+
+                    //$autoTagSetForDispellableAbilities[$heroCodename] = [];
 
                     $heroId = $heroesFile[$key]['HeroID'];
                     $heroRole = $heroesFile[$key]['Role'];
@@ -186,11 +188,47 @@
                                 $abilityUnitDamageType = null;
                             }
 
+                            if (isset($abilities[$abilityCodename]['AbilityUnitTargetTeam']))
+                            {
+                                $abilityUnitTargetTeam = $abilities[$abilityCodename]['AbilityUnitTargetTeam'];
+                            } else {
+                                $abilityUnitTargetTeam = null;
+                            }
+
+                            if (isset($abilities[$abilityCodename]['SpellImmunityType']))
+                            {
+                                $spellImmunityType = $abilities[$abilityCodename]['SpellImmunityType'];
+                            } else {
+                                $spellImmunityType = null;
+                            }
+
                             if (isset($abilities[$abilityCodename]['SpellDispellableType']))
                             {
                                 $spellDispellableType = $abilities[$abilityCodename]['SpellDispellableType'];
+                                
+            // if                             
+            //  cf_d2HeroAbilityList_abilityUnitTargetTeam содержит (не то же самое что равно)
+            //  DOTA_UNIT_TARGET_TEAM_FRIENDLY или DOTA_UNIT_TARGET_TEAM_BOTH
+            //  создать запись в таблице tb_dota2_heroTag_set 
+            // с айди героя - ?, айди тега - 29, value (default 3), ability id - все что нашли                                
+
+                                // if ($spellDispellableType == 'SPELL_DISPELLABLE_YES')
+                                // {
+
+                                //    // $autoTagSetForDispellableAbilities[$heroCodename] 
+
+                                // } else if ($spellDispellableType == 'SPELL_DISPELLABLE_YES_STRONG')
+                                // {
+                                //     $autoTagSetForDispellableAbilities[$heroCodename]['strong_friend'] = ''
+                                //     $autoTagSetForDispellableAbilities[$heroCodename]['strong_enemy'] = ''
+                                //     $autoTagSetForDispellableAbilities[$heroCodename]['basic_friend'] += ' ' +$abilityId;                                    
+                                //     $autoTagSetForDispellableAbilities[$heroCodename]['basic_enemy'] = ''
+                                // } else {
+
+                                // }
                             } else {
                                 $spellDispellableType = null;
+
                             }
 
                             if (isset($abilities[$abilityCodename]['HasScepterUpgrade']))
@@ -252,20 +290,6 @@
                                 $abilityModifierSupportBonus = $abilities[$abilityCodename]['AbilityModifierSupportBonus'];
                             } else {
                                 $abilityModifierSupportBonus = '0';
-                            }
-
-                            if (isset($abilities[$abilityCodename]['AbilityUnitTargetTeam']))
-                            {
-                                $abilityUnitTargetTeam = $abilities[$abilityCodename]['AbilityUnitTargetTeam'];
-                            } else {
-                                $abilityUnitTargetTeam = null;
-                            }
-
-                            if (isset($abilities[$abilityCodename]['SpellImmunityType']))
-                            {
-                                $spellImmunityType = $abilities[$abilityCodename]['SpellImmunityType'];
-                            } else {
-                                $spellImmunityType = null;
                             }
 
                             if (isset($abilities[$abilityCodename]['AbilityUnitTargetType']))
@@ -406,6 +430,21 @@
                     $dbClass->update($query, $forbiddenAbilityId);
                 }
             }
+
+
+            // проход по героям:
+            // if                             
+            //  cf_d2HeroAbilityList_abilityUnitTargetTeam содержит (не то же самое что равно)
+            //  DOTA_UNIT_TARGET_TEAM_FRIENDLY или DOTA_UNIT_TARGET_TEAM_BOTH
+            //  создать запись в таблице tb_dota2_heroTag_set 
+            // с айди героя - ?, айди тега - 29, value (default 3), ability id - все что нашли
+
+                            
+
+
+
+
+
 
 
             // -- read hero abilities data from Dota 2 game installation path
