@@ -144,13 +144,6 @@ hr {
     text-align: center;
 }
 
-#editHeroTagHeroImgWrap img
-{
-    height: 120px;
-    width: auto;
-    margin: 2px;
-}
-
 #editBalancePopupHtml .form-group{
     text-align: center;
 }
@@ -234,12 +227,18 @@ hr {
 
 
 
+#editHeroTagHeroImgWrap img {
+    height: 118px;
+    width: 210px;
+    margin: 3px;
+}
+
 #editHeroTagHeroImgWrap.selectedAbility img {
     border: 6px double rgb(18, 168, 23);
 }
 
 #editHeroTagHeroImgWrap {
-    width: 217px;
+    width: 218px;
     height: 124px;
     background-color: black;
     margin: auto;
@@ -269,6 +268,11 @@ hr {
 .smlGrp input
 {
     font-size: 11px;
+}
+
+#heroListWrap .input-group-addon {
+    cursor: pointer;
+    width: 34px;
 }
 /* #editInfoTagHeroNone{
     height: 33px!important;
