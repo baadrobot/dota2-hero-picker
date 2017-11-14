@@ -2,7 +2,6 @@ $(document).ready(function ()
 {
     buildHeroList('#heroListWrap');
 
-
     $('#editAccordion i').click(function ()
     {
         $(this).siblings('a.accordionHeader.collapsed').click();
@@ -286,9 +285,20 @@ $(document).ready(function ()
                 {
                     if (result.php_result == 'OK')
                     {
+                        var searchAbilityInputVal = $('#searchAbilityInput').val();;
                         for (var i = 0; i < result.hero_abilities_array.length; i++)
                         {
-                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg" data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+result.hero_abilities_array[i]['abilityCodename']+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+result.hero_abilities_array[i]['abilityCodename']+'_hp1.png?v=4195662"></div>');
+                            var abilityCodename = result.hero_abilities_array[i]['abilityCodename'];
+                            if ((searchAbilityInputVal == '')
+                            || (typeof window.searchAbilityFoundList[abilityCodename] != 'undefined'))
+                            {
+                                // color
+                                opacityStyle = '';
+                            } else {
+                                // white
+                                opacityStyle = ' ' + 'style="opacity:0.5"';
+                            }
+                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
                         }
 
                         $('.heroAbilityImg').click(function ()
@@ -493,6 +503,13 @@ $(document).ready(function ()
     $('#searchHeroAliasInput')
     .on('keyup', function ()
     {
+        // checking if another (ability) search is active
+        var abilitySearchInputEl = $('#searchAbilityInput');
+        if (abilitySearchInputEl.val() != '')
+        {
+            abilitySearchInputEl.siblings('.input-group-addon').find('i').trigger('click');
+        }
+
         var heroSearchVal = $(this).val().toLowerCase();
         if (heroSearchVal != '')
         {
@@ -571,99 +588,121 @@ $(document).ready(function ()
 
     function searchAllAbilitiesTextDo()
     {
-        var abilitySearchVal = $.trim($('#searchAbilityInput').val().toLowerCase());
+        var searchInputEl = $('#searchAbilityInput');
+        var abilitySearchVal = $.trim(searchInputEl.val().toLowerCase());
+
+        // globally saving all found abilities names
+        window.searchAbilityFoundList = [];
+
         if (abilitySearchVal != '')
         {
+            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
             if (typeof window.abilityData != 'undefined')
             {
-                var resultCurLang;
-                var resultEnglishLang = false;
-                $('[data-hero-codename]').each(function ()
-                {
-                    var heroEl = $(this);
-                    var curHeroCodename = heroEl.attr('data-hero-codename');
-                    var isNeedEnglish = (window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined');
+                    var resultCurLang;
+                    var resultEnglishLang = false;
+                    $('[data-hero-codename]').each(function ()
+                    {
+                        var heroEl = $(this);
+                        var curHeroCodename = heroEl.attr('data-hero-codename');
+                        var isNeedEnglish = (window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined');
 
-                    if (curHeroCodename == 'sand_king')
-                    {
-                        curHeroCodename = 'sandking';
-                    }
-                    var heroTooltipAllFoundAbilitiesText = '';
-                    Object.keys(window.abilityData).forEach(function(keyAbilityCodename)
-                    {
-                        if (keyAbilityCodename.startsWith(curHeroCodename))
+                        if (curHeroCodename == 'sand_king')
                         {
-                            var tooltipText = '';
-
-                            if (((window.abilityData[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)
-                            ||
-                            (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
-                            ((window.abilityDataEnglish[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
+                            curHeroCodename = 'sandking';
+                        }
+                        var heroTooltipAllFoundAbilitiesText = '';
+                        Object.keys(window.abilityData).forEach(function(keyAbilityCodename)
+                        {
+                            if (keyAbilityCodename.startsWith(curHeroCodename))
                             {
-                                tooltipText += ' ';
+                                var tooltipText = '';
+
+                                if (((window.abilityData[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)
+                                ||
+                                (((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish != 'undefined')) &&
+                                ((window.abilityDataEnglish[keyAbilityCodename]['dname']).toLowerCase().indexOf(abilitySearchVal) !== -1)))
+                                {
+                                    tooltipText += ' ';
+                                }
+
+                                tooltipText += prepareHeroAbilityTooltipBySearch('affects', 'abilityTarget', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+                                tooltipText += prepareHeroAbilityTooltipBySearch('desc', 'abilityDesc', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+                                tooltipText += prepareHeroAbilityTooltipBySearch('notes', 'abilityNotes', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
+
+                                if (tooltipText != '')
+                                {
+                                    heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip"><div class="iconTooltip iconTooltip_ability">' + window.abilityData[keyAbilityCodename]['dname'] + tooltipText;
+                                    if (typeof window.abilityData[keyAbilityCodename]['cmb'] != 'undefined') {
+                                        heroTooltipAllFoundAbilitiesText += '<div class="abilityCMB">'+window.abilityData[keyAbilityCodename]['cmb'] +'</div>'
+                                    }
+                                    heroTooltipAllFoundAbilitiesText += '</div></div>';
+
+                                    // saving in global array to underline ability icon in hero_tag_set window
+                                    window.searchAbilityFoundList[keyAbilityCodename] = 1;
+                                }
+
+                                // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
+                                // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
+                                // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
+                                // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
                             }
+                        });
 
-                            tooltipText += prepareHeroAbilityTooltipBySearch('affects', 'abilityTarget', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
-                            tooltipText += prepareHeroAbilityTooltipBySearch('desc', 'abilityDesc', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
-                            tooltipText += prepareHeroAbilityTooltipBySearch('notes', 'abilityNotes', isNeedEnglish, abilitySearchVal, keyAbilityCodename);
-
-                            if (tooltipText != '')
-                            {
-                                heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip"><div class="iconTooltip iconTooltip_ability">'+window.abilityData[keyAbilityCodename]['dname']+tooltipText+'</div></div>';
-                            }
-
-                            // abilityTooltipEl.find('.abilityDmg').html(window.abilityData[heroAbilityCodeName]['dmg']);
-                            // abilityTooltipEl.find('.abilityAttrib').html(window.abilityData[heroAbilityCodeName]['attrib']);
-                            // abilityTooltipEl.find('.abilityCMB').html(window.abilityData[heroAbilityCodeName]['cmb']);
-                            // abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
+                        if (heroTooltipAllFoundAbilitiesText != '')
+                        {
+                            heroEl.removeClass('heroListImgOpacity').attr('data-extra-tooltip', heroTooltipAllFoundAbilitiesText);
+                        } else {
+                            heroEl.addClass('heroListImgOpacity').removeAttr('data-extra-tooltip');
                         }
                     });
-
-                    if (heroTooltipAllFoundAbilitiesText != '')
-                    {
-                        heroEl.removeClass('heroListImgOpacity').attr('data-extra-tooltip', heroTooltipAllFoundAbilitiesText);
-                    } else {
-                        heroEl.addClass('heroListImgOpacity').removeAttr('data-extra-tooltip');
-                    }
-                });
+                }
+            } else {
+                $('.heroListImgOpacity').removeClass('heroListImgOpacity');
+                $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
+                searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
             }
-        } else {
-            $('.heroListImgOpacity').removeClass('heroListImgOpacity');
-            $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
-        }
     }
 
     // ability search
     $('#searchAbilityInput')
-    .on('keyup', function ()
-    {
-        if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
+        .on('keyup', function ()
         {
-            window.searchAbilityTextBeforeBlur = $(this).val();
-            $(this).blur();
-
-                pleaseWaitOpen();
-                $.ajax({
-                    url: 'https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=loretwo&l=english'
-                    ,dataType:  'jsonp'
-                    ,jsonpCallback: 'loretwo'
-                    ,success: function(data)
-                    {
-                        pleaseWaitClose();
-                        window.abilityDataEnglish = data["abilitydata"];
-                       $('#searchAbilityInput').val(window.searchAbilityTextBeforeBlur).focus();
-                       searchAllAbilitiesTextDo();
-                    }
-                });
-        } else {
-            searchAllAbilitiesTextDo();
-        }
-    }).on('blur', function ()
-    {
-        $(this).val('');
-        $('.heroListImgOpacity').removeClass('heroListImgOpacity');
-        $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
-    });
+            if ((typeof window.loadEnglishTooltipsOnce == 'undefined') || (window.loadEnglishTooltipsOnce == 1))
+            {
+                if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
+                {
+                    window.loadEnglishTooltipsOnce = 0;
+                    var searchInputEl = $(this);
+                    inputLoaderStart(searchInputEl);
+                    $.ajax({
+                        url: 'https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=loretwo&l=english'
+                        , dataType: 'jsonp'
+                        , jsonpCallback: 'loretwo'
+                        , success: function (data) {
+                            window.abilityDataEnglish = data["abilitydata"];
+                            inputLoaderStop(searchInputEl);
+                            searchAllAbilitiesTextDo();
+                            window.loadEnglishTooltipsOnce = 1;
+                        }
+                    });
+                } else {
+                    searchAllAbilitiesTextDo();
+                }
+            }
+        }).removeAttr('disabled'
+        ).siblings('.input-group-addon').on('click', function () {
+            // click on search btn
+            var searchInputEl = $('#searchAbilityInput');
+            var searchVal = searchInputEl.val();
+            if (searchVal != '')
+            {
+                searchInputEl.attr('data-last-search', searchVal).val('');
+            } else {
+                searchInputEl.val( searchInputEl.attr('data-last-search') );
+            }
+            searchInputEl.trigger('keyup');
+        });
 
 });
 // - END DOC READY//////////////////////////////////////

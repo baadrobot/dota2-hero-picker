@@ -8,8 +8,7 @@ $(document).ready(function ()
     if (!window.isMobile)
     {
         window.tooltipBox = jQuery('<div id="tooltipBox" style="visibility:hidden"></div>').appendTo('body');
-        window.tooltipDefaultYOffset = 15;
-        window.tooltipCurYoffset = window.tooltipDefaultYOffset;
+
         jQuery(document).on('mousemove', function (e)
         {
             if (window.tooltipBox.text() != (''))
@@ -72,6 +71,7 @@ $(document).ready(function ()
     $('.modal').on('shown.bs.modal', function ()
     {
         $(this).find('input:not([type]):first').trigger('focus');
+        $('body').css('padding-right', '');
     });
 });
 // - END DOC READY//////////////////////////////////////
@@ -118,9 +118,6 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
         var abilityTooltipEl = $('#abilityTooltip');
         if (typeof window.abilityData[heroAbilityCodeName] != 'undefined')
         {
-            // make tooltip Y position higher
-            window.tooltipCurYoffset = tooltipYoffset;
-
             abilityTooltipEl.find('.abilityName').html(window.abilityData[heroAbilityCodeName]['dname']);
             abilityTooltipEl.find('.abilityHR1').html('');
             abilityTooltipEl.find('.abilityTarget').html(window.abilityData[heroAbilityCodeName]['affects']);
@@ -133,9 +130,6 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
             abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
             window.tooltipBox.html(abilityTooltipEl.html());
         } else {
-            // make tooltip Y position higher
-            window.tooltipCurYoffset = -25;
-
             var heroAbilityCodeName = $(this).attr('data-ability-codename');
             var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
 
@@ -147,7 +141,6 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
     }).mouseleave(function ()
     {
         window.tooltipBox.html('');
-        window.tooltipCurYoffset = window.tooltipDefaultYOffset;
     });
 }
 
@@ -357,6 +350,53 @@ function getPreStr_js(component, preStr)
         return preStr;
     }
 }
+
+
+function inputLoaderStart(inputElement)
+{
+    var paramObj = {};
+    var inputGroup = inputElement.siblings('.input-group-addon');
+    if (inputGroup.length)
+    {
+        var element = inputGroup;
+        element.find('i').hide();
+    } else {
+        var element = inputElement;
+    }
+
+    paramObj.opacity = 0.8;
+    paramObj.loaderIntW = 12;
+    paramObj.loaderIntH = 12;
+    //paramObj.gifNameOrFalse = 'eco-ajax-loader-01.gif';
+    paramObj.gifNameOrFalse = 'spinner.gif';
+    // add loader exactly in center
+    var loaderMarginLeftAndRight = Math.round(element.width() / 2) - (paramObj.loaderIntW / 2);
+    var loaderMarginTopAndBottom = Math.round(element.height() / 2) - (paramObj.loaderIntH / 2);
+    element.prepend(
+        '<i class="kainaxImgPreloader" style="'
+            + 'margin:' + loaderMarginTopAndBottom + 'px' + ' ' + loaderMarginLeftAndRight + 'px;'
+            + 'opacity:' + paramObj.opacity + ';'
+            + 'width:' + paramObj.loaderIntW + 'px;'
+            + 'height:' + paramObj.loaderIntH + 'px;'
+            + 'position:absolute!important;'
+            + 'background:transparent url(/images/loaders/' + paramObj.gifNameOrFalse + ') no-repeat!important;'
+            + 'background-size: 100% 100%!important;'
+            + 'z-index: 999;'
+        + '"></i>'
+    );
+}
+
+function inputLoaderStop(inputElement)
+{
+    var inputGroup = inputElement.siblings('.input-group-addon');
+    if (inputGroup.length)
+    {
+        inputGroup.find('i').show();
+    }
+
+    inputElement.parent().find('.kainaxImgPreloader').remove();
+}
+
 
 function kainaxPreloadImages(paramObj)
 {
