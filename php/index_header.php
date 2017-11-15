@@ -84,10 +84,6 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             echo 'window.LangPreStr["GLOBAL"]["_DELETE_"] = "Удалить";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_ACTION_"] = "Подтвердите действие";';
             echo 'window.LangPreStr["GLOBAL"]["_CONFIRM_QUESTION_"] = "Вы уверены что хотите выполнить данное действие?";';
-            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_"] = "Стандартное";';
-            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_STRONG_"] = "Только сильное";';
-            echo 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_NO_"] = "Невозможно развеять";';
-            
         echo '</script>';
 
         echo '<link rel="stylesheet" href="css/kainax.css">';
@@ -96,6 +92,11 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         if (isset($_GET['component']))
         {
             $externalData = '<script>';
+                // this translations only needed for ability tooltips
+                $externalData .= 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_"] = "Стандартное";';
+                $externalData .= 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_STRONG_"] = "Только сильное";';
+                $externalData .= 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_NO_"] = "Невозможно развеять";';
+
                 $externalData .= '$(document).ready(function(){';
                     $externalData .= '$.ajax({url: "https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=lore&l='.$legalLangs[$_SESSION['SUserLang']]['d2lang'].'",dataType:"jsonp",jsonpCallback:"lore",';
                         $externalData .= 'success:function(data){window.abilityData = data["abilitydata"];}';
@@ -121,7 +122,13 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             }
             else if ($_GET['component'] == 'registration')
             {
-
+                echo '<script src="js/component.registration.js"></script>';
+                echo '<link rel="stylesheet" href="css/component.registration.css">';
+            }
+            else if ($_GET['component'] == 'user_profile')
+            {
+                echo '<script src="js/component.user_profile.js"></script>';
+                echo '<link rel="stylesheet" href="css/component.user_profile.css">';
             }
         }
 

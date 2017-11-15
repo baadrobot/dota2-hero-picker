@@ -528,6 +528,7 @@
         //Ключи с ограничениями:
         //pushToLegalGet('e_id', 'component', 'password_reset', 'fixedLength', 32);
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'registration');
+        pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'user_profile');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'editor');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'master');
         /*
