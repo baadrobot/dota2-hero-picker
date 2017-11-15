@@ -9,9 +9,13 @@
         {
             require('php/dota2/get_hero_abilities_data.php');
         }
+        else if ($_GET['component'] == 'user_profile')
+        {
+            require('php/component_user_profile.php');
+        }
         else if ($_GET['component'] == 'registration')
         {
-
+            require('php/component_registration.php');
         }
     } else {
         require('php/home.php');

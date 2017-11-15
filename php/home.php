@@ -5,12 +5,18 @@
 
     if (isGotAccess(_ROLE_MASTER))
     {
-        echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master">Открыть мастер редактор</a></div>';
+        echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=user_profile">Профайл пользователя</a></div>';
+        echo '<br>';
     }
+
 
     if (isGotAccess(_ROLE_EDITOR))
     {
         echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=editor">Открыть редактор баланса</a></div>';
+    }
+    if (isGotAccess(_ROLE_MASTER))
+    {
+        echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master">Открыть мастер редактор</a></div>';
     }
 
 
