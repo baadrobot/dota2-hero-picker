@@ -601,7 +601,7 @@ $(document).ready(function ()
             {
                     var resultCurLang;
                     var resultEnglishLang = false;
-                    $('[data-hero-codename]').each(function ()
+                    $('#heroListWrap [data-hero-codename]').each(function ()
                     {
                         var heroEl = $(this);
                         var curHeroCodename = heroEl.attr('data-hero-codename');
@@ -632,7 +632,7 @@ $(document).ready(function ()
 
                                 if (tooltipText != '')
                                 {
-                                    heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip"><div class="iconTooltip iconTooltip_ability">' + window.abilityData[keyAbilityCodename]['dname'] + tooltipText;
+                                    heroTooltipAllFoundAbilitiesText += '<div id="abilityTooltip" class="multiline"><div class="iconTooltip iconTooltip_ability">' + window.abilityData[keyAbilityCodename]['dname'] + tooltipText;
                                     if (typeof window.abilityData[keyAbilityCodename]['cmb'] != 'undefined') {
                                         heroTooltipAllFoundAbilitiesText += '<div class="abilityCMB">'+window.abilityData[keyAbilityCodename]['cmb'] +'</div>'
                                     }
@@ -658,9 +658,13 @@ $(document).ready(function ()
                     });
                 }
             } else {
-                $('.heroListImgOpacity').removeClass('heroListImgOpacity');
-                $('[data-extra-tooltip]').removeAttr('data-extra-tooltip');
+                $('#heroListWrap .heroListImgOpacity').removeClass('heroListImgOpacity');
                 searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+            }
+
+            if ($('#heroListWrap .heroListImgOpacity').length == 0)
+            {
+                $('#heroListWrap [data-extra-tooltip]').removeAttr('data-extra-tooltip');
             }
     }
 
