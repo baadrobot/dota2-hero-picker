@@ -312,9 +312,7 @@ $(document).ready(function ()
                             editHeroTagDecideInfoText();
                         });
 
-                        var tooltipYoffset = -180;
-
-                        addOnHoverTooltipsForAbilityImg('#editHeroTagAbilitiesImgWrap', tooltipYoffset);
+                        addOnHoverTooltipsForAbilityImg('#editHeroTagAbilitiesImgWrap');
 
                         if (result.tag_result == 'NONE')
                         {

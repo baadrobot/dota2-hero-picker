@@ -6,7 +6,6 @@
     {
         if (!isset($_GET['update']))
         {
-            echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
             //require $prebuildMasterAbilitiesFilenamePath;
 
 
@@ -38,6 +37,14 @@
                         ,cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                         ,cf_d2HeroAbilityList_isAbilityIgnored as `ignoreStatus`
                         ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
+                        --
+                        ,cf_d2HeroAbilityList_manualBuffDispellableB as `buffDispellableB`
+                        ,cf_d2HeroAbilityList_manualBuffDispellableS as `buffDispellableS`
+                        ,cf_d2HeroAbilityList_manualDebuffDispellableB as `debuffDispellableB`
+                        ,cf_d2HeroAbilityList_manualDebuffDispellableS as `debuffDispellableS`
+                        ,cf_d2HeroAbilityList_isConfirmed as `isConfirmed`
+                        ,cf_d2HeroAbilityList_spellDispellableType as `dispType`
+                        --
                         FROM tb_dota2_hero_ability_list
                         INNER JOIN tb_dota2_hero_list
                             ON tb_dota2_hero_ability_list.cf_d2HeroAbilityList_heroId = tb_dota2_hero_list.cf_d2HeroList_id
@@ -46,13 +53,34 @@
 
             $result = $dbClass->select($query);
 
-            echo '<div id="masterList"></div>';
 
-            echo '<script>';
-                echo 'window.masterAllHeroesList = '.json_encode($result).';';
-            echo '</script>';
 
-            require 'php/template_d2_hero_ability_tooltip.php';
+            echo '<ul class="nav nav-pills" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="masterList-tab" data-toggle="tab" href="#masterList" role="tab" aria-controls="masterList" aria-selected="true">Enabled abilities</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dispellableAbilities-tab" data-toggle="tab" href="#masterDispellableAbilities" role="tab" aria-controls="dispellableAbilities" aria-selected="false">Dispellable abilities</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">';
+                echo '<div id="masterList" class="tab-pane fade show active" role="tabpanel" aria-labelledby="masterList-tab">';
+                    echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
+                    // first tab            
+                    //echo '<div id="masterList"></div>';
+                echo '</div>';
+                echo '<div id="masterDispellableAbilities" class="tab-pane fade" role="tabpanel" aria-labelledby="dispellableAbilities-tab">';
+                    // second tab
+
+                echo '</div>';    
+            echo '</div>';               
+
+        echo '<script>';
+            echo 'window.masterAllHeroesList = '.json_encode($result).';';
+        echo '</script>';
+
+        require 'php/template_d2_hero_ability_tooltip.php';
+
 
         } else {
 
@@ -431,6 +459,10 @@
                 }
             }
 
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            global $dbClass;
+            $functionSelectQuery = "SELECT autoDecideAbilitiesDispellabe(NULL);";
+            $dbClass->select($query);
 
             // проход по героям:
             // if                             

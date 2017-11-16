@@ -271,6 +271,29 @@
             ));
         }
     }
+    elseif (($_POST['ajaxType'] == 'masterSetManuals') && (isGotAccess(_ROLE_MASTER)))
+    {
+        $query = 'UPDATE tb_dota2_hero_ability_list
+                     SET cf_d2HeroAbilityList_manualBuffDispellableB = ?
+                        , cf_d2HeroAbilityList_manualBuffDispellableS = ?
+                        , cf_d2HeroAbilityList_manualDebuffDispellableB = ?
+                        , cf_d2HeroAbilityList_manualDebuffDispellableS = ?
+                        , cf_d2HeroAbilityList_isConfirmed = 1
+                   WHERE cf_d2HeroAbilityList_id = ?;';
+        $isUpdateOk = $dbClass->update($query, $_POST['checkbox1'], $_POST['checkbox2'], $_POST['checkbox3'], $_POST['checkbox4'], $_POST['abilityId']);
+
+        if ($isUpdateOk)
+        {
+            // $query = 'SELECT updateDispellableAbilitiesTags(NULL);';
+            // $dbClass->select($query);
+
+            ajaxReturnAndExit(array( 'php_result'=>'OK'));
+        } else {
+            ajaxReturnAndExit(array( 'php_result'=>'ERROR',
+                                    'php_error_msg'=>'New tag has not been created! Error #ks8z-qq0q-vntt-47281!'
+            ));
+        }
+    }
     else
     {
         ajaxReturnAndExit(array( 'php_result'=>'ERROR',

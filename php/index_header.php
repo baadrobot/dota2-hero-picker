@@ -89,8 +89,10 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<link rel="stylesheet" href="css/kainax.css">';
         echo '<script src="js/kainax.js"></script>';
 
+
         if (isset($_GET['component']))
         {
+
             $externalData = '<script>';
                 // this translations only needed for ability tooltips
                 $externalData .= 'window.LangPreStr["GLOBAL"]["_DISPELLABLE_YES_"] = "Стандартное";';
@@ -104,8 +106,44 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 $externalData .= '});';
             $externalData .= '</script>';
 
+            function loadAdditionalTooltipData()
+            {
+                global $dbClass;
+                
+                $query2 = 'SELECT cf_d2HeroAbilityList_id as `abilityId`, cf_d2HeroAbilityList_spellDispellableType as `type`
+                FROM tb_dota2_hero_ability_list
+                WHERE cf_d2HeroAbilityList_spellDispellableType IS NOT NULL;';
+    
+                $spell_dispellable_type_array = $dbClass->select($query2);
+    
+                $abilityTypeList = [];
+                for ($i = 0; $i < count($spell_dispellable_type_array); $i++)
+                {
+                    if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_NO')
+                    {
+                        $dispellableTypeIntegerOrUnknownName = 0; 
+                    } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES')
+                    {
+                        $dispellableTypeIntegerOrUnknownName = 1; 
+                    } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES_STRONG')
+                    {
+                        $dispellableTypeIntegerOrUnknownName = 2; 
+                    } else {
+                        $dispellableTypeIntegerOrUnknownName = $spell_dispellable_type_array[$i]['abilityId'];
+                    }
+    
+                    $abilityTypeList[$spell_dispellable_type_array[$i]['abilityId']] = $dispellableTypeIntegerOrUnknownName;
+                }
+    
+                echo '<script>';
+                    echo 'window.abilityTypeList = '.json_encode($abilityTypeList).';';
+                echo '</script>';            
+            }
+
+            
             if  (($_GET['component'] == 'editor') && isGotAccess(_ROLE_EDITOR))
             {
+                loadAdditionalTooltipData();
                 // if problems with horisontal scroll in GB will apear, find "var gbHorizontalScrollsEl = jQuery('.horizontalScrollWrap');" in guidebook js
                 echo '<link rel="stylesheet" href="css/component.editor.css" />';
                 echo '<script src="js/component.editor.js"></script>';
@@ -116,6 +154,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             }
             else if (($_GET['component'] == 'master') && isGotAccess(_ROLE_MASTER))
             {
+                loadAdditionalTooltipData();
                 echo '<script src="js/component.master.js"></script>';
                 echo '<link rel="stylesheet" href="css/component.master.css">';
                 echo $externalData;
