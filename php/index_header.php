@@ -169,6 +169,11 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 echo '<script src="js/component.user_profile.js"></script>';
                 echo '<link rel="stylesheet" href="css/component.user_profile.css">';
             }
+            else if ($_GET['component'] == 'counter_pick')
+            {
+                echo '<script src="js/component.counter_pick.js"></script>';
+                echo '<link rel="stylesheet" href="css/component.counter_pick.css">';
+            }
         }
 
 

@@ -172,6 +172,7 @@ $(document).ready(function ()
                 {
                     // create new hero div
                     heroDivHtml = '<div class="masterDispellableWrap" data-hero-id="'+window.masterAllHeroesList[i]['heroId']+'" data-hero-codename="'+window.masterAllHeroesList[i]['heroCodename']+'">';
+                        heroDivHtml += '<a target="_blank" href="https://dota2.gamepedia.com/'+window.masterAllHeroesList[i]['heroCodename']+'#Abilities"><i class="fa fa-link" aria-hidden="true"></i></a>';
                         heroDivHtml += '<h4 class="masterHeroLocalname">'+window.masterAllHeroesList[i]['heroLocalname']+'</h4>';
                         heroDivHtml += '<div class="masterHeroImgWrap">';
                             heroDivHtml += '<img src="//cdn.dota2.com/apps/dota2/images/heroes/'+window.masterAllHeroesList[i]['heroCodename']+'_vert.jpg?v=4195662">';
@@ -179,8 +180,9 @@ $(document).ready(function ()
                         heroDivHtml += '<div class="masterDispellableAbilitiesWrap">';
                             heroDivHtml += dispellableAbilititiesItemsHtml;
                         heroDivHtml += '</div>';
+                        heroDivHtml += '<hr>';
                     heroDivHtml += '</div>';
-                    heroDivHtml += '<hr>';
+
                     $('#masterDispellableAbilities').append(heroDivHtml);
                 }
                 dispellableAbilititiesItemsHtml = '';
@@ -324,6 +326,26 @@ $(document).ready(function ()
             });
         };
     });
+
+    var filterUnconfirmedCheckboxEl = $('#filterUnconfirmed');
+    filterUnconfirmedCheckboxEl.on('click', function()
+    {
+        if ($(this).is(":checked"))
+        {
+            $('.dispAbilityItem .bkgConfirmed:not(.bkgRed, .bkgYellow)').parent().hide();
+            $('.masterDispellableWrap').each(function()
+            {
+                if (!($(this).find('.bkgRed, .bkgYellow').length))
+                {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $('.masterDispellableWrap').show();
+            $('.dispAbilityItem').show();
+        }
+    })
+
 
     addOnHoverTooltipsForAbilityImg('#masterList');
     addOnHoverTooltipsForAbilityImg('#masterDispellableAbilities');

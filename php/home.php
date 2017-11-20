@@ -3,6 +3,15 @@
 
     echo '<div>Welcome home!</div>';
 
+    if (!isGotAccess(_ROLE_USER))
+    {
+        echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=registration">Регистрация</a></div>';
+        echo '<br>';
+    }
+
+    echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=counter_pick">Контр-пик</a></div>';
+    echo '<br>';
+    
     if (isGotAccess(_ROLE_MASTER))
     {
         echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=user_profile">Профайл пользователя</a></div>';

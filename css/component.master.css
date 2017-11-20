@@ -68,3 +68,11 @@
 .brightRed {
     color: red;
 }
+
+.masterHeroLocalname{
+    display: inline;
+}
+
+.masterDispellableWrap .fa-link{
+    margin: 5px;
+}

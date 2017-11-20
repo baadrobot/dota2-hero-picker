@@ -284,8 +284,8 @@
 
         if ($isUpdateOk)
         {
-            // $query = 'SELECT updateDispellableAbilitiesTags(NULL);';
-            // $dbClass->select($query);
+             $query = 'SELECT updateDispellableAbilitiesTags(NULL);';
+             $dbClass->select($query);
 
             ajaxReturnAndExit(array( 'php_result'=>'OK'));
         } else {
