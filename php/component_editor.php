@@ -11,34 +11,8 @@
 
     $hero_array = $dbClass->select($query);
 
-    $query2 = 'SELECT cf_d2HeroAbilityList_id as `abilityId`, cf_d2HeroAbilityList_spellDispellableType as `type`
-                FROM tb_dota2_hero_ability_list
-                WHERE cf_d2HeroAbilityList_spellDispellableType IS NOT NULL;';
-
-    $spell_dispellable_type_array = $dbClass->select($query2);
-
-    $abilityTypeList = [];
-    for ($i = 0; $i < count($spell_dispellable_type_array); $i++)
-    {
-        if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_NO')
-        {
-            $dispellableTypeIntegerOrUnknownName = 0; 
-        } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES')
-        {
-            $dispellableTypeIntegerOrUnknownName = 1; 
-        } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES_STRONG')
-        {
-            $dispellableTypeIntegerOrUnknownName = 2; 
-        } else {
-            $dispellableTypeIntegerOrUnknownName = $spell_dispellable_type_array[$i]['abilityId'];
-        }
-
-        $abilityTypeList[$spell_dispellable_type_array[$i]['abilityId']] = $dispellableTypeIntegerOrUnknownName;
-    }
-
     echo '<script>';
         echo 'window.heroList = '.json_encode($hero_array).';';
-        echo 'window.abilityTypeList = '.json_encode($abilityTypeList).';';
     echo '</script>';
 
 

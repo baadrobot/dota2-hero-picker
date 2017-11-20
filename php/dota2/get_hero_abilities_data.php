@@ -6,7 +6,174 @@
     {
         if (!isset($_GET['update']))
         {
-            echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
+            require_once('php/cl.simpleHTMLDom.php');
+
+            function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
+            {
+                //******** Getting https elements
+
+                //Указываем URL, куда будем обращаться. Протокол https://
+                $ch = curl_init();
+
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_HEADER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+                //$fp = fopen("example_homepage.txt", "w");
+                //curl_setopt($ch, CURLOPT_FILE, $fp);
+                $curl_data = curl_exec($ch);
+                curl_close($ch);
+                //fclose($fp);
+
+                //******** Seperating dom elements
+
+                $html = new simple_html_dom();
+                // Load from a string
+                $html->load($curl_data);
+                unset($curl_data);
+
+
+                $arrayLaneHeroesRate = [];
+                foreach($html->find('table tbody tr') as $hero) 
+                {
+                    $heroLocalName = $hero->children(0)->getAttribute('data-value');
+                    if ($heroLocalName != '')
+                    {
+                        $presence = $hero->children(2)->getAttribute('data-value');
+                        $winRate = $hero->children(3)->getAttribute('data-value');
+                        if (($presence > $minPresence) || ($winRate > $minWinRate))
+                        {
+                            if ($presence > 80)
+                            {
+                                $presenceScore = 8;
+                            } else if ($presence > 70)
+                            {
+                                $presenceScore = 7;
+                            } else if ($presence > 60)
+                            {
+                                $presenceScore = 6;
+                            } else if ($presence > 50)
+                            {
+                                $presenceScore = 5;
+                            } else if ($presence > 40)
+                            {
+                                $presenceScore = 4;
+                            } else if ($presence > 30)
+                            {
+                                $presenceScore = 3;
+                            } else if ($presence > 20)
+                            {
+                                $presenceScore = 2;
+                            } else if ($presence > 10)
+                            {
+                                $presenceScore = 1;
+                            } else {
+                                $presenceScore = 0;
+                            }
+
+                            if ($winRate > 58)
+                            {
+                                $winScore = 12;
+                            } else if ($winRate > 56)
+                            {
+                                $winScore = 11;
+                            } else if ($winRate > 54)
+                            {
+                                $winScore = 9;
+                            } else if ($winRate > 52)
+                            {
+                                $winScore = 7;
+                            } else if ($winRate > 50)
+                            {                        
+                                $winScore = 5;
+                            } else if ($winRate > 49)
+                            {
+                                $winScore = 4;
+                            } else if ($winRate > 48)
+                            {
+                                $winScore = 3;
+                            } else if ($winRate > 47)
+                            {
+                                $winScore = 2;
+                            } else if ($winRate > 46)
+                            {
+                                $winScore = 1;
+                            } else {
+                                $winScore = 0;
+                            }
+
+                            $score = $presenceScore + $winScore;
+                            $arrayLaneHeroesRate[$heroLocalName] = $score;
+                        }                        
+                    }
+                }
+
+                $min = 1000;
+                $max = -1;
+                foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
+                {
+                    if ($valScore > $max)
+                    {
+                        $max = $valScore;
+                    }
+
+                    if ($valScore < $min)
+                    {
+                        $min = $valScore;
+                    }
+                }
+
+                global $dbClass;
+                $query = "DELETE FROM tb_dota2_heroTag_set
+                        WHERE cf_d2HeroTagSet_tag_id = ?;";
+                $dbClass->delete($query, $tagId);
+
+                $query = "INSERT INTO tb_dota2_heroTag_set
+                                SET cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
+                                    ,cf_d2HeroTagSet_tag_id = ?
+                                    ,cf_d2HeroTagSet_tag_val = ?
+                                    ,cf_d2HeroTagSet_selected_abilities = NULL
+                                    ON DUPLICATE KEY UPDATE
+                                    cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
+                                    ,cf_d2HeroTagSet_tag_id = ?
+                                    ,cf_d2HeroTagSet_tag_val = ?
+                                    ,cf_d2HeroTagSet_selected_abilities = NULL                                 
+                                    ;";
+
+                $maxValueOfTag = 5;
+                $gradation = ($max - $min) / $maxValueOfTag;
+                foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
+                {
+                    $arrayLaneHeroesRate[$keyHeroLocalName] = $maxValueOfTag;
+                    for ($i = $maxValueOfTag; $i >= 1; $i--)
+                    {
+                        if ($valScore <= ($min + ($gradation * $i)))
+                        {
+                            $arrayLaneHeroesRate[$keyHeroLocalName] = $i;
+                        }
+                    }
+                    $dbClass->insert($query, $keyHeroLocalName, $tagId, $arrayLaneHeroesRate[$keyHeroLocalName], $keyHeroLocalName, $tagId, $arrayLaneHeroesRate[$keyHeroLocalName]);
+                    echo $keyHeroLocalName . ' - ' . $arrayLaneHeroesRate[$keyHeroLocalName].'<br>';
+                }
+                return $arrayLaneHeroesRate;
+            }
+
+
+            setLaneTagValue($tagId = 33, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
+            setLaneTagValue($tagId = 36, 'https://www.dotabuff.com/heroes/lanes?lane=roaming', $minPresence = 0, $minWinRate = 0);
+            setLaneTagValue($tagId = 34, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
+            setLaneTagValue($tagId = 35, 'https://www.dotabuff.com/heroes/lanes?lane=jungle', $minPresence = 0, $minWinRate = 0);
+            // carry
+            setLaneTagValue($tagId = 32, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
+            // support Off lane
+            setLaneTagValue($tagId = 37, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
+
+            exit; // kainax: todo remove
             //require $prebuildMasterAbilitiesFilenamePath;
 
 
@@ -38,6 +205,14 @@
                         ,cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                         ,cf_d2HeroAbilityList_isAbilityIgnored as `ignoreStatus`
                         ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
+                        --
+                        ,cf_d2HeroAbilityList_manualBuffDispellableB as `buffDispellableB`
+                        ,cf_d2HeroAbilityList_manualBuffDispellableS as `buffDispellableS`
+                        ,cf_d2HeroAbilityList_manualDebuffDispellableB as `debuffDispellableB`
+                        ,cf_d2HeroAbilityList_manualDebuffDispellableS as `debuffDispellableS`
+                        ,cf_d2HeroAbilityList_isConfirmed as `isConfirmed`
+                        ,cf_d2HeroAbilityList_spellDispellableType as `dispType`
+                        --
                         FROM tb_dota2_hero_ability_list
                         INNER JOIN tb_dota2_hero_list
                             ON tb_dota2_hero_ability_list.cf_d2HeroAbilityList_heroId = tb_dota2_hero_list.cf_d2HeroList_id
@@ -46,13 +221,37 @@
 
             $result = $dbClass->select($query);
 
-            echo '<div id="masterList"></div>';
+
+
+            echo '<ul class="nav nav-pills" id="myTab" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="masterList-tab" data-toggle="tab" href="#masterList" role="tab" aria-controls="masterList" aria-selected="true">Enabled abilities</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="dispellableAbilities-tab" data-toggle="tab" href="#masterDispellableAbilities" role="tab" aria-controls="dispellableAbilities" aria-selected="false">Dispellable abilities</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">';
+                echo '<div id="masterList" class="tab-pane fade show active" role="tabpanel" aria-labelledby="masterList-tab">';
+                    echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
+                    // first tab            
+                    //echo '<div id="masterList"></div>';
+                echo '</div>';
+                echo '<div id="masterDispellableAbilities" class="tab-pane fade" role="tabpanel" aria-labelledby="dispellableAbilities-tab">';
+                    // second tab
+                    echo '<hr>';
+                    echo '<label><input id="filterUnconfirmed" type="checkbox"> Фильтровать неподтвержденные</label>';
+                    echo '<hr>';
+
+                echo '</div>';    
+            echo '</div>';               
 
             echo '<script>';
                 echo 'window.masterAllHeroesList = '.json_encode($result).';';
             echo '</script>';
 
             require 'php/template_d2_hero_ability_tooltip.php';
+
 
         } else {
 
@@ -431,25 +630,16 @@
                 }
             }
 
-
-            // проход по героям:
-            // if                             
-            //  cf_d2HeroAbilityList_abilityUnitTargetTeam содержит (не то же самое что равно)
-            //  DOTA_UNIT_TARGET_TEAM_FRIENDLY или DOTA_UNIT_TARGET_TEAM_BOTH
-            //  создать запись в таблице tb_dota2_heroTag_set 
-            // с айди героя - ?, айди тега - 29, value (default 3), ability id - все что нашли
-
-                            
+            // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            global $dbClass;
+            $functionSelectQuery = "SELECT autoDecideAbilitiesDispellabe(NULL);";
+            $dbClass->select($query);
 
 
+            // invoke MySQL function to rebuild hero tags for DISPELLABLE abilities
+            $query = 'SELECT updateDispellableAbilitiesTags(NULL);';
+            $dbClass->select($query);
 
-
-
-
-
-            // -- read hero abilities data from Dota 2 game installation path
-            // $heroAbilitiesDota2FilePathName = 'C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/scripts/npc/npc_heroes.txt';
-            // $echoCache .= '<pre>',print_r(getParamsFromDotaFile($heroAbilitiesDota2FilePathName)),'</pre>';
 
             echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
             echo '<br>Reloading...<br>';

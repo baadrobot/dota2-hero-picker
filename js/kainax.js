@@ -107,7 +107,7 @@ function pleaseWaitClose()
     $('.modal-backdrop').css('z-index', '');
 }
 
-function addOnHoverTooltipsForAbilityImg(wrapIdEl, tooltipYoffset)
+function addOnHoverTooltipsForAbilityImg(wrapIdEl)
 {
     $(wrapIdEl).find('[data-ability-codename]')
     .mouseenter(function ()
