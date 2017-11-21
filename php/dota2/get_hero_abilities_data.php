@@ -6,174 +6,6 @@
     {
         if (!isset($_GET['update']))
         {
-            require_once('php/cl.simpleHTMLDom.php');
-
-            function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
-            {
-                //******** Getting https elements
-
-                //Указываем URL, куда будем обращаться. Протокол https://
-                $ch = curl_init();
-
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_HEADER, false);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-                curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-                //$fp = fopen("example_homepage.txt", "w");
-                //curl_setopt($ch, CURLOPT_FILE, $fp);
-                $curl_data = curl_exec($ch);
-                curl_close($ch);
-                //fclose($fp);
-
-                //******** Seperating dom elements
-
-                $html = new simple_html_dom();
-                // Load from a string
-                $html->load($curl_data);
-                unset($curl_data);
-
-
-                $arrayLaneHeroesRate = [];
-                foreach($html->find('table tbody tr') as $hero) 
-                {
-                    $heroLocalName = $hero->children(0)->getAttribute('data-value');
-                    if ($heroLocalName != '')
-                    {
-                        $presence = $hero->children(2)->getAttribute('data-value');
-                        $winRate = $hero->children(3)->getAttribute('data-value');
-                        if (($presence > $minPresence) || ($winRate > $minWinRate))
-                        {
-                            if ($presence > 80)
-                            {
-                                $presenceScore = 8;
-                            } else if ($presence > 70)
-                            {
-                                $presenceScore = 7;
-                            } else if ($presence > 60)
-                            {
-                                $presenceScore = 6;
-                            } else if ($presence > 50)
-                            {
-                                $presenceScore = 5;
-                            } else if ($presence > 40)
-                            {
-                                $presenceScore = 4;
-                            } else if ($presence > 30)
-                            {
-                                $presenceScore = 3;
-                            } else if ($presence > 20)
-                            {
-                                $presenceScore = 2;
-                            } else if ($presence > 10)
-                            {
-                                $presenceScore = 1;
-                            } else {
-                                $presenceScore = 0;
-                            }
-
-                            if ($winRate > 58)
-                            {
-                                $winScore = 12;
-                            } else if ($winRate > 56)
-                            {
-                                $winScore = 11;
-                            } else if ($winRate > 54)
-                            {
-                                $winScore = 9;
-                            } else if ($winRate > 52)
-                            {
-                                $winScore = 7;
-                            } else if ($winRate > 50)
-                            {                        
-                                $winScore = 5;
-                            } else if ($winRate > 49)
-                            {
-                                $winScore = 4;
-                            } else if ($winRate > 48)
-                            {
-                                $winScore = 3;
-                            } else if ($winRate > 47)
-                            {
-                                $winScore = 2;
-                            } else if ($winRate > 46)
-                            {
-                                $winScore = 1;
-                            } else {
-                                $winScore = 0;
-                            }
-
-                            $score = $presenceScore + $winScore;
-                            $arrayLaneHeroesRate[$heroLocalName] = $score;
-                        }                        
-                    }
-                }
-
-                $min = 1000;
-                $max = -1;
-                foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
-                {
-                    if ($valScore > $max)
-                    {
-                        $max = $valScore;
-                    }
-
-                    if ($valScore < $min)
-                    {
-                        $min = $valScore;
-                    }
-                }
-
-                global $dbClass;
-                $query = "DELETE FROM tb_dota2_heroTag_set
-                        WHERE cf_d2HeroTagSet_tag_id = ?;";
-                $dbClass->delete($query, $tagId);
-
-                $query = "INSERT INTO tb_dota2_heroTag_set
-                                SET cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
-                                    ,cf_d2HeroTagSet_tag_id = ?
-                                    ,cf_d2HeroTagSet_tag_val = ?
-                                    ,cf_d2HeroTagSet_selected_abilities = NULL
-                                    ON DUPLICATE KEY UPDATE
-                                    cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
-                                    ,cf_d2HeroTagSet_tag_id = ?
-                                    ,cf_d2HeroTagSet_tag_val = ?
-                                    ,cf_d2HeroTagSet_selected_abilities = NULL                                 
-                                    ;";
-
-                $maxValueOfTag = 5;
-                $gradation = ($max - $min) / $maxValueOfTag;
-                foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
-                {
-                    $arrayLaneHeroesRate[$keyHeroLocalName] = $maxValueOfTag;
-                    for ($i = $maxValueOfTag; $i >= 1; $i--)
-                    {
-                        if ($valScore <= ($min + ($gradation * $i)))
-                        {
-                            $arrayLaneHeroesRate[$keyHeroLocalName] = $i;
-                        }
-                    }
-                    $dbClass->insert($query, $keyHeroLocalName, $tagId, $arrayLaneHeroesRate[$keyHeroLocalName], $keyHeroLocalName, $tagId, $arrayLaneHeroesRate[$keyHeroLocalName]);
-                    echo $keyHeroLocalName . ' - ' . $arrayLaneHeroesRate[$keyHeroLocalName].'<br>';
-                }
-                return $arrayLaneHeroesRate;
-            }
-
-
-            setLaneTagValue($tagId = 33, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
-            setLaneTagValue($tagId = 36, 'https://www.dotabuff.com/heroes/lanes?lane=roaming', $minPresence = 0, $minWinRate = 0);
-            setLaneTagValue($tagId = 34, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
-            setLaneTagValue($tagId = 35, 'https://www.dotabuff.com/heroes/lanes?lane=jungle', $minPresence = 0, $minWinRate = 0);
-            // carry
-            setLaneTagValue($tagId = 32, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
-            // support Off lane
-            setLaneTagValue($tagId = 37, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
-
-            exit; // kainax: todo remove
             //require $prebuildMasterAbilitiesFilenamePath;
 
 
@@ -234,7 +66,7 @@
             <div class="tab-content" id="myTabContent">';
                 echo '<div id="masterList" class="tab-pane fade show active" role="tabpanel" aria-labelledby="masterList-tab">';
                     echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
-                    // first tab            
+                    // first tab
                     //echo '<div id="masterList"></div>';
                 echo '</div>';
                 echo '<div id="masterDispellableAbilities" class="tab-pane fade" role="tabpanel" aria-labelledby="dispellableAbilities-tab">';
@@ -243,8 +75,8 @@
                     echo '<label><input id="filterUnconfirmed" type="checkbox"> Фильтровать неподтвержденные</label>';
                     echo '<hr>';
 
-                echo '</div>';    
-            echo '</div>';               
+                echo '</div>';
+            echo '</div>';
 
             echo '<script>';
                 echo 'window.masterAllHeroesList = '.json_encode($result).';';
@@ -254,6 +86,34 @@
 
 
         } else {
+            // UPDATE
+            require_once('php/cl.simpleHTMLDom.php');
+
+            // mid core
+            //setLaneTagValue($tagId = 33, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
+
+            // mid support
+            setLaneTagValue($tagId = 39, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
+
+            // roamer
+            //setLaneTagValue($tagId = 36, 'https://www.dotabuff.com/heroes/lanes?lane=roaming', $minPresence = 0, $minWinRate = 0);
+
+            // offlane core
+            //setLaneTagValue($tagId = 34, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
+
+            // offlane support
+            setLaneTagValue($tagId = 38, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
+
+            // jungler
+            //setLaneTagValue($tagId = 35, 'https://www.dotabuff.com/heroes/lanes?lane=jungle', $minPresence = 0, $minWinRate = 0);
+
+            // carry
+            //setLaneTagValue($tagId = 32, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
+
+            // support safe lane
+            //setLaneTagValue($tagId = 37, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
+
+            exit; // kainax: todo remove, but move all above to to the end
 
                                     // prepare temp array for forbidden abilities
                                     $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
@@ -404,23 +264,23 @@
                             if (isset($abilities[$abilityCodename]['SpellDispellableType']))
                             {
                                 $spellDispellableType = $abilities[$abilityCodename]['SpellDispellableType'];
-                                
-            // if                             
+
+            // if
             //  cf_d2HeroAbilityList_abilityUnitTargetTeam содержит (не то же самое что равно)
             //  DOTA_UNIT_TARGET_TEAM_FRIENDLY или DOTA_UNIT_TARGET_TEAM_BOTH
-            //  создать запись в таблице tb_dota2_heroTag_set 
-            // с айди героя - ?, айди тега - 29, value (default 3), ability id - все что нашли                                
+            //  создать запись в таблице tb_dota2_heroTag_set
+            // с айди героя - ?, айди тега - 29, value (default 3), ability id - все что нашли
 
                                 // if ($spellDispellableType == 'SPELL_DISPELLABLE_YES')
                                 // {
 
-                                //    // $autoTagSetForDispellableAbilities[$heroCodename] 
+                                //    // $autoTagSetForDispellableAbilities[$heroCodename]
 
                                 // } else if ($spellDispellableType == 'SPELL_DISPELLABLE_YES_STRONG')
                                 // {
                                 //     $autoTagSetForDispellableAbilities[$heroCodename]['strong_friend'] = ''
                                 //     $autoTagSetForDispellableAbilities[$heroCodename]['strong_enemy'] = ''
-                                //     $autoTagSetForDispellableAbilities[$heroCodename]['basic_friend'] += ' ' +$abilityId;                                    
+                                //     $autoTagSetForDispellableAbilities[$heroCodename]['basic_friend'] += ' ' +$abilityId;
                                 //     $autoTagSetForDispellableAbilities[$heroCodename]['basic_enemy'] = ''
                                 // } else {
 
@@ -652,83 +512,235 @@
         }
     }
 
-    function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)
+function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)
+{
+    $templateAbility_NewKeyFirstLine = "\t\"";
+    $templateAbility_ParameterPrefix = "\t\t\"";
+    $templateAbility_NewKeyLastLine = "\t}";
+
+    $heroAbilities = [];
+
+    // -- copy to ./php/dota2/data/same_name.txt
+    $filePathName = __DIR__ . '/data/' . basename($heroAbilitiesDota2FilePathName);
+
+    if (file_exists($heroAbilitiesDota2FilePathName))
     {
-        $templateAbility_NewKeyFirstLine = "\t\"";
-        $templateAbility_ParameterPrefix = "\t\t\"";
-        $templateAbility_NewKeyLastLine = "\t}";
+        copy( $heroAbilitiesDota2FilePathName,  $filePathName);
+    } else {
+        echo '<pre>Warning! File '.$heroAbilitiesDota2FilePathName.' not found! Please check Dota2 installation folder.</pre>';
+        return false;
+    }
 
-        $heroAbilities = [];
-
-        // -- copy to ./php/dota2/data/same_name.txt
-        $filePathName = __DIR__ . '/data/' . basename($heroAbilitiesDota2FilePathName);
-
-        if (file_exists($heroAbilitiesDota2FilePathName))
+    if (file_exists($filePathName))
+    {
+        if (!($myfile = fopen($filePathName, "r")))
         {
-            copy( $heroAbilitiesDota2FilePathName,  $filePathName);
-        } else {
-            echo '<pre>Warning! File '.$heroAbilitiesDota2FilePathName.' not found! Please check Dota2 installation folder.</pre>';
+            echo '<pre>Warning! Error opening '.$filePathName.'! Please check Dota2 installation folder.</pre>';
             return false;
-        }
-
-        if (file_exists($filePathName))
-        {
-            if (!($myfile = fopen($filePathName, "r")))
+        } else {
+            $result = [];
+            // parse each line of text file
+            while(!feof($myfile))
             {
-                echo '<pre>Warning! Error opening '.$filePathName.'! Please check Dota2 installation folder.</pre>';
-                return false;
-            } else {
-                $result = [];
-                // parse each line of text file
-                while(!feof($myfile))
+                $currentLine = fgets($myfile);
+
+                // if we found a position of a key
+                if ($templateAbility_NewKeyFirstLine == substr($currentLine, 0, strlen($templateAbility_NewKeyFirstLine)))
                 {
-                    $currentLine = fgets($myfile);
+                    $quotePos1 = 1;
+                    $quotePos2 = strpos($currentLine, '"', $quotePos1 + 1);
+                    $key = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));
+                    $result[$key] = [];
 
-                    // if we found a position of a key
-                    if ($templateAbility_NewKeyFirstLine == substr($currentLine, 0, strlen($templateAbility_NewKeyFirstLine)))
+                    //$echoCache .= '************* - '.$key.'<br>';
+
+                    // start writing each ability data to ability array
+                    //while((!feof($myfile)) && ($currentLine != $templateAbility_NewKeyLastLine))
+                    while ((!(feof($myfile)))
+                    && ($templateAbility_NewKeyLastLine != substr($currentLine, 0, strlen($templateAbility_NewKeyLastLine))))
                     {
-                        $quotePos1 = 1;
-                        $quotePos2 = strpos($currentLine, '"', $quotePos1 + 1);
-                        $key = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));
-                        $result[$key] = [];
+                        $currentLine = fgets($myfile);
 
-                        //$echoCache .= '************* - '.$key.'<br>';
-
-                        // start writing each ability data to ability array
-                        //while((!feof($myfile)) && ($currentLine != $templateAbility_NewKeyLastLine))
-                        while ((!(feof($myfile)))
-                        && ($templateAbility_NewKeyLastLine != substr($currentLine, 0, strlen($templateAbility_NewKeyLastLine))))
+                        // if this is an ability parameter line
+                        if ((substr($currentLine, 0, 3) == $templateAbility_ParameterPrefix)
+                        && (substr_count($currentLine, '"') == 4))
                         {
-                            $currentLine = fgets($myfile);
 
-                            // if this is an ability parameter line
-                            if ((substr($currentLine, 0, 3) == $templateAbility_ParameterPrefix)
-                            && (substr_count($currentLine, '"') == 4))
-                            {
+                            // write ability parameter to abilities_array
+                            $quotePos1 = 2;
+                            $quotePos2 = strpos($currentLine, '"', $quotePos1 + 1);
+                            $quotePos3 = strpos($currentLine, '"', $quotePos2 + 1);
+                            $quotePos4 = strpos($currentLine, '"', $quotePos3 + 1);
 
-                                // write ability parameter to abilities_array
-                                $quotePos1 = 2;
-                                $quotePos2 = strpos($currentLine, '"', $quotePos1 + 1);
-                                $quotePos3 = strpos($currentLine, '"', $quotePos2 + 1);
-                                $quotePos4 = strpos($currentLine, '"', $quotePos3 + 1);
+                            $subKey = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));
+                            $subKeyValue = substr($currentLine, $quotePos3 + 1, ($quotePos4 - $quotePos3 - 1));
 
-                                $subKey = substr($currentLine, $quotePos1 + 1, ($quotePos2 - $quotePos1 - 1));
-                                $subKeyValue = substr($currentLine, $quotePos3 + 1, ($quotePos4 - $quotePos3 - 1));
-
-                                $result[$key][$subKey] = $subKeyValue;
-                            }
+                            $result[$key][$subKey] = $subKeyValue;
                         }
                     }
                 }
-
-                // close file read
-                fclose($myfile);
-                return $result;
             }
 
-        } else {
-            echo '<pre>Warning! File '.$filePathName." did'nt copy properly! Please check php admin access.</pre>";
-            return false;
+            // close file read
+            fclose($myfile);
+            return $result;
+        }
+
+    } else {
+        echo '<pre>Warning! File '.$filePathName." did'nt copy properly! Please check php admin access.</pre>";
+        return false;
+    }
+}
+
+
+function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
+{
+    //******** Getting https elements
+
+    //Указываем URL, куда будем обращаться. Протокол https://
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HEADER, false);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    //$fp = fopen("example_homepage.txt", "w");
+    //curl_setopt($ch, CURLOPT_FILE, $fp);
+    $curl_data = curl_exec($ch);
+    curl_close($ch);
+    //fclose($fp);
+
+    //******** Seperating dom elements
+
+    $html = new simple_html_dom();
+    // Load from a string
+    $html->load($curl_data);
+    unset($curl_data);
+
+
+    $arrayLaneHeroesRate = [];
+    foreach($html->find('table tbody tr') as $hero)
+    {
+        $heroLocalName = $hero->children(0)->getAttribute('data-value');
+        if ($heroLocalName != '')
+        {
+            $presence = $hero->children(2)->getAttribute('data-value');
+            $winRate = $hero->children(3)->getAttribute('data-value');
+            if (($presence > $minPresence) || ($winRate > $minWinRate))
+            {
+                if ($presence > 80)
+                {
+                    $presenceScore = 8;
+                } else if ($presence > 70)
+                {
+                    $presenceScore = 7;
+                } else if ($presence > 60)
+                {
+                    $presenceScore = 6;
+                } else if ($presence > 50)
+                {
+                    $presenceScore = 5;
+                } else if ($presence > 40)
+                {
+                    $presenceScore = 4;
+                } else if ($presence > 30)
+                {
+                    $presenceScore = 3;
+                } else if ($presence > 20)
+                {
+                    $presenceScore = 2;
+                } else if ($presence > 10)
+                {
+                    $presenceScore = 1;
+                } else {
+                    $presenceScore = 0;
+                }
+
+                if ($winRate > 58)
+                {
+                    $winScore = 12;
+                } else if ($winRate > 56)
+                {
+                    $winScore = 11;
+                } else if ($winRate > 54)
+                {
+                    $winScore = 9;
+                } else if ($winRate > 52)
+                {
+                    $winScore = 7;
+                } else if ($winRate > 50)
+                {
+                    $winScore = 5;
+                } else if ($winRate > 49)
+                {
+                    $winScore = 4;
+                } else if ($winRate > 48)
+                {
+                    $winScore = 3;
+                } else if ($winRate > 47)
+                {
+                    $winScore = 2;
+                } else if ($winRate > 46)
+                {
+                    $winScore = 1;
+                } else {
+                    $winScore = 0;
+                }
+
+                $score = $presenceScore + $winScore;
+                $arrayLaneHeroesRate[$heroLocalName] = $score;
+            }
         }
     }
+
+    $min = 1000;
+    $max = -1;
+    foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
+    {
+        if ($valScore > $max)
+        {
+            $max = $valScore;
+        }
+
+        if ($valScore < $min)
+        {
+            $min = $valScore;
+        }
+    }
+
+    global $dbClass;
+    $query = "UPDATE tb_dota2_heroTag_set
+              SET cf_d2HeroTagSet_tag_val = 1
+              WHERE cf_d2HeroTagSet_tag_id = ?;";
+    $dbClass->update($query, $tagId);
+
+    $query = "UPDATE tb_dota2_heroTag_set
+                        ,cf_d2HeroTagSet_tag_val = ?
+                        ,cf_d2HeroTagSet_selected_abilities = NULL
+                        WHERE cf_d2HeroTagSet_tag_id = ?
+                          AND cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
+                        ;";
+
+    $maxValueOfTag = 5;
+    $gradation = ($max - $min) / $maxValueOfTag;
+    foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
+    {
+        $arrayLaneHeroesRate[$keyHeroLocalName] = $maxValueOfTag;
+        for ($i = $maxValueOfTag; $i >= 1; $i--)
+        {
+            if ($valScore <= ($min + ($gradation * $i)))
+            {
+                $arrayLaneHeroesRate[$keyHeroLocalName] = $i;
+            }
+        }
+        $dbClass->update($query, $arrayLaneHeroesRate[$keyHeroLocalName], $tagId, $keyHeroLocalName);
+        //echo $keyHeroLocalName . ' - ' . $arrayLaneHeroesRate[$keyHeroLocalName].'<br>';
+    }
+    return $arrayLaneHeroesRate;
+}
 ?>
