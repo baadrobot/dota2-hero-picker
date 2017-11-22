@@ -146,11 +146,19 @@
     }
     elseif ($_POST['ajaxType'] == 'getAllBalanceTags')
     {
-        $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`, cf_d2TagBalanceSet_set_type as `setType`
-                    FROM tb_dota2_tag_balance_set
-                    WHERE (cf_d2TagBalanceSet_set_type = 1 AND cf_d2TagBalanceSet_balance_value > 0)
-                    OR    (cf_d2TagBalanceSet_set_type = 0)
-                    ORDER BY cf_d2TagBalanceSet_balance_value DESC;';
+        $query = "SELECT
+                    tb_dota2_tag_balance_set.cf_d2TagBalanceSet_first_tag_id AS firstTagId,
+                    tb_dota2_tag_balance_set.cf_d2TagBalanceSet_second_tag_id AS secondTagId,
+                    tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value AS value,
+                    tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type AS setType,
+                    IFNULL(tb_lang_vars.cf_siteLang_ru_RU, '') AS d
+                FROM tb_dota2_tag_balance_set
+                LEFT JOIN tb_lang_vars
+                    ON CONCAT('_BALANCE', tb_dota2_tag_balance_set.cf_d2TagBalanceSet_id, '_') = tb_lang_vars.cf_siteLang_pre
+                WHERE tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 1
+                AND tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value > 0
+                OR tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 0
+                ORDER BY value DESC;";
         $allBalanceTags = $dbClass->select($query);
 
         // $query = 'SELECT cf_d2TagBalanceSet_first_tag_id as `firstTagId`, cf_d2TagBalanceSet_second_tag_id as `secondTagId`, cf_d2TagBalanceSet_balance_value as `value`
@@ -174,36 +182,78 @@
     }
     elseif (($_POST['ajaxType'] == 'editorAddNewTagBalance') && (isGotAccess(_ROLE_EDITOR)))
     {
-        if ($_POST['setType'] == 0)
+        $balanceNote = $_POST['textareaValue'];
+        if (($_POST['setType'] == 0) || ($_POST['balanceValue'] >= 0))
         {
-            // synergy of the same tag
-            $query = 'INSERT INTO tb_dota2_tag_balance_set
-                            SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?, cf_d2TagBalanceSet_set_type = ?
-                            ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
-
-            $isInsertOk1 = $dbClass->insert($query, $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['setType'], $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']);
-
-            $isInsertOk2 = true; // no need for second insert
+            $firstTagId = $_POST['firstTagId'];
+            $secondTagId = $_POST['secondTagId'];
+            $balanceValue = $_POST['balanceValue'];
         } else
         {
-            $query = 'INSERT INTO tb_dota2_tag_balance_set
-                            SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?, cf_d2TagBalanceSet_set_type = ?
-                            ON DUPLICATE KEY UPDATE cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
+            $firstTagId = $_POST['secondTagId'];
+            $secondTagId = $_POST['firstTagId'];
+            $balanceValue = $_POST['balanceValue'] * -1;
 
-            // 1
-            $isInsertOk1 = $dbClass->insert($query
-                , $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue'], $_POST['setType']
-                , $_POST['firstTagId'], $_POST['secondTagId'], $_POST['balanceValue']
-            );
-
-            // 2
-            $isInsertOk2 = $dbClass->insert($query
-                , $_POST['secondTagId'], $_POST['firstTagId'], $_POST['balanceValue'] * -1, $_POST['setType']
-                , $_POST['secondTagId'], $_POST['firstTagId'], $_POST['balanceValue'] * -1
-            );
+            if ($balanceNote != '')
+            {
+                $whatReplace = array("{h1}", "{a1}");
+                $onWhat   = array("{h3}", "{a3}");
+                $balanceNote = str_ireplace($whatReplace, $onWhat, $balanceNote);                
+                $whatReplace = array("{h2}", "{a2}", "{h3}", "{a3}");
+                $onWhat   = array("{h1}", "{a1}", "{h2}", "{a2}");
+                $balanceNote = str_ireplace($whatReplace, $onWhat, $balanceNote);
+            }
         }
 
-        if ($isInsertOk1 && $isInsertOk2)
+        $query = 'SELECT cf_d2TagBalanceSet_id as `balanceSetId`
+                    FROM tb_dota2_tag_balance_set
+                    WHERE cf_d2TagBalanceSet_first_tag_id = ?
+                      AND cf_d2TagBalanceSet_second_tag_id = ?;';
+
+        $resultMirrorTagBalance = $dbClass->select($query, $secondTagId, $firstTagId);
+
+        if (count($resultMirrorTagBalance) > 0)
+        {
+            $query = 'UPDATE tb_dota2_tag_balance_set
+                            SET cf_d2TagBalanceSet_first_tag_id = ?
+                              , cf_d2TagBalanceSet_second_tag_id = ?
+                              , cf_d2TagBalanceSet_balance_value = ?
+                            WHERE cf_d2TagBalanceSet_id = ?;';
+
+            $isResultOk1 = $dbClass->update($query, $firstTagId, $secondTagId, $balanceValue, $resultMirrorTagBalance[0]['balanceSetId']);
+        } else {
+            $query = 'INSERT INTO tb_dota2_tag_balance_set
+                            SET cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?, cf_d2TagBalanceSet_set_type = ?
+                            ON DUPLICATE KEY UPDATE
+                                cf_d2TagBalanceSet_first_tag_id = ?, cf_d2TagBalanceSet_second_tag_id = ?, cf_d2TagBalanceSet_balance_value = ?;';
+
+            $isResultOk1 = $dbClass->insert($query, $firstTagId, $secondTagId, $balanceValue, $_POST['setType']
+                                                , $firstTagId, $secondTagId, $balanceValue);
+        }
+
+        if ($balanceNote == '')
+        {
+            // delete balance notes
+            $query = 'DELETE FROM tb_lang_vars
+                            WHERE cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id 
+                                                    FROM tb_dota2_tag_balance_set 
+                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_");';
+
+            $isResultOk2 = $dbClass->delete($query, $firstTagId, $secondTagId);
+        } else {
+            // insert/update balance notes
+            $query = 'INSERT INTO tb_lang_vars
+                            SET cf_siteLang_module = ?
+                                , cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id 
+                                                    FROM tb_dota2_tag_balance_set 
+                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_")
+                                , cf_siteLang_ru_RU = ?
+                    ON DUPLICATE KEY UPDATE cf_siteLang_ru_RU = ?;';
+
+            $isResultOk2 = $dbClass->insert($query, 'NOTES', $firstTagId, $secondTagId, $balanceNote, $balanceNote);            
+        }
+
+        if ($isResultOk1 && $isResultOk2)
         {
             ajaxReturnAndExit(array('php_result'=>'OK'));
         } else {

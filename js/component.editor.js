@@ -786,13 +786,35 @@ function rebuildEditorBalanceTags()
 
                         var firstBalanceTagId = balanceTagsList[i]['firstTagId'];
                         var secondBalanceTagId = balanceTagsList[i]['secondTagId'];
+                        if ((typeof balanceTagsList[i]['d'] != 'undefined') && (balanceTagsList[i]['d'] != ''))
+                        {  
+                            var tagSetDescription = balanceTagsList[i]['d'];
+                        } else {
+                            var tagSetDescription = '';
+                            // if (balanceSetType == 1)
+                            // {
+                            //     // counter pick
+                            //     var tagSetDescription = '{h+} {a+} контрит {h-} {a-}';
+                            // } else {
+                            //     if (secondBalanceTagValue >= 0)
+                            //     {
+                            //         // synergy
+                            //         var tagSetDescription = '{h} {a} синергия {h} {a}';
+                                    
+                            //     } else {
+                            //         // anti-synergy
+                            //         var tagSetDescription = '{h} {a} анти-синергия {h} {a}';
+                            //     }
+                            // }
+                        }
+
                         var firstBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+firstBalanceTagId+'"]').attr('data-tag-name');
                         var secondBalanceTagName = $('#tagListWrap .tag[data-tag-id="'+secondBalanceTagId+'"]').attr('data-tag-name');
 
                             var balanceRowHtml = '';
                             balanceRowHtml += '<div class="tagBalanceItem">';
 
-                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'" data-tag-id="'+firstBalanceTagId+'" data-tag-name="'+firstBalanceTagName+'" data-tag-value="'+firstBalanceTagValue+'" data-tag-settype="'+balanceSetType+'">';
+                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'" data-balance-descr="'+tagSetDescription+'" data-tag-id="'+firstBalanceTagId+'" data-tag-name="'+firstBalanceTagName+'" data-tag-value="'+firstBalanceTagValue+'" data-tag-settype="'+balanceSetType+'">';
                                     balanceRowHtml += '(' + firstBalanceTagValue + ')';
                                 balanceRowHtml += '</div>';
                                 balanceRowHtml += '<div class="'+firstBalanceTagClass+'">';
@@ -1085,10 +1107,33 @@ function bindInputTagAlreadyExists(inputSelector)
 function editBalancePopupDecideBtnCreate()
 {
     var editBalancePopupEl = $('#editBalancePopupHtml');
+    var textareaEl = $('#balanceTagTextarea');
     var combo1Val = editBalancePopupEl.find('#combobox1 input').val();
     var combo2Val = editBalancePopupEl.find('#combobox2 input').val();
     var sliderValue = $("#editBalanceTagSlider").slider('value');
     var isCounterPick = ($('[name="counterpickOrSynergy"]:checked').val() == 1);
+
+
+    if (isCounterPick)
+    {
+        if (sliderValue != 0)
+        {
+            textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_COUNTER_'));
+        } else {
+            textareaEl.attr('placeholder', ''); // if 0
+        }        
+    } else {
+        if (sliderValue > 0)
+        {
+            textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_SNRG_'));
+        } 
+        else if (sliderValue < 0)
+        {
+            textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_ANTISNRG_'));
+        } else {
+            textareaEl.attr('placeholder', ''); // if 0
+        }
+    }
 
     if (sliderValue > 0)
     {
@@ -1138,6 +1183,25 @@ function editBalancePopupDecideBtnCreate()
         }
     }
 
+    if (isBtnEnabled)
+    {
+        var textareaValue = $('#balanceTagTextarea').val();
+
+        var isFoundH1 = (textareaValue.match(/{h1}/gi) || []).length;
+        var isFoundA1 = (textareaValue.match(/{a1}/gi) || []).length;
+        var isFoundH2 = (textareaValue.match(/{h2}/gi) || []).length;
+        var isFoundA2 = (textareaValue.match(/{a2}/gi) || []).length;        
+    
+        // {h1} часто собирает {item:SB}, а у {h2} есть {a2}
+        if ((textareaValue == '')
+        || (isFoundH1 == 1 && isFoundH2 ==1 && isFoundA1 <= 1 && isFoundA2 <= 1))
+        {
+            isBtnEnabled = true;
+        } else {
+            isBtnEnabled = false;
+        }
+    }
+    
     if (isBtnEnabled)
     {
         $('#btnConfirmDialogOK').removeAttr('disabled');
@@ -1192,11 +1256,11 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 question += selectOptionValues;
             question += '</select>';
         question += '</div>';
-    question += '</div>';
 
-    // question += '<label for="recipient-name" class="col-form-label">'+getPreStr_js('EDITOR', '_TAG_NAME_')+'</label>';
-    //question += '<input id="inputCreateNewBalanceName" type="text" class="form-control">';
-    //question += '<p id="noticeTagExist" class="noticeRed" style="display: none;">'+window.LangPreStr["editor"]["tag_exist"]+'</p>';
+        question += '<textarea id="balanceTagTextarea" class="form-control" type="text" rows="2">';
+        question += '</textarea>';
+        
+    question += '</div>';
 
     confirmDialog({
         confirmTitle : getPreStr_js('EDITOR', '_SET_BALANCE_')
@@ -1253,13 +1317,22 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 {
                     handle2.text( ui.value );
 
+                    // Nurax: возможно не будет работать т.к. значение в textarea появляется после функции 1341 стр
                     editBalancePopupDecideBtnCreate();
                 }
+            });
+
+            $('#balanceTagTextarea').on('keyup', function () 
+            {
+                editBalancePopupDecideBtnCreate();
             });
 
             if (addOrEdit == 'new')
             {
                 $("#balanceRadioWrap input:first").prop('checked', true);
+
+                // textarea
+                $('#balanceTagTextarea').val('');
             }
             else if (addOrEdit == 'edit')
             {
@@ -1282,6 +1355,8 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 
                 // console.log($('#combobox1 option:selected').val());
                 $('#btnConfirmDialogDelete').show();
+
+                $('#balanceTagTextarea').val(clickedEl.find('[data-balance-descr]').attr('data-balance-descr'));
 
                 editBalancePopupDecideBtnCreate();
             }
@@ -1347,6 +1422,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                        , secondTagId: $('#combobox2 option:selected').val()
                        , balanceValue: $('#editBalanceTagSlider').slider('value')
                        , setType: $('[name="counterpickOrSynergy"]:checked').val()
+                       , textareaValue: $('#balanceTagTextarea').val()
                       },
                 datatype: 'jsonp',
                 type: 'POST',

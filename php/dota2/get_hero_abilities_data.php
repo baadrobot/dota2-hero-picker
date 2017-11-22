@@ -87,33 +87,6 @@
 
         } else {
             // UPDATE
-            require_once('php/cl.simpleHTMLDom.php');
-
-            // mid core
-            //setLaneTagValue($tagId = 33, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
-
-            // mid support
-            setLaneTagValue($tagId = 39, 'https://www.dotabuff.com/heroes/lanes?lane=mid', $minPresence = 0, $minWinRate = 0);
-
-            // roamer
-            //setLaneTagValue($tagId = 36, 'https://www.dotabuff.com/heroes/lanes?lane=roaming', $minPresence = 0, $minWinRate = 0);
-
-            // offlane core
-            //setLaneTagValue($tagId = 34, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
-
-            // offlane support
-            setLaneTagValue($tagId = 38, 'https://www.dotabuff.com/heroes/lanes?lane=off', $minPresence = 0, $minWinRate = 0);
-
-            // jungler
-            //setLaneTagValue($tagId = 35, 'https://www.dotabuff.com/heroes/lanes?lane=jungle', $minPresence = 0, $minWinRate = 0);
-
-            // carry
-            //setLaneTagValue($tagId = 32, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
-
-            // support safe lane
-            //setLaneTagValue($tagId = 37, 'https://www.dotabuff.com/heroes/lanes?lane=safe', $minPresence = 0, $minWinRate = 0);
-
-            exit; // kainax: todo remove, but move all above to to the end
 
                                     // prepare temp array for forbidden abilities
                                     $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
@@ -500,6 +473,39 @@
             $query = 'SELECT updateDispellableAbilitiesTags(NULL);';
             $dbClass->select($query);
 
+            // update "lanes meta" tags
+            require_once('php/cl.simpleHTMLDom.php');
+
+                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=mid');
+                        // mid core
+                        setLaneTagValue($tagId = 33, $html, $minPresence = 40, $minWinRate = 50);
+                        // mid support
+                        setLaneTagValue($tagId = 39, $html, $minPresence = 0, $minWinRate = 50);
+            
+                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=roaming');
+                        // roamer
+                        setLaneTagValue($tagId = 36, $html, $minPresence = 0, $minWinRate = 50);
+            
+                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=off');
+                        // offlane solo
+                        setLaneTagValue($tagId = 34, $html, $minPresence = 0, $minWinRate = 50);
+                        // offlane core
+                        setLaneTagValue($tagId = 40, $html, $minPresence = 0, $minWinRate = 50);
+                        // offlane support
+                        setLaneTagValue($tagId = 38, $html, $minPresence = 0, $minWinRate = 50);
+                        
+            
+                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=jungle');
+                        // jungler
+                        setLaneTagValue($tagId = 35, $html, $minPresence = 0, $minWinRate = 50);
+            
+                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=safe');
+                        // carry
+                        setLaneTagValue($tagId = 32, $html, $minPresence = 0, $minWinRate = 50);
+                        // support safe lane
+                        setLaneTagValue($tagId = 37, $html, $minPresence = 0, $minWinRate = 50);
+            
+                        //exit; // kainax: todo remove, but move all above to to the end            
 
             echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
             echo '<br>Reloading...<br>';
@@ -592,14 +598,13 @@ function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)
     }
 }
 
-
-function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
+function getHtmlObjFromUrl($url)
 {
     //******** Getting https elements
 
     //Указываем URL, куда будем обращаться. Протокол https://
     $ch = curl_init();
-
+    
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HEADER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -622,7 +627,12 @@ function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
     $html->load($curl_data);
     unset($curl_data);
 
+    return $html;
+}
 
+
+function setLaneTagValue($tagId, $html, $minPresence, $minWinRate)
+{
     $arrayLaneHeroesRate = [];
     foreach($html->find('table tbody tr') as $hero)
     {
@@ -720,14 +730,15 @@ function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
     $dbClass->update($query, $tagId);
 
     $query = "UPDATE tb_dota2_heroTag_set
-                        ,cf_d2HeroTagSet_tag_val = ?
-                        ,cf_d2HeroTagSet_selected_abilities = NULL
+                        SET cf_d2HeroTagSet_tag_val = ?
+                           ,cf_d2HeroTagSet_selected_abilities = ''
                         WHERE cf_d2HeroTagSet_tag_id = ?
-                          AND cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ?)
+                          AND cf_d2HeroTagSet_hero_id = (SELECT cf_d2HeroList_id FROM tb_dota2_hero_list WHERE cf_d2HeroList_name_en_US = ? LIMIT 1)
                         ;";
 
     $maxValueOfTag = 5;
     $gradation = ($max - $min) / $maxValueOfTag;
+    //echo '<br>------------------------- Begin of tag '.$tagId.'<br>';
     foreach($arrayLaneHeroesRate as $keyHeroLocalName => $valScore)
     {
         $arrayLaneHeroesRate[$keyHeroLocalName] = $maxValueOfTag;
@@ -741,6 +752,7 @@ function setLaneTagValue($tagId, $url, $minPresence, $minWinRate)
         $dbClass->update($query, $arrayLaneHeroesRate[$keyHeroLocalName], $tagId, $keyHeroLocalName);
         //echo $keyHeroLocalName . ' - ' . $arrayLaneHeroesRate[$keyHeroLocalName].'<br>';
     }
-    return $arrayLaneHeroesRate;
+    //echo '<br>------------------------- End of tag '.$tagId.'<br>';
+    //return $arrayLaneHeroesRate;
 }
 ?>
