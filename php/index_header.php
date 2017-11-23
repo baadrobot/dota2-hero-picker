@@ -74,6 +74,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">';
         echo '<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>';
         echo '<script src="js/jquery.ui.autocomplete.js"></script>';
+        echo '<script src="js/jquery.shuffle.min.js"></script>';
 
 
         echo '<script>';
@@ -109,38 +110,38 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             function loadAdditionalTooltipData()
             {
                 global $dbClass;
-                
+
                 $query2 = 'SELECT cf_d2HeroAbilityList_id as `abilityId`, cf_d2HeroAbilityList_spellDispellableType as `type`
                 FROM tb_dota2_hero_ability_list
                 WHERE cf_d2HeroAbilityList_spellDispellableType IS NOT NULL;';
-    
+
                 $spell_dispellable_type_array = $dbClass->select($query2);
-    
+
                 $abilityTypeList = [];
                 for ($i = 0; $i < count($spell_dispellable_type_array); $i++)
                 {
                     if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_NO')
                     {
-                        $dispellableTypeIntegerOrUnknownName = 0; 
+                        $dispellableTypeIntegerOrUnknownName = 0;
                     } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES')
                     {
-                        $dispellableTypeIntegerOrUnknownName = 1; 
+                        $dispellableTypeIntegerOrUnknownName = 1;
                     } else if ($spell_dispellable_type_array[$i]['type'] == 'SPELL_DISPELLABLE_YES_STRONG')
                     {
-                        $dispellableTypeIntegerOrUnknownName = 2; 
+                        $dispellableTypeIntegerOrUnknownName = 2;
                     } else {
                         $dispellableTypeIntegerOrUnknownName = $spell_dispellable_type_array[$i]['abilityId'];
                     }
-    
+
                     $abilityTypeList[$spell_dispellable_type_array[$i]['abilityId']] = $dispellableTypeIntegerOrUnknownName;
                 }
-    
+
                 echo '<script>';
                     echo 'window.abilityTypeList = '.json_encode($abilityTypeList).';';
-                echo '</script>';            
+                echo '</script>';
             }
 
-            
+
             if  (($_GET['component'] == 'editor') && isGotAccess(_ROLE_EDITOR))
             {
                 loadAdditionalTooltipData();

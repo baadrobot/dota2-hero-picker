@@ -731,6 +731,29 @@ function colorizeAllHeroes()
     $('#btnRenameSelectedTagPopup').hide();
 }
 
+function sortEditorBalanceTags()
+{
+        //Shuffle
+        jQuery('#tagBalanceListWrap').shuffle('sort', {    itemSelector: '.tagBalanceItem'
+                                                          ,reverse: true
+                                                          ,by: function (el)
+                                                          {
+                                                                var order = Number(el.find('[data-tag-value]:first').attr('data-tag-value'));
+                                                                if ($('#tagListWrap .selectedTag').length)
+                                                                {
+                                                                    var selectedTagId = $('#tagListWrap .selectedTag').attr('data-tag-id');
+                                                                    if (el.find('[data-tag-value]').eq(0))
+                                                                    {
+
+                                                                    }
+                                                                }
+                                                                return order;
+                                                          }
+                                                          //,delimeter: ','
+                                                          //,columnWidth: '100%'
+                                                     });
+}
+
 function rebuildEditorBalanceTags()
 {
     pleaseWaitOpen();
@@ -787,7 +810,7 @@ function rebuildEditorBalanceTags()
                         var firstBalanceTagId = balanceTagsList[i]['firstTagId'];
                         var secondBalanceTagId = balanceTagsList[i]['secondTagId'];
                         if ((typeof balanceTagsList[i]['d'] != 'undefined') && (balanceTagsList[i]['d'] != ''))
-                        {  
+                        {
                             var tagSetDescription = balanceTagsList[i]['d'];
                         } else {
                             var tagSetDescription = '';
@@ -800,7 +823,7 @@ function rebuildEditorBalanceTags()
                             //     {
                             //         // synergy
                             //         var tagSetDescription = '{h} {a} синергия {h} {a}';
-                                    
+
                             //     } else {
                             //         // anti-synergy
                             //         var tagSetDescription = '{h} {a} анти-синергия {h} {a}';
@@ -839,11 +862,13 @@ function rebuildEditorBalanceTags()
                         tagBalancePopupDo('edit', $(this));
                     });
 
-                    // toDo Kainax: click for tag
+                    // toDo Kainax: add on_click for tag
                     // $('#tagBalanceListWrap .tag:first').parent().click(function ()
                     // {
                     //     tagBalancePopupDo('edit', $(this));
                     // });
+
+                    sortEditorBalanceTags();
                 }
                 else if (result.php_result == 'ERROR')
                 {
@@ -1121,12 +1146,12 @@ function editBalancePopupDecideBtnCreate()
             textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_COUNTER_'));
         } else {
             textareaEl.attr('placeholder', ''); // if 0
-        }        
+        }
     } else {
         if (sliderValue > 0)
         {
             textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_SNRG_'));
-        } 
+        }
         else if (sliderValue < 0)
         {
             textareaEl.attr('placeholder', getPreStr_js('EDITOR', '_DFLT_NOTE_ANTISNRG_'));
@@ -1190,8 +1215,8 @@ function editBalancePopupDecideBtnCreate()
         var isFoundH1 = (textareaValue.match(/{h1}/gi) || []).length;
         var isFoundA1 = (textareaValue.match(/{a1}/gi) || []).length;
         var isFoundH2 = (textareaValue.match(/{h2}/gi) || []).length;
-        var isFoundA2 = (textareaValue.match(/{a2}/gi) || []).length;        
-    
+        var isFoundA2 = (textareaValue.match(/{a2}/gi) || []).length;
+
         // {h1} часто собирает {item:SB}, а у {h2} есть {a2}
         if ((textareaValue == '')
         || (isFoundH1 == 1 && isFoundH2 ==1 && isFoundA1 <= 1 && isFoundA2 <= 1))
@@ -1201,7 +1226,7 @@ function editBalancePopupDecideBtnCreate()
             isBtnEnabled = false;
         }
     }
-    
+
     if (isBtnEnabled)
     {
         $('#btnConfirmDialogOK').removeAttr('disabled');
@@ -1263,7 +1288,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         question += '</textarea>';
 
         question += '<div id="notesWrap"></div>';
-        
+
     question += '</div>';
 
     confirmDialog({
@@ -1326,7 +1351,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 }
             });
 
-            $('#balanceTagTextarea').on('keyup', function () 
+            $('#balanceTagTextarea').on('keyup', function ()
             {
                 editBalancePopupDecideBtnCreate();
             });
@@ -1369,9 +1394,9 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 //                             .replace('{a1}', getAbilityIcon('ancient_apparition_ice_blast'))
                 //                             .replace('{h2}', getHeroIcon('alchemist'))
                 //                             .replace('{a2}', getAbilityIcon('alchemist_chemical_rage'));
-                    
+
                 //     $('#notesWrap').append(textareaPlaceholderValue);
-                    
+
                 //     // $("#balanceTagTextarea").html(
                 //     //     $("#balanceTagTextarea").html().replace('{h1}', getHeroIcon('ancient_apparition'))
                 //     //                                     .replace('{a1}', getAbilityIcon('ancient_apparition_ice_blast'))
@@ -1402,9 +1427,9 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 if ($(this).val() == $(this).attr('placeholder'))
                 {
                     $(this).val('');
-                }                
+                }
             });
-            
+
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
         }
         ,onAfterShow : function ()
@@ -1516,8 +1541,8 @@ function changeNotesWrapHtml()
                                  .replace(/{a2}/gi, getAbilityIcon('alchemist_chemical_rage', 5369));
 
     $('#notesWrap').html(textareaValue);
-    
-    eXoActivateInactiveTooltips(); 
+
+    eXoActivateInactiveTooltips();
     addOnHoverTooltipsForAbilityImg('#notesWrap');
 }
 
