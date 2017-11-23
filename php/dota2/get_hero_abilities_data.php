@@ -505,7 +505,7 @@
                         // support safe lane
                         setLaneTagValue($tagId = 37, $html, $minPresence = 0, $minWinRate = 50);
             
-                        //exit; // kainax: todo remove, but move all above to to the end            
+                        //exit;
 
             echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
             echo '<br>Reloading...<br>';

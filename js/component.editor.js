@@ -1208,6 +1208,8 @@ function editBalancePopupDecideBtnCreate()
     } else {
         $('#btnConfirmDialogOK').attr('disabled', 'disable');
     }
+
+    changeNotesWrapHtml();
 }
 
 function rebuildAll(tagsArray)
@@ -1259,6 +1261,8 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 
         question += '<textarea id="balanceTagTextarea" class="form-control" type="text" rows="2">';
         question += '</textarea>';
+
+        question += '<div id="notesWrap"></div>';
         
     question += '</div>';
 
@@ -1358,9 +1362,49 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 
                 $('#balanceTagTextarea').val(clickedEl.find('[data-balance-descr]').attr('data-balance-descr'));
 
+                // if ($('#balanceTagTextarea').attr('placeholder') == '')
+                // {
+                //     var textareaPlaceholderValue = $('#balanceTagTextarea').attr('placeholder');
+                //     textareaPlaceholderValue.replace('{h1}', getHeroIcon('ancient_apparition'))
+                //                             .replace('{a1}', getAbilityIcon('ancient_apparition_ice_blast'))
+                //                             .replace('{h2}', getHeroIcon('alchemist'))
+                //                             .replace('{a2}', getAbilityIcon('alchemist_chemical_rage'));
+                    
+                //     $('#notesWrap').append(textareaPlaceholderValue);
+                    
+                //     // $("#balanceTagTextarea").html(
+                //     //     $("#balanceTagTextarea").html().replace('{h1}', getHeroIcon('ancient_apparition'))
+                //     //                                     .replace('{a1}', getAbilityIcon('ancient_apparition_ice_blast'))
+                //     //                                     .replace('{h2}', getHeroIcon('alchemist'))
+                //     //                                     .replace('{a2}', getAbilityIcon('alchemist_chemical_rage'))
+                //     // );
+                // } else {
+                //     var textareaValue = $('#balanceTagTextarea').val();
+                //     textareaValue.replace('{h1}', getHeroIcon('ancient_apparition'))
+                //                  .replace('{a1}', getAbilityIcon('ancient_apparition_ice_blast'))
+                //                  .replace('{h2}', getHeroIcon('alchemist'))
+                //                  .replace('{a2}', getAbilityIcon('alchemist_chemical_rage'));
+
+                //     $('#notesWrap').append(textareaValue);
+                // }
+
                 editBalancePopupDecideBtnCreate();
             }
 
+            $('#balanceTagTextarea').on('focus', function()
+            {
+                if ($(this).val() == '')
+                {
+                    $(this).val($(this).attr('placeholder'))
+                }
+            }).on('blur', function()
+            {
+                if ($(this).val() == $(this).attr('placeholder'))
+                {
+                    $(this).val('');
+                }                
+            });
+            
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
         }
         ,onAfterShow : function ()
@@ -1455,4 +1499,39 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
             //
         }
     });
+}
+
+function changeNotesWrapHtml()
+{
+    if ( $('#balanceTagTextarea').val() != '' )
+    {
+        var textareaValue = $('#balanceTagTextarea').val();
+    } else {
+        var textareaValue = $('#balanceTagTextarea').attr('placeholder');
+    }
+
+    textareaValue = textareaValue.replace(/{h1}/gi, getHeroIcon('ancient_apparition', 'Ancient Apparition'))
+                                 .replace(/{a1}/gi, getAbilityIcon('ancient_apparition_ice_blast', 5348))
+                                 .replace(/{h2}/gi, getHeroIcon('alchemist', 'Alchemist'))
+                                 .replace(/{a2}/gi, getAbilityIcon('alchemist_chemical_rage', 5369));
+
+    $('#notesWrap').html(textareaValue);
+    
+    eXoActivateInactiveTooltips(); 
+    addOnHoverTooltipsForAbilityImg('#notesWrap');
+}
+
+function getHeroIcon(heroName, heroNameLocal)
+{
+    var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
+    var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
+    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+    return heroImg;
+}
+
+function getAbilityIcon(abilityCodeName, abilityId)
+{
+    var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
+    var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
+    return abilityImg;
 }
