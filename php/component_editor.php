@@ -63,11 +63,11 @@
                         //echo '<i id="btnDeleteSelectedBalancePopup" class="fa fa-minus-square text-secondary acrdHdrBtn hvrMaroon" aria-hidden="true"></i>';
 
                         echo '<div id="editAccordion2" class="collapse" role="tabpanel">';
-                            echo '<p id="tagBalanceListWrap" class="mb-3">';
+                            echo '<div id="tagBalanceListWrap" class="mb-3">';
 
                                 echo '<span>Загрузка...</span>';
 
-                            echo '</p>';
+                            echo '</div>';
                         echo '</div>';
                     echo '</div>';
                 echo '</div>';
@@ -115,7 +115,7 @@
 // </div>';
 
 //**************************************************/
-
+// popup for hero tag edit
 echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-hidden="true">';
   echo '<div class="modal-dialog" role="document">';
     echo '<div class="modal-content">';
@@ -140,7 +140,6 @@ echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-
                 echo '<span id="editHeroTagInfoHero" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на героя"></span>';
                 echo '<span id="editHeroTagInfoAbilities" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на выбранные способности"></span>';
 
-
             echo '</div>';
 
             echo '<div class="form-group">';
@@ -148,8 +147,6 @@ echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-
                     echo '<div id="custom-handle" class="ui-slider-handle"></div>';
                 echo '</div>';
             echo '</div>';
-
-
 
       echo '</div>';
       echo '<div class="modal-footer">';
@@ -160,7 +157,82 @@ echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-
     echo '</div>';
   echo '</div>';
 echo '</div>';
+// end of popup for hero tag edit
 
+// popup for hero popup
+echo '<div id="editHeroPopup" class="modal" tabindex="-1" role="dialog" aria-hidden="true">';
+echo '<div class="modal-dialog" role="document">';
+  echo '<div class="modal-content">';
+    echo '<div class="modal-header">';
+      echo '<h5 id="editHeroAllTagsHeroName" class="modal-title blueBold"></h5>';
+      echo '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+        echo '<span aria-hidden="true">&times;</span>';
+      echo '</button>';
+    echo '</div>';
+    echo '<div class="modal-body">';
+        // tab links
+        echo '<nav class="nav nav-tabs justify-content-center" id="myTab" role="tablist">';
+            echo '<a class="nav-item nav-link active" id="nav-hero-tab" data-toggle="tab" href="#nav-hero" role="tab" aria-controls="nav-hero" aria-selected="true">Герой</a>';
+            echo '<a class="nav-item nav-link" id="nav-tags-tab" data-toggle="tab" href="#nav-tags" role="tab" aria-controls="nav-tags" aria-selected="false">Тэги</a>';
+            echo '<a class="nav-item nav-link" id="nav-counter-to-tab" data-toggle="tab" href="#nav-counter-to" role="tab" aria-controls="nav-counter-to" aria-selected="false">Кого контрит</a>';
+            echo '<a class="nav-item nav-link" id="nav-counter-by-tab" data-toggle="tab" href="#nav-counter-by" role="tab" aria-controls="nav-counter-by" aria-selected="false">Кем контрится</a>';
+            echo '<a class="nav-item nav-link" id="nav-synergy-tab" data-toggle="tab" href="#nav-synergy" role="tab" aria-controls="nav-synergy" aria-selected="false">Синергия</a>';
+            echo '<a class="nav-item nav-link" id="nav-anti-synergy-tab" data-toggle="tab" href="#nav-anti-synergy" role="tab" aria-controls="nav-anti-synergy" aria-selected="false">Анти-синергия</a>';
+        echo '</nav>';
+        // end of tab links
+
+        // tab content
+        echo '<div class="tab-content" id="nav-tabContent">';
+            echo '<div class="tab-pane fade show active" id="nav-hero" role="tabpanel" aria-labelledby="nav-hero-tab">';
+                // echo '<span id="editHeroAllTagsHeroName" class="blueBold"></span>';
+                echo '<div id="editHeroAllTagsHeroImgWrap">';
+                    echo '<img>';
+                echo '</div>';
+    
+                echo '<div id="editHeroAllTagsAbilitiesImgWrap">';
+    
+                echo '</div>';
+                
+            echo '</div>';
+
+            echo '<div class="tab-pane fade" id="nav-tags" role="tabpanel" aria-labelledby="nav-tags-tab">';
+                echo '<div id="editHeroPopupTagsWrap">';
+            
+                echo '</div>';
+            echo '</div>';
+
+            echo '<div class="tab-pane fade" id="nav-counter-to" role="tabpanel" aria-labelledby="nav-counter-to-tab">...</div>';
+            echo '<div class="tab-pane fade" id="nav-counter-by" role="tabpanel" aria-labelledby="nav-counter-by-tab">...</div>';
+            echo '<div class="tab-pane fade" id="nav-synergy" role="tabpanel" aria-labelledby="nav-synergy-tab">...</div>';
+            echo '<div class="tab-pane fade" id="nav-anti-synergy" role="tabpanel" aria-labelledby="nav-anti-synergy-tab">...</div>';
+        echo '</div>';
+        // end of tab content
+
+
+
+        //   echo '<div class="form-group">';
+        //       echo '<span id="editHeroTagInfoNone" class="editHeroTagInfoText col-form-label" data-template-text="Выберите героя или способности для тега {TAG}"></span>';
+        //       echo '<span id="editHeroTagInfoHero" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на героя"></span>';
+        //       echo '<span id="editHeroTagInfoAbilities" class="editHeroTagInfoText col-form-label" data-template-text="Назначить тэг {TAG} на выбранные способности"></span>';
+
+        //   echo '</div>';
+
+        //   echo '<div class="form-group">';
+        //       echo '<div id="editHeroTagSlider">';
+        //           echo '<div id="custom-handle" class="ui-slider-handle"></div>';
+        //       echo '</div>';
+        //   echo '</div>';
+
+    echo '</div>';
+    // echo '<div class="modal-footer">';
+    //   echo '<button id="btnEditHeroTagUnset" type="button" class="btn btn-danger" >Снять тэг</button>';
+    //   echo '<button id="btnEditHeroTagDo" type="button" class="btn btn-primary">Назначить</button>';
+    //   echo '<button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>';
+    // echo '</div>';
+  echo '</div>';
+echo '</div>';
+echo '</div>';
+// end of popup for hero tag edit
 
 
 require 'php/template_d2_hero_ability_tooltip.php';

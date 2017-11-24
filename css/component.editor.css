@@ -77,6 +77,11 @@ hr {
     pointer-events: none;
 }
 
+.balanceSetItemOpacity {
+    opacity: 0.5!important;
+}
+
+
 #balanceRadioWrap {
     text-align: center;
 }
@@ -139,7 +144,7 @@ hr {
 }
 
 
-#editHeroTagPopup
+#editHeroTagPopup, #editHeroPopup
 {
     text-align: center;
 }
@@ -198,7 +203,7 @@ hr {
     margin: auto;
 }
 
-#editHeroTagAbilitiesImgWrap .heroAbilityImg
+#editHeroTagAbilitiesImgWrap .heroAbilityImg, #editHeroAllTagsAbilitiesImgWrap .heroAbilityImg
 {
     width: 56px;
     height: 56px;
@@ -212,7 +217,7 @@ hr {
 }
 
 
-#editHeroTagAbilitiesImgWrap .heroAbilityImg img
+#editHeroTagAbilitiesImgWrap .heroAbilityImg img, #editHeroAllTagsAbilitiesImgWrap .heroAbilityImg img
 {
     width: 50px;
     height: 50px;
@@ -227,7 +232,7 @@ hr {
 
 
 
-#editHeroTagHeroImgWrap img {
+#editHeroTagHeroImgWrap img, #editHeroAllTagsHeroImgWrap img {
     height: 118px;
     width: 210px;
     margin: 3px;
@@ -237,7 +242,7 @@ hr {
     border: 6px double rgb(18, 168, 23);
 }
 
-#editHeroTagHeroImgWrap {
+#editHeroTagHeroImgWrap, #editHeroAllTagsHeroImgWrap {
     width: 218px;
     height: 124px;
     background-color: black;
@@ -281,3 +286,45 @@ hr {
     width: 418px!important;
     display: inline-block!important;
 } */
+
+#tagBalanceListWrap{
+    position: relative;
+}
+
+
+.editHeroPopupTag,
+.editHeroPopupTagVal
+{
+    /* margin: 0 2px; */
+	display: inline-block;
+	font-size: 12px;
+}
+.editHeroPopupTag{
+    color: gray;
+}
+#editHeroPopupTagsWrap{
+    color: #bfbebe;
+}
+
+.editHeroPopupTagVal
+{
+margin-right: 10px;
+}
+
+.editHeroPopupTag:hover {
+    cursor: pointer;
+    color: rgb(24, 226, 30);
+}
+
+ .editHeroPopupTagVal:hover {
+    cursor: pointer;
+    color: rgb(255, 0, 0);
+}
+
+#editHeroPopup .nav-tabs {
+    margin-bottom: 15px;
+}
+#editHeroPopup .nav-tabs a{
+    font-size: 12px;
+    padding: 5px;
+}

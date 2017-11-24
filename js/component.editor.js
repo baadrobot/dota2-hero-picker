@@ -119,7 +119,6 @@ $(document).ready(function ()
                             {
                                 if (result.php_result == 'OK')
                                 {
-                                    //$('#editHeroTagPopup').modal('hide');
                                     ajaxGetTagsArray(rebuildEditorTags);
                                 }
                                 else if (result.php_result == 'ERROR')
@@ -285,7 +284,7 @@ $(document).ready(function ()
                 {
                     if (result.php_result == 'OK')
                     {
-                        var searchAbilityInputVal = $('#searchAbilityInput').val();;
+                        var searchAbilityInputVal = $('#searchAbilityInput').val();
                         for (var i = 0; i < result.hero_abilities_array.length; i++)
                         {
                             var abilityCodename = result.hero_abilities_array[i]['abilityCodename'];
@@ -321,7 +320,6 @@ $(document).ready(function ()
                             //tagValue
                         } else if (result.tag_result == 'HERO')
                         {
-                            //$('#editHeroTagAbilitiesImgWrap .selectedAbility').removeClass('selectedAbility');
                             $('#editHeroTagHeroImgWrap.selectedAbility').addClass('selectedAbility');
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);
@@ -365,8 +363,132 @@ $(document).ready(function ()
                     // we recieved NOT json
                 }
             });
+        } else {
+            // click on hero w/o selected tag
+            pleaseWaitOpen();
+
+            var editHeroAbilitiesImgWrapEl = $('#editHeroAllTagsAbilitiesImgWrap');
+
+            editHeroAbilitiesImgWrapEl.html('');
+
+            var curSelectedHeroEl = $(this);
+            var clickedheroId = curSelectedHeroEl.attr('data-hero-id');
+            
+            $('#editHeroPopup')
+                .attr('data-hero-id', clickedheroId )
+                .attr('data-hero-codename', curSelectedHeroEl.attr('data-hero-codename') );
+
+            $('#editHeroAllTagsHeroName').text( curSelectedHeroEl.attr('data-hero-namelocal') );
+
+            mainHeroImgWrapEl = $('#editHeroAllTagsHeroImgWrap');
+            mainHeroImgWrapEl.find('img')
+                .removeAttr('src')
+                .attr('data-img-src', '//cdn.dota2.com/apps/dota2/images/heroes/' + curSelectedHeroEl.attr('data-hero-codename') + '_full.png?v=4212550');
+
+            kainaxPreloadImages({wrapElement: mainHeroImgWrapEl
+                //, gifNameOrFalse: 'spinner.gif'
+                , gifNameOrFalse: 'eco-ajax-loader-01.gif'
+                , opacity: 0.8
+                , loaderIntH: 16
+                , loaderIntW: 16
+            });
+
+            // Ajax
+            $.ajax({
+                url: 'php/ajax.editor.php',
+                data: {  ajaxType: 'editorGetHeroAbilitiesAndHeroTags'
+                        , heroId: clickedheroId
+                        //  , tagId: selectedTagId
+                        },
+                datatype: 'jsonp',
+                type: 'POST',
+                cache: false,
+                success: function (result)
+                {
+                    if (result.php_result == 'OK')
+                    {
+                        // прозрачность для абилок героя в попапе
+                        var searchAbilityInputVal = $('#searchAbilityInput').val();
+                        for (var i = 0; i < result.hero_abilities_array.length; i++)
+                        {
+                            var abilityCodename = result.hero_abilities_array[i]['abilityCodename'];
+                            if ((searchAbilityInputVal == '')
+                            || (typeof window.searchAbilityFoundList[abilityCodename] != 'undefined'))
+                            {
+                                // color
+                                opacityStyle = '';
+                            } else {
+                                // white
+                                opacityStyle = ' ' + 'style="opacity:0.5"';
+                            }
+                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
+                        }
+
+                        addOnHoverTooltipsForAbilityImg('#editHeroAllTagsAbilitiesImgWrap');
+
+                        kainaxPreloadImages({wrapElement: editHeroAbilitiesImgWrapEl
+                            , gifNameOrFalse: 'spinner.gif'
+                            //, gifNameOrFalse: 'eco-ajax-loader-01.gif'
+                            , opacity: 0.6
+                            , loaderIntH: 10
+                            , loaderIntW: 10
+                        });
+
+                        var heroTagsHtml = '';
+
+                        for(i = 0; i < result.hero_tag_result.length; i++)
+                        {
+                            var curTagId = result.hero_tag_result[i]['tagId'];
+                            var curTagValue = result.hero_tag_result[i]['value'];
+
+                            var curTagName = $('#tagListWrap [data-tag-id="'+curTagId+'"]').attr('data-tag-name');
+
+                            heroTagsHtml += '<span class="editHeroPopupTag" data-tag-id="'+curTagId+'" data-tag-name="'+curTagName+'">['+curTagName+']</span>:<span class="editHeroPopupTagVal" data-tag-id="'+curTagId+'">'+curTagValue+'</span>';
+                        }
+                        $('#editHeroPopupTagsWrap').html(heroTagsHtml);
+
+                        // #editHeroPopupTagsWrap tags click
+                        $('#editHeroPopupTagsWrap .editHeroPopupTag').on('click', function()
+                        {
+                            $('#editHeroPopup').modal('hide');
+                            var clickedTagId = $(this).attr('data-tag-id');
+                            $('#tagListWrap [data-tag-id="'+clickedTagId+'"]').trigger('click');
+                        });
+                        // end of #editHeroPopupTagsWrap tags click
+                        
+                        // #editHeroPopupTagsWrap tags values click
+                        $('#editHeroPopupTagsWrap .editHeroPopupTagVal').on('click', function()
+                        {
+                            $('#editHeroPopup').modal('hide');
+                            var clickedTagId = $(this).attr('data-tag-id');
+                            $('#tagListWrap [data-tag-id="'+clickedTagId+'"]').trigger('click');
+                            window.globalClickedHeroId = clickedheroId;
+                        });
+                        // end of #editHeroPopupTagsWrap tags values click
+
+                        $('#editHeroPopup').modal();
+                    }
+                    else if (result.php_result == 'ERROR')
+                    {
+                        console.log(result.php_error_msg);
+                    };
+                },
+                complete: function (result)
+                {
+                    pleaseWaitClose();
+                },
+                error: function (request, status, error)
+                {
+                    // we recieved NOT json
+                }
+            });
+            // end of ajax
+            // end of else
         }
     });
+    // end of .heroListImg click function
+
+
 
     $('#btnEditHeroTagDo').click(function ()
     {
@@ -404,7 +526,6 @@ $(document).ready(function ()
                 if (result.php_result == 'OK')
                 {
                     $('#editHeroTagPopup').modal('hide');
-                    //ajaxGetTagsArray(rebuildEditorTags);
                 }
                 else if (result.php_result == 'ERROR')
                 {
@@ -668,44 +789,48 @@ $(document).ready(function ()
 
     // ability search
     $('#searchAbilityInput')
-        .on('keyup', function ()
+    .on('keyup', function ()
+    {
+        if ((typeof window.loadEnglishTooltipsOnce == 'undefined') || (window.loadEnglishTooltipsOnce == 1))
         {
-            if ((typeof window.loadEnglishTooltipsOnce == 'undefined') || (window.loadEnglishTooltipsOnce == 1))
+            if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
             {
-                if ((window.curUserLang != 'en_UK') && (typeof window.abilityDataEnglish == 'undefined'))
-                {
-                    window.loadEnglishTooltipsOnce = 0;
-                    var searchInputEl = $(this);
-                    inputLoaderStart(searchInputEl);
-                    $.ajax({
-                        url: 'https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=loretwo&l=english'
-                        , dataType: 'jsonp'
-                        , jsonpCallback: 'loretwo'
-                        , success: function (data) {
-                            window.abilityDataEnglish = data["abilitydata"];
-                            inputLoaderStop(searchInputEl);
-                            searchAllAbilitiesTextDo();
-                            window.loadEnglishTooltipsOnce = 1;
-                        }
-                    });
-                } else {
-                    searchAllAbilitiesTextDo();
-                }
-            }
-        }).removeAttr('disabled'
-        ).siblings('.input-group-addon').on('click', function () {
-            // click on search btn
-            var searchInputEl = $('#searchAbilityInput');
-            var searchVal = searchInputEl.val();
-            if (searchVal != '')
-            {
-                searchInputEl.attr('data-last-search', searchVal).val('');
+                window.loadEnglishTooltipsOnce = 0;
+                var searchInputEl = $(this);
+                inputLoaderStart(searchInputEl);
+                $.ajax({
+                    url: 'https://www.dota2.com/jsfeed/heropediadata?feeds=abilitydata&callback=loretwo&l=english'
+                    , dataType: 'jsonp'
+                    , jsonpCallback: 'loretwo'
+                    , success: function (data) {
+                        window.abilityDataEnglish = data["abilitydata"];
+                        inputLoaderStop(searchInputEl);
+                        searchAllAbilitiesTextDo();
+                        window.loadEnglishTooltipsOnce = 1;
+                    }
+                });
             } else {
-                searchInputEl.val( searchInputEl.attr('data-last-search') );
+                searchAllAbilitiesTextDo();
             }
-            searchInputEl.trigger('keyup');
-        });
+        }
+    }).removeAttr('disabled'
+    ).siblings('.input-group-addon').on('click', function () {
+        // click on search btn
+        var searchInputEl = $('#searchAbilityInput');
+        var searchVal = searchInputEl.val();
+        if (searchVal != '')
+        {
+            searchInputEl.attr('data-last-search', searchVal).val('');
+        } else {
+            searchInputEl.val( searchInputEl.attr('data-last-search') );
+        }
+        searchInputEl.trigger('keyup');
+    });
 
+    $('#editAccordion').on('hidden.bs.collapse', function ()
+    {
+        $(window).trigger('resize');
+    });
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -734,24 +859,39 @@ function colorizeAllHeroes()
 function sortEditorBalanceTags()
 {
         //Shuffle
-        jQuery('#tagBalanceListWrap').shuffle('sort', {    itemSelector: '.tagBalanceItem'
-                                                          ,reverse: true
-                                                          ,by: function (el)
-                                                          {
-                                                                var order = Number(el.find('[data-tag-value]:first').attr('data-tag-value'));
-                                                                if ($('#tagListWrap .selectedTag').length)
-                                                                {
-                                                                    var selectedTagId = $('#tagListWrap .selectedTag').attr('data-tag-id');
-                                                                    if (el.find('[data-tag-value]').eq(0))
-                                                                    {
+        jQuery('#tagBalanceListWrap')
+        .shuffle('sort',
+        {    itemSelector: '.tagBalanceItem'
+            ,reverse: true
+            ,by: function (el)
+            {
+                var order = Number(el.find('[data-tag-value]').attr('data-tag-value'));
 
-                                                                    }
-                                                                }
-                                                                return order;
-                                                          }
-                                                          //,delimeter: ','
-                                                          //,columnWidth: '100%'
-                                                     });
+                var selectedTagEl = $('#tagListWrap .selectedTag');
+                if (selectedTagEl.length)
+                {
+                    var selectedTagId = selectedTagEl.attr('data-tag-id');
+                    if ((el.find('[data-tag-id]:first').attr('data-tag-id') == selectedTagId)
+                    || (el.find('[data-tag-id]:last').attr('data-tag-id') == selectedTagId))
+                    {
+                        order = 10000 + order;
+                    }
+
+                    if (order >= 6000)
+                    {
+                        el.removeClass('balanceSetItemOpacity');                    
+                    } else {
+                        el.addClass('balanceSetItemOpacity');
+                    }                    
+                } else {
+                    el.removeClass('balanceSetItemOpacity');                                        
+                }
+
+                return Number(order);
+            }
+            //,delimeter: ','
+            //,columnWidth: '100%'
+        });
 }
 
 function rebuildEditorBalanceTags()
@@ -1020,6 +1160,14 @@ function rebuildEditorTags(tagsList)
                     {
                         console.log(result.php_error_msg);
                     };
+
+                    if ((typeof window.globalClickedHeroId != 'undefined') && (window.globalClickedHeroId != ''))
+                    {
+                        var selectedHeroId = window.globalClickedHeroId;
+                        window.globalClickedHeroId = '';
+                        $('.heroListImg[data-hero-id="'+selectedHeroId+'"]').trigger('click');
+                        // выполнить клик на героя с id asdLocal
+                    }
                 },
                 complete: function (result)
                 {
@@ -1034,6 +1182,7 @@ function rebuildEditorTags(tagsList)
 
         }
 
+        sortEditorBalanceTags();
     });
 }
 

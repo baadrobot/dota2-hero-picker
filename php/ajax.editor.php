@@ -46,6 +46,41 @@
             ));
         }
     }
+    // new
+    elseif (($_POST['ajaxType'] == 'editorGetHeroAbilitiesAndHeroTags') && (isGotAccess(_ROLE_EDITOR)))
+    {
+        $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
+                    FROM tb_dota2_hero_ability_list
+                   WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = 0 AND cf_d2HeroAbilityList_isAbilityForbidden = 0
+                ORDER BY cf_d2HeroAbilityList_orderPosition;';
+        $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId']);
+
+        $query = 'SELECT cf_d2HeroTagSet_tag_id as `tagId`, cf_d2HeroTagSet_tag_val as `value` 
+                    FROM tb_dota2_heroTag_set
+                   WHERE cf_d2HeroTagSet_hero_id = ?;';
+        $heroTagsResult = $dbClass->select($query, $_POST['heroId']);
+
+        // if (count($tagSetResult) > 0)
+        // {
+        //     if ($tagSetResult[0]['selectedAbilities'] == null)
+        //     {
+        //         $tagResult = 'HERO';
+        //     } else {
+        //         $tagResult = $tagSetResult[0]['selectedAbilities'];
+        //     }
+        //     $tagValue = $tagSetResult[0]['value'];
+        // } else
+        // {
+        //     $tagResult = 'NONE';
+        //     $tagValue = '';
+        // }
+        ajaxReturnAndExit(array('php_result' => 'OK'
+                ,'hero_abilities_array' => $heroAbilitiesResult
+                ,'hero_tag_result' => $heroTagsResult
+                // ,'tag_value' => $tagValue
+        ));
+    }
+    // old
     elseif (($_POST['ajaxType'] == 'editorGetHeroAbilitiesAndTagSet') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
@@ -79,6 +114,7 @@
                 ,'tag_value' => $tagValue
         ));
     }
+    // end of old
     elseif (($_POST['ajaxType'] == 'editorEditHeroTagDeleteHeroTag') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'DELETE FROM tb_dota2_heroTag_set

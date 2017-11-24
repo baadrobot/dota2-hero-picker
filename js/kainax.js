@@ -97,14 +97,26 @@ $(window).on("load",function()
 
 function pleaseWaitOpen()
 {
-    $('#pleaseWait').modal({backdrop: 'static', keyboard: false});
-    $('.modal-backdrop').css('z-index', 2000);
+    if (typeof window.pleaseWaitPopupCount == 'undefined')
+    {
+        window.pleaseWaitPopupCount = 0;
+    }
+    window.pleaseWaitPopupCount++;
+    if (window.pleaseWaitPopupCount == 1)
+    {
+        $('#pleaseWait').modal({backdrop: 'static', keyboard: false});
+        $('.modal-backdrop').css('z-index', 2000);
+    }
 }
 
 function pleaseWaitClose()
 {
-    $('#pleaseWait').modal('hide');
-    $('.modal-backdrop').css('z-index', '');
+    window.pleaseWaitPopupCount--;
+    if (window.pleaseWaitPopupCount == 0)
+    {
+        $('#pleaseWait').modal('hide');
+        $('.modal-backdrop').css('z-index', '');
+    }
 }
 
 function addOnHoverTooltipsForAbilityImg(wrapIdEl)
