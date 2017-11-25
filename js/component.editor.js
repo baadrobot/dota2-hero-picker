@@ -654,6 +654,41 @@ $(document).ready(function ()
         $('.heroListImgOpacity').removeClass('heroListImgOpacity');
     });
 
+    // tag search
+    $('#searchTagInput')
+    .on('keyup', function ()
+    {
+        // checking if another (ability) search is active
+        // var abilitySearchInputEl = $('#searchAbilityInput');
+        // if (abilitySearchInputEl.val() != '')
+        // {
+        //     abilitySearchInputEl.siblings('.input-group-addon').find('i').trigger('click');
+        // }
+
+        var tagSearchVal = $(this).val().toLowerCase();
+        if (tagSearchVal != '')
+        {
+            $('#tagListWrap .tag').each(function ()
+            {
+                var tagName = ($(this).attr('data-tag-name')).toLowerCase();
+
+                if (tagName.indexOf($.trim(tagSearchVal)) !== -1)
+                {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        } else {
+            $('#tagListWrap .tag').show();
+        }
+    }).removeAttr('disabled');
+    // .on('blur', function ()
+    // {
+    //     $(this).val('');
+    //     $('#tagListWrap .tag').show();
+    // });
+
 
     function findAndUnderlineOrFalse(needle, stack)
     {

@@ -38,6 +38,11 @@
 
             echo '<div class="col-4">';
 
+                echo '<div class="input-group smlGrp">';
+                    echo '<input id="searchTagInput" type="text" class="form-control" disabled="disabled" placeholder="Поиск тэгов"/>';
+                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                echo '</div>';
+
                 echo '<div id="editAccordion" data-children=".item">';
                     echo '<div class="item">';
                         echo '<a class="accordionHeader" data-toggle="collapse" data-parent="#editAccordion" href="#editAccordion1" aria-expanded="true" aria-controls="editAccordion1">';
