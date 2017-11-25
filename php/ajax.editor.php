@@ -71,10 +71,38 @@
 
         $heroTotalBalanceResult = $dbClass->select($query, $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId']);
 
+        $allUsedAbilities = [];
+        $allUsedAbilitiesArray = [];
+        if ($heroTotalBalanceResult !== false)
+        {
+            for($i = 0; $i < count($heroTotalBalanceResult); $i++)
+            {
+                $selAbilArray1 = explode(' ', $heroTotalBalanceResult[$i]['selAb1']);
+                $selAbilArray2 = explode(' ', $heroTotalBalanceResult[$i]['selAb2']);
+                $allUsedAbilitiesArray = array_values(array_unique(array_merge($allUsedAbilitiesArray, array_merge($selAbilArray1,$selAbilArray2))));
+            }
+
+            if (count($allUsedAbilitiesArray) > 0)
+            {
+                $allUsedAbilitiesString = implode(',',$allUsedAbilitiesArray);
+                $query = 'SELECT cf_d2HeroAbilityList_id
+                                ,cf_d2HeroAbilityList_abilityCodename
+                            FROM tb_dota2_hero_ability_list
+                           WHERE cf_d2HeroAbilityList_id IN ('.$allUsedAbilitiesString.');';
+                $allUsedAbilities = $dbClass->select($query);
+            }
+        }
+
+        $query = 'SELECT cf_d2HeroTagSet_tag_id as `tagId`, cf_d2HeroTagSet_tag_val as `value`
+                    FROM tb_dota2_heroTag_set
+                   WHERE cf_d2HeroTagSet_hero_id = ?;';
+        $heroTagsResult = $dbClass->select($query, $_POST['heroId']);
+        
         ajaxReturnAndExit(array('php_result' => 'OK'
                 ,'hero_abilities_array' => $heroAbilitiesResult
                 ,'hero_tag_result' => $heroTagsResult
                 ,'hero_total_balance_result' => $heroTotalBalanceResult
+                ,'all_involved_abilities_result' => $allUsedAbilities
         ));
     }
     // old

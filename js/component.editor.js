@@ -526,6 +526,8 @@ $(document).ready(function ()
                                                             }
                                                         }
                                                     }
+                                                    
+                                                    // ASD
 
                                                     resultDiv += '<div class="noteForBalance">';
                                                         resultDiv += note;
@@ -556,6 +558,8 @@ $(document).ready(function ()
                                                 }
                                             }
                                 }
+
+                        //console.log(result.all_involved_abilities_result);
 
                         $('#heroPopupCounterToWrap').html('');
                         $('#heroPopupCounterByWrap').html('');
