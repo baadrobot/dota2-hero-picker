@@ -49,35 +49,32 @@
     // new
     elseif (($_POST['ajaxType'] == 'editorGetHeroAbilitiesAndHeroTags') && (isGotAccess(_ROLE_EDITOR)))
     {
+        // Hero Abilities
         $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                     FROM tb_dota2_hero_ability_list
                    WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = 0 AND cf_d2HeroAbilityList_isAbilityForbidden = 0
                 ORDER BY cf_d2HeroAbilityList_orderPosition;';
         $heroAbilitiesResult = $dbClass->select($query, $_POST['heroId']);
 
-        $query = 'SELECT cf_d2HeroTagSet_tag_id as `tagId`, cf_d2HeroTagSet_tag_val as `value` 
+        $query = 'SELECT cf_d2HeroTagSet_tag_id as `tagId`, cf_d2HeroTagSet_tag_val as `value`
                     FROM tb_dota2_heroTag_set
                    WHERE cf_d2HeroTagSet_hero_id = ?;';
         $heroTagsResult = $dbClass->select($query, $_POST['heroId']);
 
-        // if (count($tagSetResult) > 0)
-        // {
-        //     if ($tagSetResult[0]['selectedAbilities'] == null)
-        //     {
-        //         $tagResult = 'HERO';
-        //     } else {
-        //         $tagResult = $tagSetResult[0]['selectedAbilities'];
-        //     }
-        //     $tagValue = $tagSetResult[0]['value'];
-        // } else
-        // {
-        //     $tagResult = 'NONE';
-        //     $tagValue = '';
-        // }
+        // Hero Counter To
+        $query = "SELECT hId, round(c.bal_val/100*((first_val+c.second_val)*10)) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 1 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_second_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_first_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 1) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE', c.setId, '_')
+        UNION ALL SELECT hId, (round(c.bal_val/100*((first_val+c.second_val)*10))*-1) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 1 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_first_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_second_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 1) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE', c.setId, '_')
+        UNION ALL SELECT hId, round(c.bal_val/100*((first_val+c.second_val)*10)) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 0 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_first_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_second_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 0 AND cf_d2TagBalanceSet_balance_value >= 0) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE', c.setId, '_')
+            UNION SELECT hId, round(c.bal_val/100*((first_val+c.second_val)*10)) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 0 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_second_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_first_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 0 AND cf_d2TagBalanceSet_balance_value >= 0) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE', c.setId, '_')
+        UNION ALL SELECT hId, round(c.bal_val/100*((first_val+c.second_val)*10)) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 0 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_first_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_second_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 0 AND cf_d2TagBalanceSet_balance_value < 0) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE', c.setId, '_')
+            UNION SELECT hId, round(c.bal_val/100*((first_val+c.second_val)*10)) AS balCoef, c.selAb1, c.selAb2, IFNULL(cf_siteLang_ru_RU, '') AS note, 0 AS setType FROM (SELECT b.cf_d2HeroTagSet_hero_id AS hId,a.bal_val,a.setId,a.first_val,a.selAb1,b.cf_d2HeroTagSet_tag_val AS second_val,b.cf_d2HeroTagSet_selected_abilities AS selAb2 FROM (SELECT cf_d2TagBalanceSet_balance_value AS bal_val, cf_d2HeroTagSet_tag_val AS first_val, cf_d2HeroTagSet_selected_abilities AS selAb1, cf_d2TagBalanceSet_second_tag_id AS countered_tag_id, cf_d2TagBalanceSet_id AS setId FROM tb_dota2_tag_balance_set INNER JOIN tb_dota2_heroTag_set ON cf_d2TagBalanceSet_first_tag_id = cf_d2HeroTagSet_tag_id WHERE cf_d2HeroTagSet_hero_id = ? AND cf_d2TagBalanceSet_set_type = 0 AND cf_d2TagBalanceSet_balance_value < 0) AS a INNER JOIN tb_dota2_heroTag_set AS b ON countered_tag_id = b.cf_d2HeroTagSet_tag_id WHERE b.cf_d2HeroTagSet_hero_id <> ?) as c LEFT JOIN tb_lang_vars ON cf_siteLang_pre = CONCAT('_BALANCE',c.setId,'_')";
+
+        $heroTotalBalanceResult = $dbClass->select($query, $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId'], $_POST['heroId']);
+
         ajaxReturnAndExit(array('php_result' => 'OK'
                 ,'hero_abilities_array' => $heroAbilitiesResult
                 ,'hero_tag_result' => $heroTagsResult
-                // ,'tag_value' => $tagValue
+                ,'hero_total_balance_result' => $heroTotalBalanceResult
         ));
     }
     // old
@@ -234,7 +231,7 @@
             {
                 $whatReplace = array("{h1}", "{a1}");
                 $onWhat   = array("{h3}", "{a3}");
-                $balanceNote = str_ireplace($whatReplace, $onWhat, $balanceNote);                
+                $balanceNote = str_ireplace($whatReplace, $onWhat, $balanceNote);
                 $whatReplace = array("{h2}", "{a2}", "{h3}", "{a3}");
                 $onWhat   = array("{h1}", "{a1}", "{h2}", "{a2}");
                 $balanceNote = str_ireplace($whatReplace, $onWhat, $balanceNote);
@@ -271,8 +268,8 @@
         {
             // delete balance notes
             $query = 'DELETE FROM tb_lang_vars
-                            WHERE cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id 
-                                                    FROM tb_dota2_tag_balance_set 
+                            WHERE cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id
+                                                    FROM tb_dota2_tag_balance_set
                                                     WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_");';
 
             $isResultOk2 = $dbClass->delete($query, $firstTagId, $secondTagId);
@@ -280,13 +277,13 @@
             // insert/update balance notes
             $query = 'INSERT INTO tb_lang_vars
                             SET cf_siteLang_module = ?
-                                , cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id 
-                                                    FROM tb_dota2_tag_balance_set 
+                                , cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id
+                                                    FROM tb_dota2_tag_balance_set
                                                     WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_")
                                 , cf_siteLang_ru_RU = ?
                     ON DUPLICATE KEY UPDATE cf_siteLang_ru_RU = ?;';
 
-            $isResultOk2 = $dbClass->insert($query, 'NOTES', $firstTagId, $secondTagId, $balanceNote, $balanceNote);            
+            $isResultOk2 = $dbClass->insert($query, 'NOTES', $firstTagId, $secondTagId, $balanceNote, $balanceNote);
         }
 
         if ($isResultOk1 && $isResultOk2)

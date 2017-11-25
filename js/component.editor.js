@@ -253,7 +253,7 @@ $(document).ready(function ()
             //     .attr( 'data-hero-id', clickedheroId )
             //     .attr( 'data-hero-codename', curSelectedHeroEl.attr('data-hero-codename'));
 
-            mainHeroImgWrapEl = $('#editHeroTagHeroImgWrap');
+            var mainHeroImgWrapEl = $('#editHeroTagHeroImgWrap');
             mainHeroImgWrapEl.find('img')
                 .removeAttr('src')
                 .attr('data-img-src', '//cdn.dota2.com/apps/dota2/images/heroes/' + curSelectedHeroEl.attr('data-hero-codename') + '_full.png?v=4212550');
@@ -373,14 +373,14 @@ $(document).ready(function ()
 
             var curSelectedHeroEl = $(this);
             var clickedheroId = curSelectedHeroEl.attr('data-hero-id');
-            
+
             $('#editHeroPopup')
                 .attr('data-hero-id', clickedheroId )
                 .attr('data-hero-codename', curSelectedHeroEl.attr('data-hero-codename') );
 
             $('#editHeroAllTagsHeroName').text( curSelectedHeroEl.attr('data-hero-namelocal') );
 
-            mainHeroImgWrapEl = $('#editHeroAllTagsHeroImgWrap');
+            var mainHeroImgWrapEl = $('#editHeroAllTagsHeroImgWrap');
             mainHeroImgWrapEl.find('img')
                 .removeAttr('src')
                 .attr('data-img-src', '//cdn.dota2.com/apps/dota2/images/heroes/' + curSelectedHeroEl.attr('data-hero-codename') + '_full.png?v=4212550');
@@ -455,7 +455,7 @@ $(document).ready(function ()
                             $('#tagListWrap [data-tag-id="'+clickedTagId+'"]').trigger('click');
                         });
                         // end of #editHeroPopupTagsWrap tags click
-                        
+
                         // #editHeroPopupTagsWrap tags values click
                         $('#editHeroPopupTagsWrap .editHeroPopupTagVal').on('click', function()
                         {
@@ -465,6 +465,120 @@ $(document).ready(function ()
                             window.globalClickedHeroId = clickedheroId;
                         });
                         // end of #editHeroPopupTagsWrap tags values click
+
+                        var heroTotalBalanceArray = [];
+                        heroTotalBalanceArray[0] = [];
+                        heroTotalBalanceArray[1] = [];
+                        for(i = 0; i < result.hero_total_balance_result.length; i++)
+                        {
+                            var setType = result.hero_total_balance_result[i]['setType'];
+                            var secondHeroId = result.hero_total_balance_result[i]['hId'];
+                            var balanceCoef = result.hero_total_balance_result[i]['balCoef'];
+
+                            if (typeof heroTotalBalanceArray[setType][secondHeroId] == 'undefined')
+                            {
+                                heroTotalBalanceArray[setType][secondHeroId] = 0;
+                            }
+
+                            heroTotalBalanceArray[setType][secondHeroId] = heroTotalBalanceArray[setType][secondHeroId] + Number(balanceCoef);
+                        }
+
+                                function createHeroBalanceDiv(setTypeFinalDecision, firstHeroId, secondHeroId, heroTotalBalanceArray, heroTotalBalanceResult)
+                                {
+                                        // prepare second hero data from "Hero List" on the page
+                                        var resultDiv = '';
+                                        var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');
+                                        var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
+                                        var imgPath = secondHeroOnPageEl.find('img').attr('src');
+                                        balanceCoefTotal = heroTotalBalanceArray[setTypeFinalDecision][secondHeroId];
+
+                                    resultDiv += '<div class="finalBalaceItem">';
+                                        resultDiv += '<div class="heroInfoWrapForBalance clearFix">';
+                                            resultDiv += '<div class="heroImgWrapForBalance float-left align-middle"><img src="' + imgPath + '" width="30px" height="auto"></div>';
+                                            resultDiv += '<div class="heroNamelocalForBalance float-left align-middle">' + secondHeroNamelocal + '</div>';
+                                            resultDiv += '<div class="heroTotalCoefForBalance float-right align-middle">' + balanceCoefTotal + '</div>';
+                                        resultDiv += '</div>';
+                                        resultDiv += '<div class="heroNotesWrapForBalance" style="display:none">';
+                                            for (i = 0; i < heroTotalBalanceResult.length; i++)
+                                            {
+                                                //clickedheroId
+                                                var curSetType = heroTotalBalanceResult[i]['setType'];
+                                                var curSecondHeroId = heroTotalBalanceResult[i]['hId'];
+
+                                                if ((curSetType == setTypeFinalDecision) && (curSecondHeroId == secondHeroId))
+                                                {
+                                                    var balanceCoef = heroTotalBalanceResult[i]['balCoef'];
+                                                    var selAb2 = heroTotalBalanceResult[i]['selAb2'];
+                                                    var selAb1 = heroTotalBalanceResult[i]['selAb1'];
+                                                    var note = heroTotalBalanceResult[i]['note'];
+
+                                                    if (note == '')
+                                                    {
+                                                        if (setTypeFinalDecision == 1)
+                                                        {
+                                                            note = getPreStr_js('EDITOR', '_DFLT_NOTE_COUNTER_');
+                                                        } else
+                                                        {
+                                                            if (balanceCoefTotal >= 0) {
+                                                                note = getPreStr_js('EDITOR', '_DFLT_NOTE_SNRG_');
+                                                            } else {
+                                                                note = getPreStr_js('EDITOR', '_DFLT_NOTE_ANTISNRG_');
+                                                            }
+                                                        }
+                                                    }
+
+                                                    resultDiv += '<div class="noteForBalance">';
+                                                        resultDiv += note;
+                                                    resultDiv += '</div>';
+                                                }
+                                            }
+                                        resultDiv += '</div>';
+                                    resultDiv += '</div>';
+
+                                            if (setTypeFinalDecision == 1)
+                                            {
+                                                if (balanceCoefTotal >= 0)
+                                                {
+                                                    // Hero CounterTo
+                                                    $('#heroPopupCounterToWrap').append(resultDiv);
+                                                } else {
+                                                    // Hero CounterBy
+                                                    $('#heroPopupCounterByWrap').append(resultDiv);
+                                                }
+                                            } else {
+                                                if (balanceCoefTotal >= 0)
+                                                {
+                                                    // Hero Synergy wrap
+                                                    $('#heroPopupSynergyWrap').append(resultDiv);
+                                                } else {
+                                                    // Hero AntiSynergy wrap
+                                                    $('#heroPopupAntiSynergyWrap').append(resultDiv);
+                                                }
+                                            }
+                                }
+
+                        $('#heroPopupCounterToWrap').html('');
+                        $('#heroPopupCounterByWrap').html('');
+                        $('#heroPopupSynergyWrap').html('');
+                        $('#heroPopupAntiSynergyWrap').html('');
+                        Object.keys(heroTotalBalanceArray[1]).forEach(function (keySecondHeroId)
+                        {
+                            createHeroBalanceDiv(1, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result);
+                        });
+                        Object.keys(heroTotalBalanceArray[0]).forEach(function (keySecondHeroId)
+                        {
+                            createHeroBalanceDiv(0, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result);
+                        });
+
+                        $('.heroInfoWrapForBalance').on('click', function()
+                        {
+                            if (!$(this).hasClass('selectedHeroPopupBalance'))
+                            {
+                                $('.selectedHeroPopupBalance').removeClass('selectedHeroPopupBalance').siblings('.heroNotesWrapForBalance').slideUp(100);
+                                $(this).addClass('selectedHeroPopupBalance').siblings('.heroNotesWrapForBalance').slideDown(100);
+                            }
+                        });
+
 
                         $('#editHeroPopup').modal();
                     }
@@ -879,12 +993,12 @@ function sortEditorBalanceTags()
 
                     if (order >= 6000)
                     {
-                        el.removeClass('balanceSetItemOpacity');                    
+                        el.removeClass('balanceSetItemOpacity');
                     } else {
                         el.addClass('balanceSetItemOpacity');
-                    }                    
+                    }
                 } else {
-                    el.removeClass('balanceSetItemOpacity');                                        
+                    el.removeClass('balanceSetItemOpacity');
                 }
 
                 return Number(order);
