@@ -193,23 +193,42 @@ echo '<div class="modal-dialog" role="document">';
                 echo '<div id="editHeroAllTagsHeroImgWrap">';
                     echo '<img>';
                 echo '</div>';
-    
+
                 echo '<div id="editHeroAllTagsAbilitiesImgWrap">';
-    
+
                 echo '</div>';
-                
+
             echo '</div>';
 
             echo '<div class="tab-pane fade" id="nav-tags" role="tabpanel" aria-labelledby="nav-tags-tab">';
                 echo '<div id="editHeroPopupTagsWrap">';
-            
+
                 echo '</div>';
             echo '</div>';
 
-            echo '<div class="tab-pane fade" id="nav-counter-to" role="tabpanel" aria-labelledby="nav-counter-to-tab">...</div>';
-            echo '<div class="tab-pane fade" id="nav-counter-by" role="tabpanel" aria-labelledby="nav-counter-by-tab">...</div>';
-            echo '<div class="tab-pane fade" id="nav-synergy" role="tabpanel" aria-labelledby="nav-synergy-tab">...</div>';
-            echo '<div class="tab-pane fade" id="nav-anti-synergy" role="tabpanel" aria-labelledby="nav-anti-synergy-tab">...</div>';
+            echo '<div class="tab-pane fade" id="nav-counter-to" role="tabpanel" aria-labelledby="nav-counter-to-tab">';
+                echo '<div id="heroPopupCounterToWrap">';
+
+                echo '</div>';
+            echo '</div>';
+
+            echo '<div class="tab-pane fade" id="nav-counter-by" role="tabpanel" aria-labelledby="nav-counter-by-tab">';
+                echo '<div id="heroPopupCounterByWrap">';
+
+                echo '</div>';
+            echo '</div>';
+
+            echo '<div class="tab-pane fade" id="nav-synergy" role="tabpanel" aria-labelledby="nav-synergy-tab">';
+                echo '<div id="heroPopupSynergyWrap">';
+
+                echo '</div>';
+            echo '</div>';
+
+            echo '<div class="tab-pane fade" id="nav-anti-synergy" role="tabpanel" aria-labelledby="nav-anti-synergy-tab">';
+                echo '<div id="heroPopupAntiSynergyWrap">';
+
+                echo '</div>';
+            echo '</div>';
         echo '</div>';
         // end of tab content
 
