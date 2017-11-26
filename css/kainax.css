@@ -513,3 +513,8 @@ span.dispStrong{
 ul.ui-autocomplete{
 	z-index: 1000000;
 }
+
+.scrollablePanel {
+	height:400px;
+	overflow-y: scroll;
+  }

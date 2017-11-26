@@ -164,6 +164,7 @@ echo '<div id="editHeroTagPopup" class="modal" tabindex="-1" role="dialog" aria-
 echo '</div>';
 // end of popup for hero tag edit
 
+
 // popup for hero popup
 echo '<div id="editHeroPopup" class="modal" tabindex="-1" role="dialog" aria-hidden="true">';
 echo '<div class="modal-dialog" role="document">';
@@ -207,25 +208,25 @@ echo '<div class="modal-dialog" role="document">';
             echo '</div>';
 
             echo '<div class="tab-pane fade" id="nav-counter-to" role="tabpanel" aria-labelledby="nav-counter-to-tab">';
-                echo '<div id="heroPopupCounterToWrap">';
+                echo '<div id="heroPopupCounterToWrap" class="scrollablePanel">';
 
                 echo '</div>';
             echo '</div>';
 
             echo '<div class="tab-pane fade" id="nav-counter-by" role="tabpanel" aria-labelledby="nav-counter-by-tab">';
-                echo '<div id="heroPopupCounterByWrap">';
+                echo '<div id="heroPopupCounterByWrap" class="scrollablePanel">';
 
                 echo '</div>';
             echo '</div>';
 
             echo '<div class="tab-pane fade" id="nav-synergy" role="tabpanel" aria-labelledby="nav-synergy-tab">';
-                echo '<div id="heroPopupSynergyWrap">';
+                echo '<div id="heroPopupSynergyWrap" class="scrollablePanel">';
 
                 echo '</div>';
             echo '</div>';
 
             echo '<div class="tab-pane fade" id="nav-anti-synergy" role="tabpanel" aria-labelledby="nav-anti-synergy-tab">';
-                echo '<div id="heroPopupAntiSynergyWrap">';
+                echo '<div id="heroPopupAntiSynergyWrap" class="scrollablePanel">';
 
                 echo '</div>';
             echo '</div>';

@@ -483,7 +483,7 @@ $(document).ready(function ()
                             heroTotalBalanceArray[setType][secondHeroId] = heroTotalBalanceArray[setType][secondHeroId] + Number(balanceCoef);
                         }
 
-                                function createHeroBalanceDiv(setTypeFinalDecision, firstHeroId, secondHeroId, heroTotalBalanceArray, heroTotalBalanceResult)
+                                function createHeroBalanceDiv(setTypeFinalDecision, firstHeroId, secondHeroId, heroTotalBalanceArray, heroTotalBalanceResult, allInvolvedAbilitiesResult)
                                 {
                                         // prepare second hero data from "Hero List" on the page
                                         var resultDiv = '';
@@ -526,11 +526,28 @@ $(document).ready(function ()
                                                             }
                                                         }
                                                     }
-                                                    
-                                                    // ASD
 
-                                                    resultDiv += '<div class="noteForBalance">';
-                                                        resultDiv += note;
+                                                    eXoActivateInactiveTooltips();
+                                                    addOnHoverTooltipsForAbilityImg('#editHeroPopup');
+                                                            if (balanceCoef < 0)
+                                                            {
+                                                                var colorClass = 'noticeRed';
+                                                            } else {
+                                                                var colorClass = 'noticeGreen';
+                                                            }
+                                                    resultDiv += '<div class="noteForBalance '+colorClass+'">';
+                                                        resultDiv += '<span class="noteTextForBalance">';
+                                                            if ((setTypeFinalDecision == 1) && (balanceCoef < 0))
+                                                            {
+                                                                // for Counter-By we need to change H1 and H2 places
+                                                                resultDiv += generateBalanceNote(note, secondHeroId, clickedheroId, selAb2, selAb1, allInvolvedAbilitiesResult);
+                                                            } else {
+                                                                resultDiv += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult);
+                                                            }
+                                                        resultDiv += '</span>';
+                                                        resultDiv += '<span class="coefForBalance">';
+                                                            resultDiv += balanceCoef;
+                                                        resultDiv += '</span>';
                                                     resultDiv += '</div>';
                                                 }
                                             }
@@ -559,19 +576,17 @@ $(document).ready(function ()
                                             }
                                 }
 
-                        //console.log(result.all_involved_abilities_result);
-
                         $('#heroPopupCounterToWrap').html('');
                         $('#heroPopupCounterByWrap').html('');
                         $('#heroPopupSynergyWrap').html('');
                         $('#heroPopupAntiSynergyWrap').html('');
                         Object.keys(heroTotalBalanceArray[1]).forEach(function (keySecondHeroId)
                         {
-                            createHeroBalanceDiv(1, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result);
+                            createHeroBalanceDiv(1, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result, result.all_involved_abilities_result);
                         });
                         Object.keys(heroTotalBalanceArray[0]).forEach(function (keySecondHeroId)
                         {
-                            createHeroBalanceDiv(0, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result);
+                            createHeroBalanceDiv(0, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result, result.all_involved_abilities_result);
                         });
 
                         $('.heroInfoWrapForBalance').on('click', function()
@@ -580,9 +595,10 @@ $(document).ready(function ()
                             {
                                 $('.selectedHeroPopupBalance').removeClass('selectedHeroPopupBalance').siblings('.heroNotesWrapForBalance').slideUp(100);
                                 $(this).addClass('selectedHeroPopupBalance').siblings('.heroNotesWrapForBalance').slideDown(100);
+                            } else {
+                                $('.selectedHeroPopupBalance').removeClass('selectedHeroPopupBalance').siblings('.heroNotesWrapForBalance').slideUp(100);
                             }
                         });
-
 
                         $('#editHeroPopup').modal();
                     }
@@ -598,6 +614,9 @@ $(document).ready(function ()
                 error: function (request, status, error)
                 {
                     // we recieved NOT json
+                    console.log(request);
+                    console.log(status);
+                    console.log(error);
                 }
             });
             // end of ajax
@@ -1828,15 +1847,30 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
     });
 }
 
+
+                    function getHeroIcon(heroName, heroNameLocal)
+                    {
+                        var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
+                        var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
+                        var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+                        return heroImg;
+                    }
+
+                    function getAbilityIcon(abilityCodeName, abilityId)
+                    {
+                        var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
+                        var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
+                        return abilityImg;
+                    }
+
 function changeNotesWrapHtml()
 {
-    if ( $('#balanceTagTextarea').val() != '' )
+    if ($('#balanceTagTextarea').val() != '')
     {
         var textareaValue = $('#balanceTagTextarea').val();
     } else {
         var textareaValue = $('#balanceTagTextarea').attr('placeholder');
     }
-
     textareaValue = textareaValue.replace(/{h1}/gi, getHeroIcon('ancient_apparition', 'Ancient Apparition'))
                                  .replace(/{a1}/gi, getAbilityIcon('ancient_apparition_ice_blast', 5348))
                                  .replace(/{h2}/gi, getHeroIcon('alchemist', 'Alchemist'))
@@ -1848,17 +1882,48 @@ function changeNotesWrapHtml()
     addOnHoverTooltipsForAbilityImg('#notesWrap');
 }
 
-function getHeroIcon(heroName, heroNameLocal)
+function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult)
 {
-    var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
-    var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
-    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
-    return heroImg;
+    var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + firstHeroId + '"]');
+    var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');
+
+    var firstHeroCodename = firstHeroOnPageEl.attr('data-hero-codename');
+    var secondHeroCodename = secondHeroOnPageEl.attr('data-hero-codename');
+
+    var firstHeroNamelocal = firstHeroOnPageEl.attr('data-hero-namelocal');
+    var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
+    var imgPath = secondHeroOnPageEl.find('img').attr('src');
+
+    var selAb1 = selAb1.split(' ');
+    var selAb2 = selAb2.split(' ');
+
+    firstHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb1.length; i++)
+    {
+        if (i != 0)
+        {
+            firstHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb1[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        firstHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    secondHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb2.length; i++)
+    {
+        if (i != 0)
+        {
+            secondHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb2[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    return balanceNoteTemplate.replace(/{h1}/gi, getHeroIcon(firstHeroCodename, firstHeroNamelocal))
+                            .replace(/{a1}/gi, firstHeroAbilitiesIcons)
+                            .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
+                            .replace(/{a2}/gi, secondHeroAbilitiesIcons);
 }
 
-function getAbilityIcon(abilityCodeName, abilityId)
-{
-    var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
-    var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
-    return abilityImg;
-}
