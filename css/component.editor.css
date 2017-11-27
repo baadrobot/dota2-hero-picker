@@ -47,12 +47,12 @@
     width: 28px;
     height: 32px;
     margin: 2px;
-    cursor: pointer;
 }
 
 .heroListImg:hover {
     -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
     filter: grayscale(0%);
+    cursor: pointer;
 }
 
 hr {
@@ -364,11 +364,16 @@ line-height: 40px
     cursor: pointer;
     background-color: rgb(235, 235, 235);
 }
+#notesWrap{
+    margin: 10px auto 0 auto;
+    padding: 0 14px;
+}
 
 #notesWrap,
 .heroNotesWrapForBalance{
     font-size: 11px;
-    line-height: 26px
+    line-height: 21px;
+    text-align: center;
 }
 .heroNotesWrapForBalance {
     margin-top: -5px;
@@ -394,20 +399,35 @@ line-height: 40px
     width: 430px;
     border: 1px solid rgba(0,0,0,.125);
     border-top: none;
+    display: flex;
 }
 .finalBalaceItem .noteForBalance:last-of-type{
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px;
 }
+.finalBalaceItem .noteForBalance:first-of-type{
+    margin: 1px 0 0;
+}
 .selectedHeroPopupBalance {
     border-bottom-left-radius: 0;
 }
 
+#notesWrap,
+.noteTextForBalance{
+    width: 398px;
+}
+
+.noteTextForBalance{
+    margin-bottom: 3px;
+    padding: 0 2px;
+}
+
 .coefForBalance{
-    float: right;
     width: 30px;
     text-align: center;
+    background-color: #f3f3f3;
+    border-left: 1px solid rgba(0,0,0,.125);
 }
 
 #editHeroPopup{
