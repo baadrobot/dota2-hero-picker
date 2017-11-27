@@ -491,19 +491,21 @@ $(document).ready(function ()
                                         var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
                                         var imgPath = secondHeroOnPageEl.find('img').attr('src');
                                         balanceCoefTotal = heroTotalBalanceArray[setTypeFinalDecision][secondHeroId];
+                                        var colorCoefColor = balanceCoefTotal >= 0 ? 'noticeGreen' : 'noticeRed';
+                                        var balanceCoefTotalText = balanceCoefTotal > 0 ? '+'+balanceCoefTotal : balanceCoefTotal;
 
                                     resultDiv += '<div class="finalBalaceItem">';
                                         resultDiv += '<div class="heroInfoWrapForBalance clearFix">';
                                             resultDiv += '<div class="heroImgWrapForBalance float-left align-middle"><img src="' + imgPath + '" width="30px" height="auto"></div>';
                                             resultDiv += '<div class="heroNamelocalForBalance float-left align-middle">' + secondHeroNamelocal + '</div>';
-                                            resultDiv += '<div class="heroTotalCoefForBalance float-right align-middle">' + balanceCoefTotal + '</div>';
+                                            resultDiv += '<div class="heroTotalCoefForBalance '+colorCoefColor+' float-right align-middle">' + balanceCoefTotalText + '</div>';
                                         resultDiv += '</div>';
                                         resultDiv += '<div class="heroNotesWrapForBalance" style="display:none">';
                                             for (i = 0; i < heroTotalBalanceResult.length; i++)
                                             {
-                                                //clickedheroId
                                                 var curSetType = heroTotalBalanceResult[i]['setType'];
                                                 var curSecondHeroId = heroTotalBalanceResult[i]['hId'];
+                                                var isReversedSynergy = heroTotalBalanceResult[i]['isRvrs'];
 
                                                 if ((curSetType == setTypeFinalDecision) && (curSecondHeroId == secondHeroId))
                                                 {
@@ -527,8 +529,6 @@ $(document).ready(function ()
                                                         }
                                                     }
 
-                                                    eXoActivateInactiveTooltips();
-                                                    addOnHoverTooltipsForAbilityImg('#editHeroPopup');
                                                             if (balanceCoef < 0)
                                                             {
                                                                 var colorClass = 'noticeRed';
@@ -536,18 +536,18 @@ $(document).ready(function ()
                                                                 var colorClass = 'noticeGreen';
                                                             }
                                                     resultDiv += '<div class="noteForBalance '+colorClass+'">';
-                                                        resultDiv += '<span class="noteTextForBalance">';
+                                                        resultDiv += '<div class="noteTextForBalance">';
                                                             if ((setTypeFinalDecision == 1) && (balanceCoef < 0))
                                                             {
                                                                 // for Counter-By we need to change H1 and H2 places
-                                                                resultDiv += generateBalanceNote(note, secondHeroId, clickedheroId, selAb2, selAb1, allInvolvedAbilitiesResult);
+                                                                resultDiv += generateBalanceNote(note, secondHeroId, clickedheroId, selAb2, selAb1, allInvolvedAbilitiesResult, isReversedSynergy);
                                                             } else {
-                                                                resultDiv += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult);
+                                                                resultDiv += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
                                                             }
-                                                        resultDiv += '</span>';
-                                                        resultDiv += '<span class="coefForBalance">';
+                                                        resultDiv += '</div>';
+                                                        resultDiv += '<div class="coefForBalance">';
                                                             resultDiv += balanceCoef;
-                                                        resultDiv += '</span>';
+                                                        resultDiv += '</div>';
                                                     resultDiv += '</div>';
                                                 }
                                             }
@@ -576,6 +576,7 @@ $(document).ready(function ()
                                             }
                                 }
 
+                        // popuplate
                         $('#heroPopupCounterToWrap').html('');
                         $('#heroPopupCounterByWrap').html('');
                         $('#heroPopupSynergyWrap').html('');
@@ -589,6 +590,27 @@ $(document).ready(function ()
                             createHeroBalanceDiv(0, clickedheroId, keySecondHeroId, heroTotalBalanceArray, result.hero_total_balance_result, result.all_involved_abilities_result);
                         });
 
+                        // sort
+                        function sortTotalHeroCoefDESC(a, b) {
+                            var contentA = Number($(a).find(".heroTotalCoefForBalance").text());
+                            var contentB = Number($(b).find(".heroTotalCoefForBalance").text());
+                            return contentA < contentB ? 1 : -1;
+                        };
+                        function sortTotalHeroCoefASC(a, b) {
+                            var contentA = Number($(a).find(".heroTotalCoefForBalance").text());
+                            var contentB = Number($(b).find(".heroTotalCoefForBalance").text());
+                            return contentA < contentB ? -1 : 1;
+                        };
+                        $('#heroPopupCounterToWrap .finalBalaceItem').sort(sortTotalHeroCoefDESC).appendTo('#heroPopupCounterToWrap');
+                        $('#heroPopupCounterByWrap .finalBalaceItem').sort(sortTotalHeroCoefASC).appendTo('#heroPopupCounterByWrap');
+                        $('#heroPopupSynergyWrap .finalBalaceItem').sort(sortTotalHeroCoefDESC).appendTo('#heroPopupSynergyWrap');
+                        $('#heroPopupAntiSynergyWrap .finalBalaceItem').sort(sortTotalHeroCoefASC).appendTo('#heroPopupAntiSynergyWrap');
+
+                        // tooltips
+                        eXoActivateInactiveTooltips();
+                        addOnHoverTooltipsForAbilityImg('#editHeroPopup');
+
+                        // on click
                         $('.heroInfoWrapForBalance').on('click', function()
                         {
                             if (!$(this).hasClass('selectedHeroPopupBalance'))
@@ -1882,8 +1904,19 @@ function changeNotesWrapHtml()
     addOnHoverTooltipsForAbilityImg('#notesWrap');
 }
 
-function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult)
+function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy)
 {
+    if (isReversedSynergy == 1)
+    {
+        // reverse {h1}{a1} and {h2}{a2} for this hero
+        balanceNoteTemplate = balanceNoteTemplate.replace(/{h1}/gi, '{temp_h1}')
+                                                 .replace(/{a1}/gi, '{temp_a1}')
+                                                 .replace(/{h2}/gi, '{h1}')
+                                                 .replace(/{a2}/gi, '{a1}')
+                                                 .replace(/{temp_h1}/gi, '{h2}')
+                                                 .replace(/{temp_a1}/gi, '{a2}');
+    }
+
     var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + firstHeroId + '"]');
     var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');
 
