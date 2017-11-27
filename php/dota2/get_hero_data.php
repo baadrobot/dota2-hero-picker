@@ -64,7 +64,14 @@
             $pro_win = $hero_data_array[$i]['pro_win'];
         }
 
-
+        if (!isset($hero_data_array[$i]['attack_type']))
+        {
+            $attack_type = NULL;
+        } else if ($hero_data_array[$i]['attack_type'] == 'Melee') {
+            $attack_type = 0;
+        } else if ($hero_data_array[$i]['attack_type'] == 'Ranged') {
+            $attack_type = 1;
+        }
 
         $myQuery = 'INSERT INTO tb_dota2_hero_list
         (cf_d2HeroList_id,
@@ -126,7 +133,7 @@
             $hero_data_array[$i]['localized_name'],
             $heroNameAliases,
             $primary_attr,
-            $hero_data_array[$i]['attack_type'],
+            $attack_type,
             $hero_data_array[$i]['attack_range'],
             $hero_data_array[$i]['img'],
             $hero_data_array[$i]['icon'],
@@ -150,7 +157,7 @@
             $hero_data_array[$i]['localized_name'],
             $heroNameAliases,
             $primary_attr,
-            $hero_data_array[$i]['attack_type'],
+            $attack_type,
             $hero_data_array[$i]['attack_range'],
             $hero_data_array[$i]['img'],
             $hero_data_array[$i]['icon'],

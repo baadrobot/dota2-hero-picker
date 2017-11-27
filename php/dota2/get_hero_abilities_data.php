@@ -55,15 +55,15 @@
 
 
 
-            echo '<ul class="nav nav-pills" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active" id="masterList-tab" data-toggle="tab" href="#masterList" role="tab" aria-controls="masterList" aria-selected="true">Enabled abilities</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="dispellableAbilities-tab" data-toggle="tab" href="#masterDispellableAbilities" role="tab" aria-controls="dispellableAbilities" aria-selected="false">Dispellable abilities</a>
-                </li>
-            </ul>
-            <div class="tab-content" id="myTabContent">';
+            echo '<ul class="nav nav-pills" id="myTab" role="tablist">';
+                echo '<li class="nav-item">';
+                    echo '<a class="nav-link active" id="masterList-tab" data-toggle="tab" href="#masterList" role="tab" aria-controls="masterList" aria-selected="true">Enabled abilities</a>';
+                echo '</li>';
+                echo '<li class="nav-item">';
+                    echo '<a class="nav-link" id="dispellableAbilities-tab" data-toggle="tab" href="#masterDispellableAbilities" role="tab" aria-controls="dispellableAbilities" aria-selected="false">Dispellable abilities</a>';
+                echo '</li>';
+            echo '</ul>';
+            echo '<div class="tab-content" id="myTabContent">';
                 echo '<div id="masterList" class="tab-pane fade show active" role="tabpanel" aria-labelledby="masterList-tab">';
                     echo '<div><a href="/index.php?lang='.$_SESSION['SUserLang'].'&component=master&update=all">Обновить героев и их способности.</a></div>';
                     // first tab
@@ -161,11 +161,98 @@
                     //$autoTagSetForDispellableAbilities[$heroCodename] = [];
 
                     $heroId = $heroesFile[$key]['HeroID'];
-                    $heroRole = $heroesFile[$key]['Role'];
+                    $heroComplexityVal = $heroesFile[$key]['Complexity'];
+                    //$heroCMEnabled = $heroesFile[$key]['CMEnabled'];
 
-                    $heroRolelevels = $heroesFile[$key]['Rolelevels'];
-                    $heroComplexity = $heroesFile[$key]['Complexity'];
-                    $heroCMEnabled = $heroesFile[$key]['CMEnabled'];
+                    $heroRolesAndLevels = [];
+                    if (isset($heroesFile[$key]['Role']) && isset($heroesFile[$key]['Rolelevels']))
+                    {
+                            $heroRoles = explode(',', $heroesFile[$key]['Role']);
+                            $heroRolelevels = explode(',', $heroesFile[$key]['Rolelevels']);
+                        $heroRolesAndLevels = array_combine($heroRoles, $heroRolelevels);
+                    }
+
+                    if (isset($heroRolesAndLevels['Support']))
+                    {
+                        $roleSupportVal = $heroRolesAndLevels['Support'];
+                    } else {
+                        $roleSupportVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Carry']))
+                    {
+                        $roleCarryVal = $heroRolesAndLevels['Carry'];
+                    } else {
+                        $roleCarryVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Escape']))
+                    {
+                        $roleEscapeVal = $heroRolesAndLevels['Escape'];
+                    } else {
+                        $roleEscapeVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Initiator']))
+                    {
+                        $roleInitiatorVal = $heroRolesAndLevels['Initiator'];
+                    } else {
+                        $roleInitiatorVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Nuker']))
+                    {
+                        $roleNukerVal = $heroRolesAndLevels['Nuker'];
+                    } else {
+                        $roleNukerVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Disabler']))
+                    {
+                        $roleDisablerVal = $heroRolesAndLevels['Disabler'];
+                    } else {
+                        $roleDisablerVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Jungler']))
+                    {
+                        $roleJunglerVal = $heroRolesAndLevels['Jungler'];
+                    } else {
+                        $roleJunglerVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Durable']))
+                    {
+                        $roleDurableVal = $heroRolesAndLevels['Durable'];
+                    } else {
+                        $roleDurableVal = 0;
+                    }
+                    if (isset($heroRolesAndLevels['Pusher']))
+                    {
+                        $rolePusherVal = $heroRolesAndLevels['Pusher'];
+                    } else {
+                        $rolePusherVal = 0;
+                    }
+
+                    // сделать insert для сложности героя
+                    $query = 'UPDATE tb_dota2_hero_list
+                                SET  cf_d2HeroList_complexity = ?
+                                    ,cf_d2HeroList_role_support = ?
+                                    ,cf_d2HeroList_role_carry = ?
+                                    ,cf_d2HeroList_role_escape = ?
+                                    ,cf_d2HeroList_role_initiator = ?
+                                    ,cf_d2HeroList_role_nuker = ?
+                                    ,cf_d2HeroList_role_disabler = ?
+                                    ,cf_d2HeroList_role_jungler = ?
+                                    ,cf_d2HeroList_role_durable = ?
+                                    ,cf_d2HeroList_role_pusher = ?
+                               WHERE cf_d2HeroList_id = ?;';
+                    $dbClass->update($query, $heroComplexityVal
+                                            ,$roleSupportVal
+                                            ,$roleCarryVal
+                                            ,$roleEscapeVal
+                                            ,$roleInitiatorVal
+                                            ,$roleNukerVal
+                                            ,$roleDisablerVal
+                                            ,$roleJunglerVal
+                                            ,$roleDurableVal
+                                            ,$rolePusherVal
+                                            ,$heroId);
+
+
 
                     $abilityOrderPosition = -1;
                     for ($i = 1; $i <= 20; $i++) // Kainax: maxed from 9 to 20 for Invoker
@@ -177,6 +264,7 @@
                             {
                                 $abilityId = $abilities[$abilityCodename]['ID'];
                             } else {
+
                                 continue;
                             }
                             $abilityOrderPosition++;
@@ -338,6 +426,8 @@
                                 $abilityUnitTargetFlags = null;
                             }
 
+                            
+
 
                             // AbilityType //ultimate etc
                             // AbilityBehavior // passive, channeling, DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES" etc
@@ -446,8 +536,6 @@
                                                         );
                         }
                     }
-
-
                 }
             }
 
@@ -510,6 +598,115 @@
             echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
             echo '<br>Reloading...<br>';
             //file_put_contents($prebuildMasterAbilitiesFilenamePath, $echoCache);
+
+            global $dbClass;
+            // delete all primary attr setted on hero tags before setting new
+            $query = 'DELETE FROM tb_dota2_heroTag_set
+                            WHERE cf_d2HeroTagSet_tag_id IN (51,52,53,54,57,62,63);';
+            $dbClass->delete($query);
+
+            $query = 'SELECT cf_d2HeroList_id as `heroId`
+                            , cf_d2HeroList_primary_attr as `heroAttr`
+                            , cf_d2HeroList_attack_type as `attackType`
+                            , cf_d2HeroList_attack_range as `attackRange`
+                            , cf_d2HeroList_complexity as `complexity`
+                           FROM tb_dota2_hero_list;';
+            $heroParamsResult = $dbClass->select($query);
+            
+            // has aghanim upgrade
+            $query = 'SELECT DISTINCT(cf_d2HeroAbilityList_heroId) AS heroId
+                        FROM tb_dota2_hero_ability_list
+                       WHERE cf_d2HeroAbilityList_hasScepterUpgrade = 1;';
+            $hasScepterUpgradeResult = $dbClass->select($query);
+           
+            // query for range tag
+            $query = 'INSERT INTO tb_dota2_heroTag_set
+                            SET cf_d2HeroTagSet_hero_id = ?
+                                ,cf_d2HeroTagSet_tag_id = ?
+                                ,cf_d2HeroTagSet_tag_val = ?;';
+
+            // create tags - hero has aghanim
+            for ($i = 0; $i < count($hasScepterUpgradeResult); $i++)
+            {
+                $dbClass->insert($query, $hasScepterUpgradeResult[$i]["heroId"], 54, 5);
+            }
+
+            //  create tags - hero primary attr
+            for ($i = 0; $i < count($heroParamsResult); $i++)
+            {
+                $tagId = '';
+                if ($heroParamsResult[$i]['heroAttr'] == 1)
+                {
+                    $tagId = 51;
+                }
+                else if ($heroParamsResult[$i]['heroAttr'] == 2)
+                {
+                    $tagId = 52;
+
+                } else  if ($heroParamsResult[$i]['heroAttr'] == 3) {
+                    $tagId = 53;
+                }
+                if ($tagId != '')
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], $tagId, 5);
+                }
+
+                // insert for complexity
+                $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 57, $heroParamsResult[$i]["complexity"]);
+
+                if ($heroParamsResult[$i]["attackType"] == 0)
+                {
+                    // is melee
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 62, 5);
+                } else if ($heroParamsResult[$i]["attackType"] == 1)
+                {
+                    // is ranged
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 63, 5);
+
+                    // range (how far?)
+                    // for Sniper
+                    if ($heroParamsResult[$i]["heroId"] == 35)
+                    {
+                        $rangeValue = 5;
+                    } else
+                    // for TA
+                    if ($heroParamsResult[$i]["heroId"] == 46)
+                    {
+                        $rangeValue = 2;
+                    } else
+                    // for DK
+                    if ($heroParamsResult[$i]["heroId"] == 49)
+                    {
+                        $rangeValue = 3;
+                    } else
+                    // for TB
+                    if ($heroParamsResult[$i]["heroId"] == 109)
+                    {
+                        $rangeValue = 3;
+                    } else {
+                        // standart range heroes
+                        $rangeValue = 1;
+                        if ($heroParamsResult[$i]["attackRange"] >= 140 && $heroParamsResult[$i]["attackRange"] < 330)
+                        {
+                            $rangeValue = 1;
+                        } 
+                        else if ($heroParamsResult[$i]["attackRange"] >= 330 && $heroParamsResult[$i]["attackRange"] < 425)
+                        {
+                            $rangeValue = 2;
+                        } 
+                        else if ($heroParamsResult[$i]["attackRange"] >= 425 && $heroParamsResult[$i]["attackRange"] < 575)
+                        {
+                            $rangeValue = 3;
+                        }
+                        else if ($heroParamsResult[$i]["attackRange"] >= 575)
+                        {
+                            $rangeValue = 4;
+                        }
+                    }
+
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 55, $rangeValue);
+                }               
+            }
 
             // redirect page when all done
             echo '<script>';
