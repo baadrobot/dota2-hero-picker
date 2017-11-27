@@ -17,6 +17,10 @@
         {
             require('php/component_registration.php');
         }
+        else if ($_GET['component'] == 'counter_pick')
+        {
+            require('php/component_counter_pick.php');
+        }
     } else {
         require('php/home.php');
     }

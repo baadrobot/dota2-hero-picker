@@ -531,6 +531,7 @@
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'user_profile');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'editor');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'master');
+        pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'counter_pick');
         /*
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'registration');
         pushToLegalGet('component', 'anyGet', 'anyVal', 'fixedList', 'user_profile');
@@ -562,6 +563,7 @@
         echo $max_item_id;
 */
         pushToLegalGet('game', 'component', 'editor', 'anyVal', '');
+        pushToLegalGet('game', 'component', 'counter_pick', 'anyVal', '');
         pushToLegalGet('update', 'component', 'master', 'fixedList', 'all');
         //pushToLegalGet('id', 'component', 'guidebook', 'maxInt', 3000);
         pushToLegalGet('email', 'component', 'registration', 'anyVal', ''); //store express checkout - from email link

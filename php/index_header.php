@@ -172,12 +172,16 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             }
             else if ($_GET['component'] == 'counter_pick')
             {
+                // echo '<script src="js/component.counter_pick.js"></script>';
+                // echo '<link rel="stylesheet" href="css/component.counter_pick.css">';
+                //
+                // loadAdditionalTooltipData();
+                // if problems with horisontal scroll in GB will apear, find "var gbHorizontalScrollsEl = jQuery('.horizontalScrollWrap');" in guidebook js
+                echo '<link rel="stylesheet" href="css/component.counter_pick.css" />';
                 echo '<script src="js/component.counter_pick.js"></script>';
-                echo '<link rel="stylesheet" href="css/component.counter_pick.css">';
+                // echo $externalData;
             }
         }
-
-
 
     echo '</head>';
     echo '<body>';

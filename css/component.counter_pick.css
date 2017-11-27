@@ -1,0 +1,478 @@
+.heroListImgOpacity {
+    opacity: 0.3;
+}
+
+.acrdHdrBtn {
+    cursor: pointer;
+    margin: 5px 0 0 5px;
+}
+
+.hvrDrkGr:hover {
+    color: green!important;
+}
+
+#btnDeleteSelectedTagPopup {
+    cursor: pointer;
+    display: none;
+}
+
+.hvrMaroon:hover {
+    color: maroon!important;
+}
+
+.hvrOrange:hover {
+    color: rgb(255, 136, 0)!important;
+}
+
+.heroList {
+    width: 100%;
+    /* margin: 10px auto 10px auto; */
+    /* max-width: 702px; */
+    clear: both;
+}
+
+#editAccordion{
+    /* margin: 10px auto 10px auto; */
+}
+
+.heroListImg {
+    float: left;
+    width: 32px;
+    height: 36px;
+    background-color: black;
+    margin: 1px 1px 0 0;
+}
+
+.heroListImg img {
+    width: 28px;
+    height: 32px;
+    margin: 2px;
+}
+
+.heroListImg:hover {
+    -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(0%);
+    cursor: pointer;
+}
+
+hr {
+    clear: both;
+    visibility: hidden;
+}
+
+.heroBalancePanel img {
+    width: 40px;
+    height: auto;
+    margin: 1px;
+    cursor: pointer;
+}
+
+.heroBalance {
+    z-index: 99;
+    position: absolute;
+    font-weight: 700;
+    text-shadow: 1px 1px rgba(10, 6, 6, 0.78);
+    margin: 8px 12px 0px 13px;
+    font-size: .8em;
+    pointer-events: none;
+}
+
+.balanceSetItemOpacity {
+    opacity: 0.5!important;
+}
+
+
+#balanceRadioWrap {
+    text-align: center;
+}
+
+#wizardRadioWrap {
+    text-align: center;
+}
+
+
+.tagBalanceItem div:nth-child(1),
+.tagBalanceItem div:nth-child(5)
+{
+    width: 34px;
+}
+.tagBalanceItem div:nth-child(2),
+.tagBalanceItem div:nth-child(4)
+{
+    width: 119px;
+}
+.tagBalanceItem div:nth-child(3){
+    margin-left: auto;
+    margin-right: auto;
+    font-family: fantasy;
+    font-size: 19px;
+    color: #dadada;
+    width: 30px;
+}
+.tagBalanceItem div {
+    text-align: center;
+    vertical-align: middle;
+}
+.tagBalanceItem {
+    background-color: rgb(243, 243, 243);
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    margin: 4px 1px;
+    padding: 3px 0;
+}
+.tagBalanceItem:hover {
+    border-color: rgb(104, 154, 208);
+    cursor: pointer;
+}
+
+.noticeRed {
+    color: red;
+}
+
+.noticeGreen {
+    color: rgb(0, 199, 0);
+}
+
+.blueBold {
+    color: rgb(14, 109, 199);
+    font-weight: bold;
+}
+
+.selectedTag
+,#editHeroTagTagName
+,.greenBold
+{
+    font-weight: bold;
+    color: rgb(18, 168, 23);
+}
+
+
+#editHeroTagPopup, #editHeroPopup
+{
+    text-align: center;
+}
+
+#editBalancePopupHtml .form-group{
+    text-align: center;
+}
+
+#editBalancePopupHtml input{
+    width: 315px;
+}
+
+#editBalancePopupHtml .ui-slider-horizontal,
+#editBalancePopupHtml .ui-slider-range-min {
+    background: white;
+}
+
+#editBalancePopupHtml.sliderMore .ui-slider-horizontal,
+#editBalancePopupHtml.sliderLess .ui-slider-range-min,
+#editBalancePopupHtml.sliderMore #combobox2 .ui-widget-content,
+#editBalancePopupHtml.sliderLess #combobox1 .ui-widget-content {
+    background: #ee7360;
+}
+
+#editBalancePopupHtml.cccolorForSynergy .ui-slider-horizontal,
+#editBalancePopupHtml.rrred #combobox1 .ui-widget-content,
+#editBalancePopupHtml.rrred #combobox2 .ui-widget-content {
+    background: #ee7360!important;
+}
+
+#editBalancePopupHtml.sliderMore .ui-slider-range-min,
+#editBalancePopupHtml.sliderLess .ui-slider-horizontal,
+#editBalancePopupHtml.sliderMore #combobox1 .ui-widget-content,
+#editBalancePopupHtml.sliderLess #combobox2 .ui-widget-content {
+    background: #98e498;
+}
+
+#editBalancePopupHtml.cccolorForSynergy .ui-slider-range-min,
+#editBalancePopupHtml.gggreen #combobox1 .ui-widget-content,
+#editBalancePopupHtml.gggreen #combobox2 .ui-widget-content {
+    background: #98e498!important;
+}
+
+
+#custom-handle, #custom-handle2 {
+    width: 1.7em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+#editHeroTagSlider, #editBalanceTagSlider {
+    width: 70%;
+    margin: auto;
+}
+
+#editHeroTagAbilitiesImgWrap .heroAbilityImg, #editHeroAllTagsAbilitiesImgWrap .heroAbilityImg
+{
+    width: 56px;
+    height: 56px;
+    border: 3px solid rgba(0, 0, 0, 0);
+    margin: 3px 1px;
+    background-color: black;
+    display: inline-block;
+}
+#editHeroTagAbilitiesImgWrap .heroAbilityImg.selectedAbility {
+    border: 6px double rgb(18, 168, 23);
+}
+
+
+#editHeroTagAbilitiesImgWrap .heroAbilityImg img, #editHeroAllTagsAbilitiesImgWrap .heroAbilityImg img
+{
+    width: 50px;
+    height: 50px;
+    border: none;
+}
+#editHeroTagAbilitiesImgWrap .heroAbilityImg.selectedAbility img
+{
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+}
+
+
+
+#editHeroTagHeroImgWrap img, #editHeroAllTagsHeroImgWrap img {
+    height: 118px;
+    width: 210px;
+    margin: 3px;
+}
+
+#editHeroTagHeroImgWrap.selectedAbility img {
+    border: 6px double rgb(18, 168, 23);
+}
+
+#editHeroTagHeroImgWrap, #editHeroAllTagsHeroImgWrap {
+    width: 218px;
+    height: 124px;
+    background-color: black;
+    margin: auto;
+}
+
+#heroListWrap{
+    max-width: 756px;
+}
+#tagListWrap{
+    line-height: 1;
+}
+.smlGrp{
+    width: 219px;
+    height: 25px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+#heroListWrap .smlGrp{
+    display: inline-flex;
+    float: left;
+}
+#heroListWrap .smlGrp:nth-child(2){
+    float: right;
+}
+
+.smlGrp .input-group-addon,
+.smlGrp input
+{
+    font-size: 11px;
+}
+
+#heroListWrap .input-group-addon {
+    cursor: pointer;
+    width: 34px;
+}
+/* #editInfoTagHeroNone{
+    height: 33px!important;
+    top: 214px!important;
+    margin: 0!important;
+    width: 418px!important;
+    display: inline-block!important;
+} */
+
+#tagBalanceListWrap{
+    position: relative;
+}
+
+
+.editHeroPopupTag,
+.editHeroPopupTagVal
+{
+    /* margin: 0 2px; */
+	display: inline-block;
+	font-size: 12px;
+}
+.editHeroPopupTag{
+    color: gray;
+}
+#editHeroPopupTagsWrap{
+    color: #bfbebe;
+}
+
+.editHeroPopupTagVal
+{
+margin-right: 10px;
+}
+
+.editHeroPopupTag:hover {
+    cursor: pointer;
+    color: rgb(24, 226, 30);
+}
+
+ .editHeroPopupTagVal:hover {
+    cursor: pointer;
+    color: red;
+}
+
+#editHeroPopup .nav-tabs {
+    margin-bottom: 15px;
+}
+/* #editHeroPopup .nav-tabs a{
+    font-size: 11px;
+    padding: 2px 5px 1px;
+} */
+
+#editHeroTagInfoNone,
+#editHeroTagInfoHero,
+#editHeroTagInfoAbilities{
+    font-size: 11px;
+}
+
+#editHeroTagInfoNone{
+    color: red!important;
+}
+
+.heroImgWrapForBalance,
+.heroNamelocalForBalance,
+.heroTotalCoefForBalance{
+line-height: 40px
+}
+
+
+.heroInfoWrapForBalance{
+    width: 440px;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    padding: 6px 6px 5px;
+    background-color: rgb(243, 243, 243);
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    margin: 4px 1px;
+}
+
+.heroInfoWrapForBalance:hover{
+    cursor: pointer;
+    background-color: rgb(235, 235, 235);
+}
+#notesWrap{
+    margin: 10px auto 0 auto;
+    padding: 0 14px;
+}
+
+#notesWrap,
+.heroNotesWrapForBalance{
+    font-size: 11px;
+    line-height: 21px;
+    text-align: center;
+}
+.heroNotesWrapForBalance {
+    margin-top: -5px;
+    margin-left: 6px;
+}
+
+.heroImgWrapForBalance {
+    background-color: black;
+    width: 34px;
+    height: 39px;
+}
+.heroImgWrapForBalance img{
+    margin: -4px 2px 0;
+}
+
+.heroTotalCoefForBalance {
+    font-size: 20px;
+}
+.heroNamelocalForBalance{
+    margin-left: 7px;
+}
+.noteForBalance{
+    width: 430px;
+    border: 1px solid rgba(0,0,0,.125);
+    border-top: none;
+    display: flex;
+}
+.finalBalaceItem .noteForBalance:last-of-type{
+    -webkit-border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    border-radius: 0 0 5px 5px;
+}
+.finalBalaceItem .noteForBalance:first-of-type{
+    margin: 1px 0 0;
+}
+.selectedHeroPopupBalance {
+    border-bottom-left-radius: 0;
+}
+
+#notesWrap,
+.noteTextForBalance{
+    width: 398px;
+}
+
+.noteTextForBalance{
+    margin-bottom: 3px;
+    padding: 0 2px;
+}
+
+.coefForBalance{
+    width: 30px;
+    text-align: center;
+    background-color: #f3f3f3;
+    border-left: 1px solid rgba(0,0,0,.125);
+}
+
+#editHeroPopup{
+    min-height: 732px;
+}
+
+
+/*top pick icons*/
+#pickedHeroWrap{
+    margin: 10px;
+    padding: 10px;
+}
+.friendPick img, .enemyPick img{
+    width: 70px;
+    height: auto;
+    border: 1px solid black; 
+}
+
+.friendPick, .enemyPick, .banPick{
+    display: inline-block;
+    margin: 2px;
+}
+#gameMode{
+    text-align: center;
+    vertical-align: middle;
+}
+#friendPickList, #enemyPickList{
+    /* display: inline-block; */
+    text-align: center;
+}
+
+#banPickList img{
+    width: 50px;
+    height: auto;
+
+    height: 30px;
+    border: 1px solid black;   
+}
+
+.plyrClr{
+    padding: 2px;
+    background-color: blue;
+    
+}
