@@ -637,7 +637,7 @@ $(document).ready(function ()
                 {
                     // we recieved NOT json
                     console.log(request);
-                    console.log(status);
+                    //console.log(status);
                     console.log(error);
                 }
             });
