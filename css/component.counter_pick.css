@@ -49,9 +49,21 @@
     margin: 2px;
 }
 
-.heroListImg:hover {
-    -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+.heroListImg img.redLine {
+    width: 36px;
+    height: 46px;
+    margin: 2px;
+    position: absolute;
+    -webkit-filter: grayscale(0%);
     filter: grayscale(0%);
+    margin-top: -5px;
+    margin-left: -2px;
+    z-index: 10;
+}
+
+.heroListImg:hover:not(.pickedOrBaned) {
+    /* -webkit-filter: grayscale(0%); Safari 6.0 - 9.0 */
+    /* filter: grayscale(0%); */
     cursor: pointer;
 }
 
@@ -573,13 +585,58 @@ line-height: 40px
     background-color: #976a0a;
 }
 
-.draggable{
+.draggable:not(.draggableOverDroppable){
     width: 44px;
     height: 50px;
 }
 
-.draggable img{
+.draggable:not(.draggableOverDroppable) img{
     width: 40px;
     height: 46px;
     margin: 2px;
+}
+
+#enemyPickList .pickedHeroImgDelete,
+#friendPickList .pickedHeroImgDelete
+{
+    position: absolute;
+    margin-left: 55px;
+    margin-top: 1px;
+    color: #ffffffb0;
+    text-shadow: 0 0 2px black;
+}
+#enemyPickList .pickedHeroImgDelete:hover,
+#friendPickList .pickedHeroImgDelete:hover,
+#banPickList .pickedHeroImgDelete:hover
+{
+    cursor: pointer;
+    color: white;
+}
+
+#banPickList .pickedHeroImgDelete {
+    position: absolute;
+    margin-left: 31px;
+    margin-top: 1px;
+    font-size: 0.8rem;
+    color: #ffffffbf;
+    z-index: 189;
+    text-shadow: 0 0 2px black;
+}
+
+.slot, .pickedHeroImgWrap{
+    background-color: transparent;
+}
+
+.enemyPick.ui-droppable-active:not(.ui-droppable-hover),
+.friendPick.ui-droppable-active:not(.ui-droppable-hover)
+{
+    background-color: #5e5e5e;
+}
+.banPick.ui-droppable-active:not(.ui-droppable-hover)
+{
+    background-color: #753030;
+}
+
+.draggableOverDroppable {
+    /* background-color: rgb(99, 99, 99); */
 }
