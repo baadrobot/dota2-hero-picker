@@ -186,6 +186,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
     echo '</head>';
     echo '<body>';
 
+    echo '<div class="background-image"></div>';
     // Menu
 ?>
     <nav class="navbar navbar-expand-md bg-primary navbar-dark">

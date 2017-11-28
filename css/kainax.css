@@ -12,6 +12,30 @@ body > .container {
 	padding: 10px 2px;
 }
 
+.background-image {
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: -1000;
+    display: block;
+
+	background-image: url(../images/bkg800x600.png);
+
+	width: 100%;
+	height: 100%;
+
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+
+    -webkit-filter: blur(2px) brightness(24%) contrast(68%) hue-rotate(166deg) saturate(144%);
+    -moz-filter: blur(2px) brightness(24%) contrast(68%) hue-rotate(166deg) saturate(144%);
+    -o-filter: blur(2px) brightness(24%) contrast(68%) hue-rotate(166deg) saturate(144%);
+    -ms-filter: blur(2px) brightness(24%) contrast(68%) hue-rotate(166deg) saturate(144%);
+    filter: blur(2px) brightness(24%) contrast(68%) hue-rotate(166deg) saturate(144%);
+}
+
 *:focus:not([data-toggle="tab"]) {
 	outline: none!important;
     border-color: #ced4da!important;
@@ -474,7 +498,7 @@ span.dispStrong{
 
 /* END tooltip for ability description*/
 
-.grayscale{
+.grayscale, .pickedOrBaned{
     -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
     filter: grayscale(100%);
 }
@@ -517,4 +541,4 @@ ul.ui-autocomplete{
 .scrollablePanel {
 	height:400px!important;
 	overflow-y: scroll;
-  }
+}

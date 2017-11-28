@@ -17,36 +17,42 @@
 
 
     //echo '<div class="container-fluid">';
-        echo '<div id="pickedHeroWrap" class="row">';
-            echo '<div id="friendPickList" class="col-5">';
-                echo '<div class="friendPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="friendPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="friendPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="friendPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="friendPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-            echo '</div>';
 
-            echo '<div class="col-2">';
-                echo '<div id="gameMode" data-mode="ap">ALL PICK</div>';
-            echo '</div>';
-            
-            echo '<div id="enemyPickList" class="col-5">';
-                echo '<div class="enemyPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="enemyPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="enemyPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="enemyPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-                echo '<div class="enemyPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"><div class="plyrClr"></div></div>';
-            echo '</div>';
+        echo '<div id="dragNdropInstructions" class="row">';
+            echo '<div class="col-4">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ ПРОТИВНИКОВ</div>';
+            echo '<div class="col-3">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ БАНЫ</div>';
+            echo '<div class="col-4">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ СОЮЗНИКОВ</div>';
         echo '</div>';
 
-        echo '<div class="row">';
+        echo '<div id="pickedHeroWrap" class="row">';
+            echo '<div id="friendPickList" class="col-4">';
+                echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
+            echo '</div>';
+
+            echo '<div class="col-3">';
+                // BANS
                 echo '<div id="banPickList" class="col-12">';
-                    echo '<div class="banPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"></div>';
-                    echo '<div class="banPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"></div>';
-                    echo '<div class="banPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"></div>';
-                    echo '<div class="banPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"></div>';
-                    echo '<div class="banPick"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_hphover.png?v=4238480"></div>';
+                    echo '<div class="banPick emptySlot"></div>';
+                    echo '<div class="banPick emptySlot"></div>';
+                    echo '<div class="banPick emptySlot"></div>';
+                    echo '<div class="banPick emptySlot"></div>';
+                    echo '<div class="banPick emptySlot"></div>';
                 echo '</div>';
+                // GAME MODE TITLE
+                echo '<div id="gameMode" data-mode="ap">ALL PICK</div>';
+            echo '</div>';
+
+            echo '<div id="friendPickList" class="col-4">';
+                echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
+                echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
+            echo '</div>';
         echo '</div>';
 
         echo '<div class="row">';
@@ -55,11 +61,6 @@
 
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
-                echo '</div>';
-
-                echo '<div class="input-group smlGrp">';
-                    echo '<input id="searchAbilityInput" type="text" class="form-control" disabled="disabled" placeholder="Введите героев "/>';
                     echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
                 echo '</div>';
 

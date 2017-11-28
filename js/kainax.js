@@ -162,7 +162,7 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl)
             } else {
                 abilityDispellableSpanEl.html('').parent().hide();
             }
-            
+
 
             abilityTooltipEl.find('.abilityDesc').html(window.abilityData[heroAbilityCodeName]['desc']);
             abilityTooltipEl.find('.abilityNotes').html(window.abilityData[heroAbilityCodeName]['notes']);

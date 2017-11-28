@@ -439,40 +439,147 @@ line-height: 40px
 }
 
 
-/*top pick icons*/
-#pickedHeroWrap{
-    margin: 10px;
-    padding: 10px;
-}
-.friendPick img, .enemyPick img{
-    width: 70px;
-    height: auto;
-    border: 1px solid black; 
+
+
+
+
+/******************** top pick icons ********************/
+#dragNdropInstructions {
+    font-size: 9px;
+    text-align: center;
+    color: #a5a5a5;
+    text-shadow: 0 0 1px #5a7f92;
 }
 
-.friendPick, .enemyPick, .banPick{
-    display: inline-block;
-    margin: 2px;
+#pickedHeroWrap{
+    margin: 0 0 10px 0;
+    padding: 0 0 10px 0;
 }
-#gameMode{
-    text-align: center;
-    vertical-align: middle;
+#pickedHeroWrap div{
+    padding: 0;
 }
 #friendPickList, #enemyPickList{
     /* display: inline-block; */
     text-align: center;
+    padding: 0;
+}
+#gameMode{
+    text-align: center;
+    vertical-align: middle;
+    font-family: sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: #dcf3f0;
+    text-shadow: 0 0 8px white;
 }
 
-#banPickList img{
-    width: 50px;
-    height: auto;
-
-    height: 30px;
-    border: 1px solid black;   
+.friendPick, .enemyPick, .banPick{
+    display: inline-block;
+    background-color: #525252;
+    padding: 0;
 }
 
+.emptySlot{
+    box-shadow: inset 0 10px 40px #252525, 0 9px 30px #252525;
+}
+
+.friendPick:not(.emptySlot), .enemyPick:not(.emptySlot)
+{
+    box-shadow: 0 9px 30px #252525;
+}
+
+.friendPick, .enemyPick{
+    margin: 2px;
+    width: 70px;
+    height: 40px;
+}
+.friendPick img, .enemyPick img, .banPick img {
+    /* float: left; */
+}
+.friendPick img, .enemyPick img {
+    width: 68px;
+    height: 38px;
+    margin: 1px;
+}
+.pickedHeroImgWrap{
+    float: left;
+}
 .plyrClr{
-    padding: 2px;
-    background-color: blue;
-    
+    /* padding: 2px; */
+    /* background-color: blue; */
+    position: relative;
+    /* display: block; */
+    width: 70px;
+    height: 4px;
+    /* float: right; */
+    top: 40px;
+    border: #ffffff29 solid 1px;
+}
+#banPickList{
+    /* float: right; */
+    /* width: 216px; */
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+.banPick {
+    display: inline-block;
+    margin: 2px 1px 0;
+    width: 44px;
+    height: 28px;
+    background-color: #692b2b;
+    box-shadow: inset 0 -1px 25px black, 0 1px 4px -2px black;
+}
+.banPick img{
+    width: 40px;
+    height: 24px;
+    margin: 2px;
+}
+.banPick:not(.emptySlot){
+    -ms-filter: sepia() blur(0) brightness(81%) contrast(108%) hue-rotate(306deg) saturate(205%);
+    -webkit-filter: sepia() blur(0) brightness(81%) contrast(108%) hue-rotate(306deg) saturate(205%);
+    filter: sepia() blur(0) brightness(81%) contrast(108%) hue-rotate(306deg) saturate(205%);
+}
+
+.friendPick:nth-child(1) .plyrClr{
+    background-color: #2b69e9;
+}
+.friendPick:nth-child(2) .plyrClr{
+    background-color: #6ff8b8;
+}
+.friendPick:nth-child(3) .plyrClr{
+    background-color: #ad03b4;
+}
+.friendPick:nth-child(4) .plyrClr{
+    background-color: #f0fd12;
+}
+.friendPick:nth-child(5) .plyrClr{
+    background-color: #f05f08;
+}
+
+.enemyPick:nth-child(1) .plyrClr{
+    background-color: #f070b7;
+}
+.enemyPick:nth-child(2) .plyrClr{
+    background-color: #9bc03d;
+}
+.enemyPick:nth-child(3) .plyrClr{
+    background-color: #68e0e7;
+}
+.enemyPick:nth-child(4) .plyrClr{
+    background-color: #059e1d;
+}
+.enemyPick:nth-child(5) .plyrClr{
+    background-color: #976a0a;
+}
+
+.draggable{
+    width: 44px;
+    height: 50px;
+}
+
+.draggable img{
+    width: 40px;
+    height: 46px;
+    margin: 2px;
 }
