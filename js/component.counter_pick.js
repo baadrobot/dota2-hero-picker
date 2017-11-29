@@ -48,7 +48,11 @@ $(document).ready(function ()
             ,revert: 'invalid'
             , drag: function (event, ui)
             {
+
+
                 var draggedHero = $(this);
+
+
                 //var dragHeroId = draggedHero.attr('data-hero-id');
                 draggedHero.addClass('grayscale');
                 ui.helper.addClass('draggable');
@@ -56,84 +60,139 @@ $(document).ready(function ()
             start: function (e, ui)
             {
                 var draggedHero = $(this);
-
                 if (draggedHero.hasClass('pickedOrBaned'))
                 {
                     //This will prevent moving the element from it's position
                     e.preventDefault();
                 }
-            },            
+
+                ui.helper.attr('data-dragged-from', 'fromHeroList');
+            },
             stop: function (event, ui) {
                 var draggedHero = $(this);
                 draggedHero.removeClass('grayscale');
                 ui.helper.removeClass('draggable');
-            }         
+            }
         });
 
         $(".emptySlot").droppable({
             drop: function (event, ui)
             {
-                var dropedToEl = $(this);
-                dropedToEl.removeClass('emptySlot').addClass('slot');
+                // recived in placeholder (not droped out for delete)
+                ui.helper.attr('data-is-recieved-or-droped-out', 1);
+
+                var recieverEl = $(this);
 
                 var draggedHeroId = ui.helper.attr('data-hero-id');
-                var draggedHeroCodename = ui.helper.attr('data-hero-codename');
 
-                // release prev hero (if any)
-                var slotImgWrap = dropedToEl.find('.pickedHeroImgWrap');
+                // check if slot is NOT empty
+                var slotImgWrap = recieverEl.find('.pickedHeroImgWrap');
                 if (slotImgWrap.length)
                 {
+                    // slot is NOT empty
                     var prevSlotHeroId = slotImgWrap.attr('data-hero-id');
-                    $('.heroListImg[data-hero-id="' + prevSlotHeroId + '"]')
-                    .removeClass('pickedOrBaned')
-                    .find('.redLine').remove();
-
-                    slotImgWrap.remove();
+                    if (ui.helper.attr('data-dragged-from') == 'fromPlaceHolder')
+                    {
+                        // ------- hero dragged from another slot - previous hero must be swapped with new one
+                        lockNewHeroInSlot($('.pickedHeroImgWrap[data-hero-id="' + draggedHeroId + '"]').parent(), prevSlotHeroId);
+                    } else {
+                        // ------- hero dragged in from hero list
+                        releaseHeroInList(prevSlotHeroId);
+                        slotImgWrap.remove();
+                    }
                 }
-
-                // lock dragged hero
-                $('.heroListImg[data-hero-id="' + draggedHeroId + '"]').addClass('pickedOrBaned');
-
-                // cross out hero (if ban)
-                if (dropedToEl.hasClass('banPick'))
-                {
-                    $('.heroListImg[data-hero-id="' + draggedHeroId + '"]').prepend('<img src="images/redline.png" class="redLine">');
-                }
-
-                // create new img_wrap and img
-                dropedToEl.prepend('<div class="pickedHeroImgWrap" data-hero-id="'+draggedHeroId+'"><span class="pickedHeroImgDelete fa fa-times"></span><img data-img-src="//cdn.dota2.com/apps/dota2/images/heroes/' + draggedHeroCodename + '_hphover.png?v=4238480"></div>');
-
-                // preload new img
-                kainaxPreloadImages({ wrapElement: dropedToEl.find('.pickedHeroImgWrap')
-                                    , gifNameOrFalse: 'spinner.gif'
-                                    //, gifNameOrFalse: 'eco-ajax-loader-01.gif'
-                                    , opacity: 0.6
-                                    , loaderIntH: 10
-                                    , loaderIntW: 10
-                                    //, missingPicOrFalse: false
-                                });
-                
-                // remove img from pick/ban
-                $('.pickedHeroImgDelete').on('click', function()
-                {
-                    // console.log($(this).parent().attr('data-hero-id'));
-                    var deletedHeroId = $(this).parent().attr('data-hero-id');
-                    var imgWrapToRemoveEl = $(this).parent();
-                    imgWrapToRemoveEl.parent().removeClass('slot').addClass('emptySlot')
-                    imgWrapToRemoveEl.remove();
-
-                    $('.heroListImg[data-hero-id="' + deletedHeroId + '"]')
-                        .removeClass('pickedOrBaned')
-                        .find('.redLine').remove();
-                });
+                lockNewHeroInSlot(recieverEl, draggedHeroId);
             },
             over: function(event, ui) {
                 ui.helper.addClass('draggableOverDroppable');
             },
             out: function(event, ui) {
                 ui.helper.removeClass('draggableOverDroppable');
-            }     
+            }
         });
+
+        function removeHeroFromSlot(slotItemEl)
+        {
+            slotItemEl.parent().removeClass('slot').addClass('emptySlot');
+            slotItemEl.remove();
+        }
+
+        function releaseHeroInList(heroId)
+        {
+            $('.heroListImg[data-hero-id="' + heroId + '"]')
+            .removeClass('pickedOrBaned')
+            .find('.redLine').remove();
+        }
+
+        function lockNewHeroInSlot(slotEl, heroId)
+        {
+            // clear all old elements
+            removeHeroFromSlot( $('.pickedHeroImgWrap[data-hero-id="' + heroId + '"]') );
+            releaseHeroInList(heroId);
+
+            slotEl.removeClass('emptySlot').addClass('slot');
+            var heroListEl = $('.heroListImg[data-hero-id="' + heroId + '"]');
+            var draggedHeroCodename = heroListEl.attr('data-hero-codename');
+
+            heroListEl.addClass('pickedOrBaned');
+
+            // cross out hero (if ban)
+            if (slotEl.hasClass('banPick'))
+            {
+                // do not add another if already has one
+                if (heroListEl.find('.redLine').length == 0) {
+                    // cross out
+                    heroListEl.prepend('<img src="images/redline.png" class="redLine">');
+                }
+            } else {
+                heroListEl.find('.redLine').remove();
+            }
+
+            // create new img_wrap and img
+            slotEl.prepend('<div class="pickedHeroImgWrap" data-hero-id="' + heroId + '" data-hero-codename="' + draggedHeroCodename + '"><span class="pickedHeroImgDelete fa fa-times"></span><img data-img-src="//cdn.dota2.com/apps/dota2/images/heroes/' + draggedHeroCodename + '_hphover.png?v=4238480"></div>');
+
+            // preload new img
+            kainaxPreloadImages({
+                wrapElement: slotEl.find('.pickedHeroImgWrap')
+                , gifNameOrFalse: 'spinner.gif'
+                //, gifNameOrFalse: 'eco-ajax-loader-01.gif'
+                , opacity: 0.6
+                , loaderIntH: 10
+                , loaderIntW: 10
+                //, missingPicOrFalse: false
+            });
+
+            slotEl.find('.pickedHeroImgWrap').draggable({
+                cursor: 'default'
+                , helper: "clone"
+                , zIndex: 200
+                //,revert: 'invalid'
+                ,
+                start: function (e, ui) {
+                    var draggedHero = $(this);
+                    ui.helper.attr('data-is-recieved-or-droped-out', 0);
+                    ui.helper.attr('data-dragged-from', 'fromPlaceHolder');
+                },
+                stop: function (event, ui) {
+                    if (ui.helper.attr('data-is-recieved-or-droped-out') == 0) {
+                        var dragedFromSlotEl = $(this);
+                        removeHeroFromSlot(dragedFromSlotEl);
+                        releaseHeroInList(dragedFromSlotEl.attr('data-hero-id'));
+                    }
+                }
+            });
+
+            // cross button (remove pick/ban)
+            slotEl.find('.pickedHeroImgDelete').on('click', function ()
+            {
+                // console.log($(this).parent().attr('data-hero-id'));
+                var deletedHeroId = $(this).parent().attr('data-hero-id');
+                var imgWrapToRemoveEl = $(this).parent();
+                removeHeroFromSlot(imgWrapToRemoveEl);
+                releaseHeroInList(deletedHeroId);
+            });
+        }
+
 
         $('.emptySlot')
         .mouseenter(function()
@@ -142,7 +201,7 @@ $(document).ready(function ()
         })
         .mouseleave(function() {
             $(this).find('.pickedHeroImgDelete').hide();
-        });        
+        });
     // end of drag'n'drop
 
 

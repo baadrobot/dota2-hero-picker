@@ -553,35 +553,35 @@ line-height: 40px
     filter: sepia() blur(0) brightness(81%) contrast(108%) hue-rotate(306deg) saturate(205%);
 }
 
-.friendPick:nth-child(1) .plyrClr{
+.enemyPick:nth-child(1) .plyrClr{
     background-color: #2b69e9;
 }
-.friendPick:nth-child(2) .plyrClr{
+.enemyPick:nth-child(2) .plyrClr{
     background-color: #6ff8b8;
 }
-.friendPick:nth-child(3) .plyrClr{
+.enemyPick:nth-child(3) .plyrClr{
     background-color: #ad03b4;
 }
-.friendPick:nth-child(4) .plyrClr{
+.enemyPick:nth-child(4) .plyrClr{
     background-color: #f0fd12;
 }
-.friendPick:nth-child(5) .plyrClr{
+.enemyPick:nth-child(5) .plyrClr{
     background-color: #f05f08;
 }
 
-.enemyPick:nth-child(1) .plyrClr{
+.friendPick:nth-child(1) .plyrClr{
     background-color: #f070b7;
 }
-.enemyPick:nth-child(2) .plyrClr{
+.friendPick:nth-child(2) .plyrClr{
     background-color: #9bc03d;
 }
-.enemyPick:nth-child(3) .plyrClr{
+.friendPick:nth-child(3) .plyrClr{
     background-color: #68e0e7;
 }
-.enemyPick:nth-child(4) .plyrClr{
+.friendPick:nth-child(4) .plyrClr{
     background-color: #059e1d;
 }
-.enemyPick:nth-child(5) .plyrClr{
+.friendPick:nth-child(5) .plyrClr{
     background-color: #976a0a;
 }
 
@@ -635,8 +635,4 @@ line-height: 40px
 .banPick.ui-droppable-active:not(.ui-droppable-hover)
 {
     background-color: #753030;
-}
-
-.draggableOverDroppable {
-    /* background-color: rgb(99, 99, 99); */
 }
