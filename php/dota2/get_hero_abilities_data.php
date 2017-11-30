@@ -426,7 +426,7 @@
                                 $abilityUnitTargetFlags = null;
                             }
 
-                            
+
 
 
                             // AbilityType //ultimate etc
@@ -569,11 +569,11 @@
                         setLaneTagValue($tagId = 33, $html, $minPresence = 40, $minWinRate = 50);
                         // mid support
                         setLaneTagValue($tagId = 39, $html, $minPresence = 0, $minWinRate = 50);
-            
+
                         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=roaming');
                         // roamer
                         setLaneTagValue($tagId = 36, $html, $minPresence = 0, $minWinRate = 50);
-            
+
                         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=off');
                         // offlane solo
                         setLaneTagValue($tagId = 34, $html, $minPresence = 0, $minWinRate = 50);
@@ -581,18 +581,18 @@
                         setLaneTagValue($tagId = 40, $html, $minPresence = 0, $minWinRate = 50);
                         // offlane support
                         setLaneTagValue($tagId = 38, $html, $minPresence = 0, $minWinRate = 50);
-                        
-            
+
+
                         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=jungle');
                         // jungler
                         setLaneTagValue($tagId = 35, $html, $minPresence = 0, $minWinRate = 50);
-            
+
                         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=safe');
                         // carry
                         setLaneTagValue($tagId = 32, $html, $minPresence = 0, $minWinRate = 50);
                         // support safe lane
                         setLaneTagValue($tagId = 37, $html, $minPresence = 0, $minWinRate = 50);
-            
+
                         //exit;
 
             echo '<br>------------ HEROES AND ABILITIES SUCCESSFULLY UPDATED ------------<br>';
@@ -602,7 +602,7 @@
             global $dbClass;
             // delete all primary attr setted on hero tags before setting new
             $query = 'DELETE FROM tb_dota2_heroTag_set
-                            WHERE cf_d2HeroTagSet_tag_id IN (51,52,53,54,57,62,63);';
+                            WHERE cf_d2HeroTagSet_tag_id IN (51,52,53,57,62,63);';
             $dbClass->delete($query);
 
             $query = 'SELECT cf_d2HeroList_id as `heroId`
@@ -612,13 +612,13 @@
                             , cf_d2HeroList_complexity as `complexity`
                            FROM tb_dota2_hero_list;';
             $heroParamsResult = $dbClass->select($query);
-            
+
             // has aghanim upgrade
             $query = 'SELECT DISTINCT(cf_d2HeroAbilityList_heroId) AS heroId
                         FROM tb_dota2_hero_ability_list
                        WHERE cf_d2HeroAbilityList_hasScepterUpgrade = 1;';
             $hasScepterUpgradeResult = $dbClass->select($query);
-           
+
             // query for range tag
             $query = 'INSERT INTO tb_dota2_heroTag_set
                             SET cf_d2HeroTagSet_hero_id = ?
@@ -628,7 +628,7 @@
             // create tags - hero has aghanim
             for ($i = 0; $i < count($hasScepterUpgradeResult); $i++)
             {
-                $dbClass->insert($query, $hasScepterUpgradeResult[$i]["heroId"], 54, 5);
+                $dbClass->insert($query, $hasScepterUpgradeResult[$i]["heroId"], 54, 2);
             }
 
             //  create tags - hero primary attr
@@ -684,16 +684,16 @@
                     {
                         $rangeValue = 3;
                     } else {
-                        // standart range heroes
+                        // standard range heroes
                         $rangeValue = 1;
                         if ($heroParamsResult[$i]["attackRange"] >= 140 && $heroParamsResult[$i]["attackRange"] < 330)
                         {
                             $rangeValue = 1;
-                        } 
+                        }
                         else if ($heroParamsResult[$i]["attackRange"] >= 330 && $heroParamsResult[$i]["attackRange"] < 425)
                         {
                             $rangeValue = 2;
-                        } 
+                        }
                         else if ($heroParamsResult[$i]["attackRange"] >= 425 && $heroParamsResult[$i]["attackRange"] < 575)
                         {
                             $rangeValue = 3;
@@ -705,7 +705,7 @@
                     }
 
                     $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 55, $rangeValue);
-                }               
+                }
             }
 
             // redirect page when all done
@@ -801,7 +801,7 @@ function getHtmlObjFromUrl($url)
 
     //Указываем URL, куда будем обращаться. Протокол https://
     $ch = curl_init();
-    
+
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_HEADER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
