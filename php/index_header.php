@@ -107,6 +107,8 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 $externalData .= '});';
             $externalData .= '</script>';
 
+            echo '<script src="js/prebuild.scepter_descr.js"></script>';
+
             function loadAdditionalTooltipData()
             {
                 global $dbClass;

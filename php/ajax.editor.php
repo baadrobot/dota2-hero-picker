@@ -50,7 +50,9 @@
     elseif (($_POST['ajaxType'] == 'editorGetHeroAbilitiesAndHeroTags') && (isGotAccess(_ROLE_EDITOR)))
     {
         // Hero Abilities
-        $query = 'SELECT cf_d2HeroAbilityList_id as `id`, cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
+        $query = 'SELECT cf_d2HeroAbilityList_id as `id`
+                       , cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
+                       , cf_d2HeroAbilityList_hasScepterUpgrade as `hasScepterUpgrade`
                     FROM tb_dota2_hero_ability_list
                    WHERE cf_d2HeroAbilityList_heroId = ? AND cf_d2HeroAbilityList_isAbilityIgnored = 0 AND cf_d2HeroAbilityList_isAbilityForbidden = 0
                 ORDER BY cf_d2HeroAbilityList_orderPosition;';

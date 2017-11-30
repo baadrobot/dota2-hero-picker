@@ -37,14 +37,13 @@
                         ,cf_d2HeroAbilityList_abilityCodename as `abilityCodename`
                         ,cf_d2HeroAbilityList_isAbilityIgnored as `ignoreStatus`
                         ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
-                        --
                         ,cf_d2HeroAbilityList_manualBuffDispellableB as `buffDispellableB`
                         ,cf_d2HeroAbilityList_manualBuffDispellableS as `buffDispellableS`
                         ,cf_d2HeroAbilityList_manualDebuffDispellableB as `debuffDispellableB`
                         ,cf_d2HeroAbilityList_manualDebuffDispellableS as `debuffDispellableS`
                         ,cf_d2HeroAbilityList_isConfirmed as `isConfirmed`
                         ,cf_d2HeroAbilityList_spellDispellableType as `dispType`
-                        --
+                        ,cf_d2HeroAbilityList_hasScepterUpgrade as `hasScepter`
                         FROM tb_dota2_hero_ability_list
                         INNER JOIN tb_dota2_hero_list
                             ON tb_dota2_hero_ability_list.cf_d2HeroAbilityList_heroId = tb_dota2_hero_list.cf_d2HeroList_id
@@ -88,6 +87,39 @@
         } else {
             // UPDATE
 
+            // получаем html
+            $html = getHtmlObjFromUrl('http://wiki.teamliquid.net/dota2/Aghanim%27s_Scepter');
+            // парсим
+            $scepterDescrArray = [];
+
+            foreach($html->find('table', 1)->find('tbody tr') as $ability)
+            {
+                $td = $ability->children(0);
+                if (trim($td->plaintext) != 'Hero')
+                {
+                    if (!$ability->children(1)->children(0)->hasAttribute('title'))
+                    {
+                        $abilityLocalName = $ability->children(0)->children(0)->getAttribute('title');
+                    } else {
+                        $abilityLocalName = $ability->children(1)->children(0)->getAttribute('title');
+                    }
+                    $abilityAghaDescr = $ability->last_child()->plaintext;
+                    // echo $abilityLocalName.'<br>';
+                    // echo $abilityAghaDescr.'<br>';
+                    // echo '<br>'.'<br>'.'<br>';
+                    $scepterDescrArray[$abilityLocalName] = $abilityAghaDescr;
+                }
+            }
+
+            if ($scepterDescrArray != [])
+            {
+                file_put_contents(__DIR__.'/../../js/prebuild.scepter_descr.js', 'window.scepterDescr = '.json_encode($scepterDescrArray).';');
+            }
+            exit;
+
+            //json_encode($array) + save to file
+
+                        
                                     // prepare temp array for forbidden abilities
                                     $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
                                                     ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
@@ -253,7 +285,7 @@
                                             ,$heroId);
 
 
-
+                  
                     $abilityOrderPosition = -1;
                     for ($i = 1; $i <= 20; $i++) // Kainax: maxed from 9 to 20 for Invoker
                     {
@@ -426,9 +458,12 @@
                                 $abilityUnitTargetFlags = null;
                             }
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> a50ef345bd8a3697a555cf491c177cf4e6f8b8dc
                             // AbilityType //ultimate etc
                             // AbilityBehavior // passive, channeling, DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES" etc
                             // AbilityDuration
@@ -562,8 +597,6 @@
             $dbClass->select($query);
 
             // update "lanes meta" tags
-            require_once('php/cl.simpleHTMLDom.php');
-
                         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=mid');
                         // mid core
                         setLaneTagValue($tagId = 33, $html, $minPresence = 40, $minWinRate = 50);
@@ -795,6 +828,7 @@ function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)
     }
 }
 
+<<<<<<< HEAD
 function getHtmlObjFromUrl($url)
 {
     //******** Getting https elements
@@ -828,6 +862,8 @@ function getHtmlObjFromUrl($url)
 }
 
 
+=======
+>>>>>>> a50ef345bd8a3697a555cf491c177cf4e6f8b8dc
 function setLaneTagValue($tagId, $html, $minPresence, $minWinRate)
 {
     $arrayLaneHeroesRate = [];

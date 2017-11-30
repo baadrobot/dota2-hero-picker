@@ -282,6 +282,11 @@ $(document).ready(function ()
                 cache: false,
                 success: function (result)
                 {
+                    // nurax: добавил проверить будет ли работать: убрать если нет
+                    $('#editHeroTagHeroImgWrap.selectedAbility').removeClass('selectedAbility');                    
+                    $('.heroAbilityImg.selectedAbility').removeClass('selectedAbility'); 
+                    // end of nurax
+
                     if (result.php_result == 'OK')
                     {
                         var searchAbilityInputVal = $('#searchAbilityInput').val();
@@ -297,7 +302,24 @@ $(document).ready(function ()
                                 // white
                                 opacityStyle = ' ' + 'style="opacity:0.5"';
                             }
-                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
+
+                            // nurax (удалить коммент если заработает)
+                            var $aghaIcon = '';
+                            var scepterDescr = '';
+                            if (typeof window.abilityData[abilityCodename] != 'undefined')
+                            {
+                                if (typeof window.scepterDescr[window.abilityData[abilityCodename]['dname']] != 'undefined')
+                                {
+                                    var scepterAbilityDName = window.abilityData[abilityCodename]['dname'];
+                                    scepterDescr = ' '+'data-inactive-tooltip="<div class='+"'scepterDescrTooltip'"+'><h6>'+scepterAbilityDName+'</h6>'+window.scepterDescr[window.abilityData[abilityCodename]['dname']]+'</div>"';
+                                    $aghaIcon = '<div class="aghaScepterIconBig"><img src="//cdn.dota2.com/apps/dota2/images/items/ultimate_scepter_lg.png"'+scepterDescr+' width="20px" height="20px"></div>';
+                                }
+                            }
+
+                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'">'+$aghaIcon+'<img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
+                            // end of nurax
+
+                            // editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
                         }
 
                         $('.heroAbilityImg').click(function ()
@@ -311,6 +333,9 @@ $(document).ready(function ()
                             editHeroTagDecideInfoText();
                         });
 
+                        // nurax activated tooltips (удалить коммент если всё заработает)
+                        eXoActivateInactiveTooltips();
+                        // end of nurax
                         addOnHoverTooltipsForAbilityImg('#editHeroTagAbilitiesImgWrap');
 
                         if (result.tag_result == 'NONE')
@@ -320,7 +345,8 @@ $(document).ready(function ()
                             //tagValue
                         } else if (result.tag_result == 'HERO')
                         {
-                            $('#editHeroTagHeroImgWrap.selectedAbility').addClass('selectedAbility');
+                            console.log(123);
+                            $('#editHeroTagHeroImgWrap').addClass('selectedAbility');
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);
                             $('#btnEditHeroTagUnset').show();
@@ -346,7 +372,7 @@ $(document).ready(function ()
                         });
 
                         editHeroTagDecideInfoText();
-
+               
                         $('#editHeroTagPopup').modal();
                     }
                     else if (result.php_result == 'ERROR')
@@ -421,7 +447,20 @@ $(document).ready(function ()
                                 // white
                                 opacityStyle = ' ' + 'style="opacity:0.5"';
                             }
-                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'"><img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
+
+                            var $aghaIcon = '';
+                            var scepterDescr = '';
+                            if (typeof window.abilityData[abilityCodename] != 'undefined')
+                            {
+                                if (typeof window.scepterDescr[window.abilityData[abilityCodename]['dname']] != 'undefined')
+                                {
+                                    var scepterAbilityDName = window.abilityData[abilityCodename]['dname'];
+                                    scepterDescr = ' '+'data-inactive-tooltip="<div class='+"'scepterDescrTooltip'"+'><h6>'+scepterAbilityDName+'</h6>'+window.scepterDescr[window.abilityData[abilityCodename]['dname']]+'</div>"';
+                                    $aghaIcon = '<div class="aghaScepterIconBig"><img src="//cdn.dota2.com/apps/dota2/images/items/ultimate_scepter_lg.png"'+scepterDescr+' width="20px" height="20px"></div>';
+                                }
+                            }
+
+                            editHeroAbilitiesImgWrapEl.append('<div class="heroAbilityImg"'+opacityStyle+' data-ability-id="'+result.hero_abilities_array[i]['id']+'" data-ability-codename="'+abilityCodename+'">'+$aghaIcon+'<img data-img-src="//cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodename+'_hp1.png?v=4195662"></div>');
                         }
 
                         addOnHoverTooltipsForAbilityImg('#editHeroAllTagsAbilitiesImgWrap');

@@ -553,3 +553,29 @@ ul.ui-autocomplete{
 	height:400px!important;
 	overflow-y: scroll;
 }
+
+.aghaScepterIconBig{
+	width: 32px;
+    height: 32px;
+    position: absolute;
+    margin: -14px 0 0 32px;
+    border-radius: 4px;
+    border: 2px solid black;
+    overflow: hidden;
+    background-color: white;
+    z-index: 10;
+}
+
+.aghaScepterIconBig img{
+    width: 26px!important;
+	height: 26px!important;
+}
+
+.scepterDescrTooltip{
+	background-color: black;
+	opacity: 0.9;
+	max-width: 400px;
+	padding: 10px;
+	color: #8aa2e8;
+	font-size: 12px;
+}
