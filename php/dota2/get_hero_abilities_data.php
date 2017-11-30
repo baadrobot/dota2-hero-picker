@@ -119,7 +119,7 @@
 
             //json_encode($array) + save to file
 
-                        
+
                                     // prepare temp array for forbidden abilities
                                     $query = 'SELECT cf_d2HeroAbilityList_id as `abilityId`
                                                     ,cf_d2HeroAbilityList_isAbilityForbidden as `isForbidden`
@@ -285,7 +285,7 @@
                                             ,$heroId);
 
 
-                  
+
                     $abilityOrderPosition = -1;
                     for ($i = 1; $i <= 20; $i++) // Kainax: maxed from 9 to 20 for Invoker
                     {
@@ -458,12 +458,6 @@
                                 $abilityUnitTargetFlags = null;
                             }
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> a50ef345bd8a3697a555cf491c177cf4e6f8b8dc
                             // AbilityType //ultimate etc
                             // AbilityBehavior // passive, channeling, DOTA_ABILITY_BEHAVIOR_ROOT_DISABLES" etc
                             // AbilityDuration
@@ -828,42 +822,6 @@ function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)
     }
 }
 
-<<<<<<< HEAD
-function getHtmlObjFromUrl($url)
-{
-    //******** Getting https elements
-
-    //Указываем URL, куда будем обращаться. Протокол https://
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HEADER, false);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-
-    //$fp = fopen("example_homepage.txt", "w");
-    //curl_setopt($ch, CURLOPT_FILE, $fp);
-    $curl_data = curl_exec($ch);
-    curl_close($ch);
-    //fclose($fp);
-
-    //******** Seperating dom elements
-
-    $html = new simple_html_dom();
-    // Load from a string
-    $html->load($curl_data);
-    unset($curl_data);
-
-    return $html;
-}
-
-
-=======
->>>>>>> a50ef345bd8a3697a555cf491c177cf4e6f8b8dc
 function setLaneTagValue($tagId, $html, $minPresence, $minWinRate)
 {
     $arrayLaneHeroesRate = [];
