@@ -121,11 +121,11 @@ function pleaseWaitClose()
 
 function addOnHoverTooltipsForAbilityImg(wrapIdEl)
 {
-    $(wrapIdEl).find('[data-ability-codename]')
+    $(wrapIdEl).find('[data-ability-codename] > img')
     .mouseenter(function ()
     {
         //var heroAbilityCodeName = $(this).attr('data-ability-codename');
-        var heroAbilityCodeName = $(this).attr('data-ability-codename');
+        var heroAbilityCodeName = $(this).parent().attr('data-ability-codename');
 
         var abilityTooltipEl = $('#abilityTooltip');
         if (typeof window.abilityData[heroAbilityCodeName] != 'undefined')
@@ -135,7 +135,7 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl)
             abilityTooltipEl.find('.abilityTarget').html(window.abilityData[heroAbilityCodeName]['affects']);
             abilityTooltipEl.find('.abilityHR2').html('');
 
-            var abilityId = $(this).attr('data-ability-id');
+            var abilityId = $(this).parent().attr('data-ability-id');
             var abilityDispellableSpanEl = abilityTooltipEl.find('#abilityDispellable span');
 
             if ((typeof window.abilityTypeList != 'undefined') && (typeof window.abilityTypeList[abilityId] != 'undefined'))
@@ -172,7 +172,6 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl)
             abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
             window.tooltipBox.html(abilityTooltipEl.html());
         } else {
-            var heroAbilityCodeName = $(this).attr('data-ability-codename');
             var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
 
             // cut from lone_druid_true_form_battle_cry hero namecode to leave: true_form_battle_cry

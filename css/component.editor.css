@@ -1,3 +1,11 @@
+.background-image {
+-webkit-filter:blur(10px) brightness(150%) contrast(100%) hue-rotate(166deg) saturate(82%)!important;
+-moz-filter: blur(10px) brightness(150%) contrast(100%) hue-rotate(166deg) saturate(82%)!important;
+-o-filter: blur(10px) brightness(150%) contrast(100%) hue-rotate(166deg) saturate(82%)!important;
+-ms-filter: blur(10px) brightness(150%) contrast(100%) hue-rotate(166deg) saturate(82%)!important;
+filter: blur(10px) brightness(150%) contrast(100%) hue-rotate(166deg) saturate(82%)!important;
+}
+
 .heroListImgOpacity {
     opacity: 0.3;
 }
