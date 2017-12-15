@@ -25,7 +25,7 @@
         echo '</div>';
 
         echo '<div id="pickedHeroWrap" class="row">';
-            echo '<div id="friendPickList" class="col-4">';
+            echo '<div id="enemyPickList" class="col-4">';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';

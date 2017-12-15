@@ -345,7 +345,6 @@ $(document).ready(function ()
                             //tagValue
                         } else if (result.tag_result == 'HERO')
                         {
-                            console.log(123);
                             $('#editHeroTagHeroImgWrap').addClass('selectedAbility');
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);

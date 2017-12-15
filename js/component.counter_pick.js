@@ -14,6 +14,12 @@ $(document).ready(function ()
         question += '</div>';
     question += '</div>';
 
+    function getAjaxBalanceForHeroId(draggedHeroId)
+    {
+        //
+        alert(draggedHeroId);
+    }
+    
     // confirmDialog({
     //     confirmTitle : getPreStr_js('COUNTER_PICK', '_CM_OR_AP_')
     //     ,confirmHtml : question
@@ -102,6 +108,7 @@ $(document).ready(function ()
                     }
                 }
                 lockNewHeroInSlot(recieverEl, draggedHeroId);
+                getAjaxBalanceForHeroId(draggedHeroId);
             },
             over: function(event, ui) {
                 ui.helper.addClass('draggableOverDroppable');
