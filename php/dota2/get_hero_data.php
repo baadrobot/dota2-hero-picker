@@ -64,6 +64,100 @@
             $pro_win = $hero_data_array[$i]['pro_win'];
         }
 
+
+        //nuraxxx
+        if (!isset($hero_data_array[$i]['1_pick']))
+        {
+            $pick_1 = 0;
+        } else {
+            $pick_1 = $hero_data_array[$i]['1_pick'];
+        }
+        if (!isset($hero_data_array[$i]['1_win']))
+        {
+            $win_1 = 0;
+        } else {
+            $win_1 = $hero_data_array[$i]['1_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['2_pick']))
+        {
+            $pick_2 = 0;
+        } else {
+            $pick_2 = $hero_data_array[$i]['2_pick'];
+        }
+        if (!isset($hero_data_array[$i]['2_win']))
+        {
+            $win_2 = 0;
+        } else {
+            $win_2 = $hero_data_array[$i]['2_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['3_pick']))
+        {
+            $pick_3 = 0;
+        } else {
+            $pick_3 = $hero_data_array[$i]['3_pick'];
+        }
+        if (!isset($hero_data_array[$i]['3_win']))
+        {
+            $win_3 = 0;
+        } else {
+            $win_3 = $hero_data_array[$i]['3_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['4_pick']))
+        {
+            $pick_4 = 0;
+        } else {
+            $pick_4 = $hero_data_array[$i]['4_pick'];
+        }
+        if (!isset($hero_data_array[$i]['4_win']))
+        {
+            $win_4 = 0;
+        } else {
+            $win_4 = $hero_data_array[$i]['4_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['5_pick']))
+        {
+            $pick_5 = 0;
+        } else {
+            $pick_5 = $hero_data_array[$i]['5_pick'];
+        }
+        if (!isset($hero_data_array[$i]['5_win']))
+        {
+            $win_5 = 0;
+        } else {
+            $win_5 = $hero_data_array[$i]['5_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['6_pick']))
+        {
+            $pick_6 = 0;
+        } else {
+            $pick_6 = $hero_data_array[$i]['6_pick'];
+        }
+        if (!isset($hero_data_array[$i]['6_win']))
+        {
+            $win_6 = 0;
+        } else {
+            $win_6 = $hero_data_array[$i]['6_win'];
+        }
+
+        if (!isset($hero_data_array[$i]['7_pick']))
+        {
+            $pick_7 = 0;
+        } else {
+            $pick_7 = $hero_data_array[$i]['7_pick'];
+        }
+        if (!isset($hero_data_array[$i]['7_win']))
+        {
+            $win_7 = 0;
+        } else {
+            $win_7 = $hero_data_array[$i]['7_win'];
+        }
+        //eof nuraxxx
+
         if (!isset($hero_data_array[$i]['attack_type']))
         {
             $attack_type = NULL;
@@ -88,17 +182,21 @@
         cf_d2HeroList_pro_ban,
         cf_d2HeroList_pro_pick,
         cf_d2HeroList_pro_win,
-        cf_d2HeroList_1000_pick,
-        cf_d2HeroList_1000_win,
-        cf_d2HeroList_2000_pick,
-        cf_d2HeroList_2000_win,
-        cf_d2HeroList_3000_pick,
-        cf_d2HeroList_3000_win,
-        cf_d2HeroList_4000_pick,
-        cf_d2HeroList_4000_win,
-        cf_d2HeroList_5000_pick,
-        cf_d2HeroList_5000_win)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        cf_d2HeroList_1_pick,
+        cf_d2HeroList_1_win,
+        cf_d2HeroList_2_pick,
+        cf_d2HeroList_2_win,
+        cf_d2HeroList_3_pick,
+        cf_d2HeroList_3_win,
+        cf_d2HeroList_4_pick,
+        cf_d2HeroList_4_win,
+        cf_d2HeroList_5_pick,
+        cf_d2HeroList_5_win,
+        cf_d2HeroList_6_pick,
+        cf_d2HeroList_6_win,
+        cf_d2HeroList_7_pick,
+        cf_d2HeroList_7_win)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON DUPLICATE KEY UPDATE
         cf_d2HeroList_codename = ?,
         cf_d2HeroList_name_en_US = ?,
@@ -113,16 +211,20 @@
         cf_d2HeroList_pro_ban = ?,
         cf_d2HeroList_pro_pick = ?,
         cf_d2HeroList_pro_win = ?,
-        cf_d2HeroList_1000_pick = ?,
-        cf_d2HeroList_1000_win = ?,
-        cf_d2HeroList_2000_pick = ?,
-        cf_d2HeroList_2000_win = ?,
-        cf_d2HeroList_3000_pick = ?,
-        cf_d2HeroList_3000_win = ?,
-        cf_d2HeroList_4000_pick = ?,
-        cf_d2HeroList_4000_win = ?,
-        cf_d2HeroList_5000_pick = ?,
-        cf_d2HeroList_5000_win = ?
+        cf_d2HeroList_1_pick = ?,
+        cf_d2HeroList_1_win = ?,
+        cf_d2HeroList_2_pick = ?,
+        cf_d2HeroList_2_win = ?,
+        cf_d2HeroList_3_pick = ?,
+        cf_d2HeroList_3_win = ?,
+        cf_d2HeroList_4_pick = ?,
+        cf_d2HeroList_4_win = ?,
+        cf_d2HeroList_5_pick = ?,
+        cf_d2HeroList_5_win = ?,
+        cf_d2HeroList_6_pick = ?,
+        cf_d2HeroList_6_win = ?,
+        cf_d2HeroList_7_pick = ?,
+        cf_d2HeroList_7_win = ?
         ;';
 
 
@@ -142,16 +244,20 @@
             $pro_ban,
             $pro_pick,
             $pro_win,
-            $hero_data_array[$i]['1000_pick'],
-            $hero_data_array[$i]['1000_win'],
-            $hero_data_array[$i]['2000_pick'],
-            $hero_data_array[$i]['2000_win'],
-            $hero_data_array[$i]['3000_pick'],
-            $hero_data_array[$i]['3000_win'],
-            $hero_data_array[$i]['4000_pick'],
-            $hero_data_array[$i]['4000_win'],
-            $hero_data_array[$i]['5000_pick'],
-            $hero_data_array[$i]['5000_win'],
+            $pick_1,
+            $win_1,
+            $pick_2,
+            $win_2,
+            $pick_3,
+            $win_3,
+            $pick_4,
+            $win_4,
+            $pick_5,
+            $win_5,
+            $pick_6,
+            $win_6,
+            $pick_7,
+            $win_7,
             // on update
             $heroCodename,
             $hero_data_array[$i]['localized_name'],
@@ -166,16 +272,20 @@
             $pro_ban,
             $pro_pick,
             $pro_win,
-            $hero_data_array[$i]['1000_pick'],
-            $hero_data_array[$i]['1000_win'],
-            $hero_data_array[$i]['2000_pick'],
-            $hero_data_array[$i]['2000_win'],
-            $hero_data_array[$i]['3000_pick'],
-            $hero_data_array[$i]['3000_win'],
-            $hero_data_array[$i]['4000_pick'],
-            $hero_data_array[$i]['4000_win'],
-            $hero_data_array[$i]['5000_pick'],
-            $hero_data_array[$i]['5000_win']
+            $pick_1,
+            $win_1,
+            $pick_2,
+            $win_2,
+            $pick_3,
+            $win_3,
+            $pick_4,
+            $win_4,
+            $pick_5,
+            $win_5,
+            $pick_6,
+            $win_6,
+            $pick_7,
+            $win_7
         );
 
         if ($result)

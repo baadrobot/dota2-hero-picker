@@ -115,7 +115,6 @@
             {
                 file_put_contents(__DIR__.'/../../js/prebuild.scepter_descr.js', 'window.scepterDescr = '.json_encode($scepterDescrArray).';');
             }
-            exit;
 
             //json_encode($array) + save to file
 

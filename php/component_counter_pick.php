@@ -67,8 +67,8 @@
             echo '</div>';
 
 // ----------------------------- Editor panel
-            echo '<div class="col-4">';
-
+            echo '<div id="heroCounterBalanceListWrap" class="col-4 scrollablePanel">';
+            
             echo '</div>';
         echo '</div>';
     //echo '</div>';

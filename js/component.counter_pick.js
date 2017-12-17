@@ -14,12 +14,151 @@ $(document).ready(function ()
         question += '</div>';
     question += '</div>';
 
+    window.balance = [];
     function getAjaxBalanceForHeroId(draggedHeroId)
     {
         //
-        alert(draggedHeroId);
+        if (typeof window.balance[draggedHeroId] == 'undefined')
+        {
+            jQuery('#heroCounterBalanceListWrap').html('Loading...');
+
+            //Ajax
+            $.ajax({
+                url: 'php/ajax.editor.php',
+                data: {  ajaxType: 'editorGetHeroAbilitiesAndHeroTags'
+                         , heroId: draggedHeroId
+                        },
+                datatype: 'jsonp',
+                type: 'POST',
+                cache: false,
+                success: function (result)
+                {
+                    if (result.php_result == 'OK')
+                    {
+                        window.balance[draggedHeroId] = result;
+                        doRecountCounterPickBalance();
+                    }
+                    else if (result.php_result == 'ERROR')
+                    {
+                        console.log(result.php_error_msg);
+                    };
+                },
+                complete: function (result)
+                {
+
+                },
+                error: function (request, status, error)
+                {
+                    // we recieved NOT json, probably error in ajax.php
+                }
+            });
+        } else {
+            // вызов пересчета баланса
+            doRecountCounterPickBalance();
+
+        }
+        // alert(draggedHeroId);
     }
-    
+    function doRecountCounterPickBalance()
+    {
+        jQuery('#heroCounterBalanceListWrap').html('');
+        var tempCounterBalance = [];
+        
+        //проходимся по циклу выбранных героев врагов
+        $('.enemyPick.slot').each(function()
+        {
+            var curEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
+            var resultForCurHero = window.balance[curEnemyHeroId];
+
+            Object.keys(resultForCurHero['hero_total_balance_result']).forEach(function (i)
+            {
+                var setType = resultForCurHero['hero_total_balance_result'][i]['setType'];
+                
+                if (setType == 1)
+                {
+                    var secondHeroId = resultForCurHero['hero_total_balance_result'][i]['hId'];
+                    var balanceCoef = resultForCurHero['hero_total_balance_result'][i]['balCoef'];                    
+                    if (typeof tempCounterBalance[secondHeroId] == 'undefined')
+                    {
+                        tempCounterBalance[secondHeroId] = 0;
+                    }
+                    tempCounterBalance[secondHeroId] = tempCounterBalance[secondHeroId] + (Number(balanceCoef) * -1);
+                }
+            });
+        });
+        
+        // еще раз проход, но по союзникам
+        $('.friendPick.slot').each(function()
+        {
+            var curFriendHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
+            var resultForCurHero = window.balance[curFriendHeroId];
+        
+            Object.keys(resultForCurHero['hero_total_balance_result']).forEach(function (i)
+            {
+                var setType = resultForCurHero['hero_total_balance_result'][i]['setType'];
+                
+                if (setType == 0)
+                {
+                    var secondHeroId = resultForCurHero['hero_total_balance_result'][i]['hId'];
+                    var balanceCoef = resultForCurHero['hero_total_balance_result'][i]['balCoef'];                    
+                    if (typeof tempCounterBalance[secondHeroId] == 'undefined')
+                    {
+                        tempCounterBalance[secondHeroId] = 0;
+                    }
+                    tempCounterBalance[secondHeroId] = tempCounterBalance[secondHeroId] + Number(balanceCoef);
+                }
+            });
+        });
+
+        
+        window.maxRecomendations = 5;
+
+        function pushToBottom(array, pos, newVal, heroIdArray, newHeroId)
+        {
+            if (pos < window.maxRecomendations)
+            {
+                temp = pushToBottom(array, pos+1, array[pos], heroIdArray, heroIdArray[pos]);
+                array = temp['heroValArray'];
+                heroIdArray = temp['heroIdArray'];
+                array[pos] = newVal;
+                heroIdArray[pos] = newHeroId;
+            }
+            var temp = [];
+            temp['heroValArray'] = array;
+            temp['heroIdArray'] = heroIdArray;
+            return temp;
+        }
+
+        var tempBalanceHeroIdArray = [];
+        var tempBalanceHeroValueArray = [];
+        for (var i = 0; i < window.maxRecomendations;i++)
+        {
+            tempBalanceHeroValueArray[i] = -99999;
+        }
+
+        Object.keys(tempCounterBalance).forEach(function (keyHeroId)
+        {
+            var val = tempCounterBalance[keyHeroId];
+            for (var iPos = 0; iPos < window.maxRecomendations; iPos++)
+            {
+                if (val > tempBalanceHeroValueArray[iPos])
+                {
+                    var tempResultArray = pushToBottom(tempBalanceHeroValueArray, iPos, val, tempBalanceHeroIdArray, keyHeroId);
+                    tempBalanceHeroValueArray = tempResultArray['heroValArray'];
+                    tempBalanceHeroIdArray = tempResultArray['heroIdArray'];
+                    break;
+                }
+            }
+        });        
+
+        for (var i = 0; i < window.maxRecomendations;i++)        
+        {
+            var heroLocalName = $('#heroListWrap').find('[data-hero-id="'+tempBalanceHeroIdArray[i]+'"]').attr('data-hero-namelocal');
+            jQuery('#heroCounterBalanceListWrap').append('<div>'+heroLocalName+' ('+ tempBalanceHeroValueArray[i] +')</div><br />');
+
+        }
+    }
+
     // confirmDialog({
     //     confirmTitle : getPreStr_js('COUNTER_PICK', '_CM_OR_AP_')
     //     ,confirmHtml : question
@@ -122,13 +261,14 @@ $(document).ready(function ()
         {
             slotItemEl.parent().removeClass('slot').addClass('emptySlot');
             slotItemEl.remove();
+            doRecountCounterPickBalance();
         }
 
         function releaseHeroInList(heroId)
         {
             $('.heroListImg[data-hero-id="' + heroId + '"]')
             .removeClass('pickedOrBaned')
-            .find('.redLine').remove();
+            .find('.redLine').remove();           
         }
 
         function lockNewHeroInSlot(slotEl, heroId)
