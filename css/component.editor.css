@@ -263,30 +263,7 @@ hr {
 #tagListWrap{
     line-height: 1;
 }
-.smlGrp{
-    width: 219px;
-    height: 25px;
-    margin-bottom: 8px;
-    font-size: 11px;
-}
-#heroListWrap .smlGrp{
-    display: inline-flex;
-    float: left;
-}
-#heroListWrap .smlGrp:nth-child(2){
-    float: right;
-}
 
-.smlGrp .input-group-addon,
-.smlGrp input
-{
-    font-size: 11px;
-}
-
-#heroListWrap .input-group-addon {
-    cursor: pointer;
-    width: 34px;
-}
 /* #editInfoTagHeroNone{
     height: 33px!important;
     top: 214px!important;

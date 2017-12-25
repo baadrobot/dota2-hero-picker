@@ -16,10 +16,19 @@
 
     global $dbClass;
 
+    $rewriteHeroAliases = [];
+    $rewriteHeroAliases[17] = 'raijin'; // Storm Sprit - removed SS
+    $rewriteHeroAliases[42] = 'snk;wk'; // Wraith King - removed SK
+    $rewriteHeroAliases[61] = ''; // Broodmother - removed BM
+    $rewriteHeroAliases[78] = ''; // Brewmaster - removed BM
+    
+
     for ($i=0; $i < count($hero_data_array); $i++)
     {
+        $heroId = $hero_data_array[$i]['id'];
         $heroFullCodename = $hero_data_array[$i]['name'];
         $heroCodename = substr($heroFullCodename, strlen($heroKeyPrefix));
+
 
                                 // getting some data from npc_heroes.txt
                                 if ((isset($heroesFile[$heroFullCodename])) && (isset($heroesFile[$heroFullCodename]['NameAliases'])))
@@ -27,6 +36,11 @@
                                     $heroNameAliases = $heroesFile[$heroFullCodename]['NameAliases'];
                                 } else {
                                     $heroNameAliases = '';
+                                }
+
+                                if (isset($rewriteHeroAliases[$heroId]))
+                                {
+                                    $heroNameAliases = $rewriteHeroAliases[$heroId];
                                 }
 
         // getting all other from OpenDota Heroes API
