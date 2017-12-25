@@ -115,7 +115,6 @@
             {
                 file_put_contents(__DIR__.'/../../js/prebuild.scepter_descr.js', 'window.scepterDescr = '.json_encode($scepterDescrArray).';');
             }
-            exit;
 
             //json_encode($array) + save to file
 
@@ -259,7 +258,6 @@
                         $rolePusherVal = 0;
                     }
 
-                    // сделать insert для сложности героя
                     $query = 'UPDATE tb_dota2_hero_list
                                 SET  cf_d2HeroList_complexity = ?
                                     ,cf_d2HeroList_role_support = ?
@@ -629,7 +627,7 @@
             global $dbClass;
             // delete all primary attr setted on hero tags before setting new
             $query = 'DELETE FROM tb_dota2_heroTag_set
-                            WHERE cf_d2HeroTagSet_tag_id IN (51,52,53,57,62,63);';
+                            WHERE cf_d2HeroTagSet_tag_id IN (51,52,53,57,62,63, 97, 98, 99, 100, 101, 102);';
             $dbClass->delete($query);
 
             $query = 'SELECT cf_d2HeroList_id as `heroId`
@@ -637,6 +635,12 @@
                             , cf_d2HeroList_attack_type as `attackType`
                             , cf_d2HeroList_attack_range as `attackRange`
                             , cf_d2HeroList_complexity as `complexity`
+                            , cf_d2HeroList_role_escape as `escape`
+                            , cf_d2HeroList_role_initiator as `initiator`
+                            , cf_d2HeroList_role_nuker as `nuker`
+                            , cf_d2HeroList_role_disabler as `disabler`
+                            , cf_d2HeroList_role_durable as `durable`
+                            , cf_d2HeroList_role_pusher as `pusher`
                            FROM tb_dota2_hero_list;';
             $heroParamsResult = $dbClass->select($query);
 
@@ -679,7 +683,124 @@
                 }
 
                 // insert for complexity
-                $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 57, $heroParamsResult[$i]["complexity"]);
+                $complexityValue = 0;
+                if ($heroParamsResult[$i]["complexity"] == 1)
+                {
+                    $complexityValue = 1;
+                } else if ($heroParamsResult[$i]["complexity"] == 2)
+                {
+                    $complexityValue = 3;
+                } else if ($heroParamsResult[$i]["complexity"] == 3)
+                {
+                    $complexityValue = 5;
+                }
+                if ($complexityValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 57, $complexityValue);
+                }
+
+                // insert for escape
+                $escapeValue = 0;
+                if ($heroParamsResult[$i]["escape"] == 1)
+                {
+                    $escapeValue = 1;
+                } else if ($heroParamsResult[$i]["escape"] == 2)
+                {
+                    $escapeValue = 3;
+                } else if ($heroParamsResult[$i]["escape"] == 3)
+                {
+                    $escapeValue = 5;
+                }
+                if ($escapeValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 98, $escapeValue);
+                }
+
+                // insert for initiator
+                $initiatorValue = 0;
+                if ($heroParamsResult[$i]["initiator"] == 1)
+                {
+                    $initiatorValue = 1;
+                } else if ($heroParamsResult[$i]["initiator"] == 2)
+                {
+                    $initiatorValue = 3;
+                } else if ($heroParamsResult[$i]["initiator"] == 3)
+                {
+                    $initiatorValue = 5;
+                }
+                if ($initiatorValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 99, $initiatorValue);
+                }
+                
+                // insert for nuker
+                $nukerValue = 0;
+                if ($heroParamsResult[$i]["nuker"] == 1)
+                {
+                    $nukerValue = 1;
+                } else if ($heroParamsResult[$i]["nuker"] == 2)
+                {
+                    $nukerValue = 3;
+                } else if ($heroParamsResult[$i]["nuker"] == 3)
+                {
+                    $nukerValue = 5;
+                }
+                if ($nukerValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 100, $nukerValue);
+                }
+
+                // insert for disabler
+                $disablerValue = 0;
+                if ($heroParamsResult[$i]["disabler"] == 1)
+                {
+                    $disablerValue = 1;
+                } else if ($heroParamsResult[$i]["disabler"] == 2)
+                {
+                    $disablerValue = 3;
+                } else if ($heroParamsResult[$i]["disabler"] == 3)
+                {
+                    $disablerValue = 5;
+                }
+                if ($disablerValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 101, $disablerValue);
+                }
+
+                // insert for durable
+                $durableValue = 0;
+                if ($heroParamsResult[$i]["durable"] == 1)
+                {
+                    $durableValue = 1;
+                } else if ($heroParamsResult[$i]["durable"] == 2)
+                {
+                    $durableValue = 3;
+                } else if ($heroParamsResult[$i]["durable"] == 3)
+                {
+                    $durableValue = 5;
+                }
+                if ($durableValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 102, $durableValue);
+                }
+
+                // insert for pusher
+                $pusherValue = 0;
+                if ($heroParamsResult[$i]["pusher"] == 1)
+                {
+                    $pusherValue = 1;
+                } else if ($heroParamsResult[$i]["pusher"] == 2)
+                {
+                    $pusherValue = 3;
+                } else if ($heroParamsResult[$i]["pusher"] == 3)
+                {
+                    $pusherValue = 5;
+                }
+                if ($pusherValue > 0)
+                {
+                    $dbClass->insert($query, $heroParamsResult[$i]["heroId"], 97, $pusherValue);
+                }
+
 
                 if ($heroParamsResult[$i]["attackType"] == 0)
                 {

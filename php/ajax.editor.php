@@ -123,11 +123,21 @@
                    WHERE cf_d2HeroTagSet_hero_id = ?;';
         $heroTagsResult = $dbClass->select($query, $_POST['heroId']);
 
+        $query = 'SELECT cf_d2ItemList_name as `itemName`, cf_d2ItemList_codename as `itemCodename`, cf_d2ItemList_alias_single as `itemAliasSingle`
+                    FROM tb_dota2_item_list;';
+        $itemListResult = $dbClass->select($query);
+
+        for($i = 0; $i < count($itemListResult); $i++)
+        {
+            $itemListArray[$itemListResult[$i]['itemAliasSingle']] = array('itemCodename'=>$itemListResult[$i]['itemCodename'], 'itemName'=>$itemListResult[$i]['itemName']);
+        }
+
         ajaxReturnAndExit(array('php_result' => 'OK'
                 ,'hero_abilities_array' => $heroAbilitiesResult
                 ,'hero_tag_result' => $heroTagsResult
                 ,'hero_total_balance_result' => $heroTotalBalanceResult
                 ,'all_involved_abilities_result' => $allUsedAbilities
+                ,'all_items_list_array' => $itemListArray
         ));
     }
     // old

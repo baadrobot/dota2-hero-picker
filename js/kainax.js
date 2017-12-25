@@ -329,15 +329,15 @@ function getHeroImgPath(heroCodeName, type)
     }
 }
 
-function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNameAliases)
+function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNameAliases, heroAliasSingle)
 {
     var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
-    var div = '<div data-inactive-tooltip="'+tooltip+'" class="heroListImg" data-hero-aliases="'+heroNameAliases+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-namelocal="'+heroNameLocal+'">';
+    var div = '<div data-inactive-tooltip="'+tooltip+'" class="heroListImg" data-hero-aliases="'+heroNameAliases+'" data-alias-single="'+heroAliasSingle+'" data-hero-id="'+heroId+'" data-hero-codename="'+heroCodeName+'" data-hero-namelocal="'+heroNameLocal+'">';
     if (isNeedValueSpan)
     {
         div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
     }
-    div += '<img data-img-src="'+getHeroImgPath(heroCodeName, 'vert')+'" /></div>';
+    div += '<img data-img-src="'+getHeroImgPath(heroCodeName, 'vert')+'" class="heroImgV" /></div>';
     return div;
 }
 
@@ -358,7 +358,14 @@ function buildHeroList(wrapId)
                         if (window.heroList[i]['a'] == j)
                         {
                             //heroListHtml += '<div>';
-                            heroListHtml += getHeroImg(window.heroList[i]['n'], window.heroList[i]['id'], window.heroList[i]['cn'], isNeedValueSpan, window.heroList[i]['na']);
+                            if(window.heroList[i]['na'] != '')
+                            {
+                                var fullNameAliases = window.heroList[i]['na'] + ',' + window.heroList[i]['nac'];
+                            } else {
+                                var fullNameAliases = window.heroList[i]['nac'];
+                            }
+                            
+                            heroListHtml += getHeroImg(window.heroList[i]['n'], window.heroList[i]['id'], window.heroList[i]['cn'], isNeedValueSpan, fullNameAliases, window.heroList[i]['nas']);
                             //heroListHtml += '</div>';
                         }
                     }

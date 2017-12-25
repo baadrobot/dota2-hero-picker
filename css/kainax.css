@@ -62,6 +62,30 @@ body {
 }
 /* END - our nice tabs*/
 
+.smlGrp{
+    width: 219px;
+    height: 25px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+#heroListWrap .smlGrp{
+    display: inline-flex;
+    float: left;
+}
+#heroListWrap .smlGrp:nth-child(2){
+    float: right;
+}
+
+.smlGrp .input-group-addon,
+.smlGrp input
+{
+    font-size: 11px;
+}
+
+#heroListWrap .input-group-addon {
+    cursor: pointer;
+    width: 34px;
+}
 
 .plus {
     color: #36ff04;
@@ -552,6 +576,12 @@ ul.ui-autocomplete{
 .scrollablePanel {
 	height:400px!important;
 	overflow-y: scroll;
+}
+
+.scrollablePanelYAuto {
+	height: 400px!important;
+    overflow-y: auto;
+    overflow-x: hidden;	
 }
 
 .aghaScepterIconBig{

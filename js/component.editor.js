@@ -345,7 +345,6 @@ $(document).ready(function ()
                             //tagValue
                         } else if (result.tag_result == 'HERO')
                         {
-                            console.log(123);
                             $('#editHeroTagHeroImgWrap').addClass('selectedAbility');
                             //tag_value added
                             $('#editHeroTagSlider').slider('value', result.tag_value);
@@ -1820,8 +1819,8 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         }
         ,onUserClickedDelete : function ()
         {
-            console.log($('#combobox1 option:selected').val());
-            console.log($('#combobox2 option:selected').val());
+            // console.log($('#combobox1 option:selected').val());
+            // console.log($('#combobox2 option:selected').val());
 
             pleaseWaitOpen();
             // $('.tag.selectedTag').click();
@@ -1924,6 +1923,14 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                         return abilityImg;
                     }
 
+                    function getItemIcon(itemCodename, itemName)
+                    {
+                        var tooltip = "<div class='tooltipWrap'>"+itemName+'</div>';
+                        var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+itemCodename+'_lg.png';
+                        var itemImg = '<img src="'+itemIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+                        return itemImg;
+                    }
+
 function changeNotesWrapHtml()
 {
     if ($('#balanceTagTextarea').val() != '')
@@ -1932,6 +1939,17 @@ function changeNotesWrapHtml()
     } else {
         var textareaValue = $('#balanceTagTextarea').attr('placeholder');
     }
+
+    var indexOfItem = textareaValue.indexOf('{i:');
+    var indexOfEndOfItem = textareaValue.indexOf('}', indexOfItem);
+    var itemSliceResult = textareaValue.slice(indexOfItem+3, indexOfEndOfItem);
+    var itemSliceResultForReplace = '{i:'+itemSliceResult+'}';
+
+    if(typeof window.itemList[itemSliceResult] != 'undefined')
+    {
+        textareaValue = textareaValue.replace(itemSliceResultForReplace, getItemIcon(window.itemList[itemSliceResult]['itemCodename'], window.itemList[itemSliceResult]['itemName']));
+    }
+
     textareaValue = textareaValue.replace(/{h1}/gi, getHeroIcon('ancient_apparition', 'Ancient Apparition'))
                                  .replace(/{a1}/gi, getAbilityIcon('ancient_apparition_ice_blast', 5348))
                                  .replace(/{h2}/gi, getHeroIcon('alchemist', 'Alchemist'))
@@ -1993,9 +2011,21 @@ function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, sel
         secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
     }
 
+    var indexOfColon = balanceNoteTemplate.indexOf(':');
+    var indexOfSemicolon = balanceNoteTemplate.indexOf(';');
+    var itemAliasSingle = (balanceNoteTemplate.slice(indexOfColon+1, indexOfSemicolon)).toLowerCase();
+    var itemAliasSingleWithBraces = ('{i:'+balanceNoteTemplate.slice(indexOfColon+1, indexOfSemicolon)+'}').toLowerCase();
+    var itemAliasSingleRegExpObj = new RegExp(itemAliasSingleWithBraces,"gi");
+
+    if (typeof window.heroList[itemAliasSingle] != 'undefined')
+    {
+        balanceNoteTemplate = balanceNoteTemplate.replace(itemAliasSingleRegExpObj, getItemIcon(window.heroList[itemAliasSingle]['itemCodename'], window.heroList[itemAliasSingle]['itemName']));
+    }
+
     return balanceNoteTemplate.replace(/{h1}/gi, getHeroIcon(firstHeroCodename, firstHeroNamelocal))
                             .replace(/{a1}/gi, firstHeroAbilitiesIcons)
                             .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
                             .replace(/{a2}/gi, secondHeroAbilitiesIcons);
+                            // .replace(itemAliasSingleRegExpObj, getItemIcon(allItemsListArray[itemAliasSingle]['itemCodename'], allItemsListArray[itemAliasSingle]['itemName']));
 }
 
