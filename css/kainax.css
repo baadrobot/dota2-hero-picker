@@ -599,6 +599,7 @@ ul.ui-autocomplete{
 .aghaScepterIconBig img{
     width: 26px!important;
 	height: 26px!important;
+	margin: 0!important;
 }
 
 .scepterDescrTooltip{
