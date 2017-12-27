@@ -80,7 +80,50 @@ $(document).ready(function ()
     // click on PLUS btn (add balance)
     $('#btnCreateNewBalancePopup').click(function()
     {
-        tagBalancePopupDo('new', '');
+        var itemsHtml = '<div id="itemsWrap">';
+
+        pleaseWaitOpen();
+
+        //Ajax
+        $.ajax({
+            url: 'php/ajax.editor.php',
+            data: {  ajaxType: 'editorGetItemList'
+                    },
+            datatype: 'jsonp',
+            type: 'POST',
+            cache: false,
+            success: function (result)
+            {
+                if (result.php_result == 'OK')
+                {
+                    for(var i = 0; i < result.item_list.length; i++)
+                    {
+                        var tooltip = "<div class='tooltipWrap'>"+result.item_list[i]['itemName']+'</div>';
+                        var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+result.item_list[i]['itemCodename']+'_lg.png';                        
+
+                        itemsHtml += '<div class="itemImgWrap">';
+                            itemsHtml += '<img src="'+itemIconUrl+'" height="30px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
+                        itemsHtml += '</div>';
+                    }
+                    
+                    itemsHtml += '</div>';
+                    
+                    tagBalancePopupDo('new', '', itemsHtml);
+                }
+                else if (result.php_result == 'ERROR')
+                {
+                    console.log(result.php_error_msg);
+                };
+            },
+            complete: function (result)
+            {
+                pleaseWaitClose();
+            },
+            error: function (request, status, error)
+            {
+                // we recieved NOT json
+            }
+        });
     });
 
 
@@ -333,9 +376,7 @@ $(document).ready(function ()
                             editHeroTagDecideInfoText();
                         });
 
-                        // nurax activated tooltips (удалить коммент если всё заработает)
                         eXoActivateInactiveTooltips();
-                        // end of nurax
                         addOnHoverTooltipsForAbilityImg('#editHeroTagAbilitiesImgWrap');
 
                         if (result.tag_result == 'NONE')
@@ -1231,7 +1272,52 @@ function rebuildEditorBalanceTags()
 
                     $('#tagBalanceListWrap .tagBalanceItem').click(function ()
                     {
-                        tagBalancePopupDo('edit', $(this));
+                        var clickedBalanceEl = $(this);
+                        var itemsHtml = '<div id="itemsWrap">';
+
+                        pleaseWaitOpen();
+
+                        //Ajax
+                        $.ajax({
+                            url: 'php/ajax.editor.php',
+                            data: {  ajaxType: 'editorGetItemList'
+                                    },
+                            datatype: 'jsonp',
+                            type: 'POST',
+                            cache: false,
+                            success: function (result)
+                            {
+                                if (result.php_result == 'OK')
+                                {
+                                    for(var i = 0; i < result.item_list.length; i++)
+                                    {
+                                        var tooltip = "<div class='tooltipWrap'>"+result.item_list[i]['itemName']+'</div>';
+                                        var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+result.item_list[i]['itemCodename']+'_lg.png';                        
+
+                                        itemsHtml += '<div class="itemImgWrap">';
+                                            itemsHtml += '<img src="'+itemIconUrl+'" height="30px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
+                                        itemsHtml += '</div>';
+                                    }
+                                    
+                                    itemsHtml += '</div>';
+                                    
+                                    tagBalancePopupDo('edit', clickedBalanceEl, itemsHtml);
+                                }
+                                else if (result.php_result == 'ERROR')
+                                {
+                                    console.log(result.php_error_msg);
+                                };
+                            },
+                            complete: function (result)
+                            {
+                                pleaseWaitClose();
+                            },
+                            error: function (request, status, error)
+                            {
+                                // we recieved NOT json
+                            }
+                        });
+
                     });
 
                     // toDo Kainax: add on_click for tag
@@ -1624,7 +1710,7 @@ function rebuildAll(tagsArray)
     rebuildEditorBalanceTags();
 }
 
-function tagBalancePopupDo(addOrEdit, clickedEl)
+function tagBalancePopupDo(addOrEdit, clickedEl, htmlForItems)
 {
     var question = '';
     question += '<div id="balanceRadioWrap">';
@@ -1669,6 +1755,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
         question += '</textarea>';
 
         question += '<div id="notesWrap"></div>';
+        // question += '<div id="itemsWrap"></div>';
 
     question += '</div>';
 
@@ -1691,17 +1778,14 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                     $('#editBalancePopupHtml').removeClass('cccolorForSynergy');
                 }
                 editBalancePopupDecideBtnCreate();
-                //$('#btnConfirmDialogOK').attr('disabled', 'disable');
             });
 
-            // console.log($('[name="counterpickOrSynergy"]:checked').val());
 
             $("#combobox1 select, #combobox2 select").combobox();
 
             $('#combobox1 input, #combobox2 input').autocomplete({
                 select: function(event, ui)
                 {
-                    //$(this).parent().siblings('select').val($(ui.item.option).val());
                     $(this).val($(ui.item.option).text());
                     editBalancePopupDecideBtnCreate();
                 }
@@ -1727,7 +1811,6 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 {
                     handle2.text( ui.value );
 
-                    // Nurax: возможно не будет работать т.к. значение в textarea появляется после функции 1341 стр
                     editBalancePopupDecideBtnCreate();
                 }
             });
@@ -1797,6 +1880,9 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 editBalancePopupDecideBtnCreate();
             }
 
+            // add item list to click them for fill input with item shortcut
+            $('#notesWrap').after(htmlForItems);
+
             $('#balanceTagTextarea').on('focus', function()
             {
                 if ($(this).val() == '')
@@ -1809,13 +1895,43 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
                 {
                     $(this).val('');
                 }
+            }).on('keyup mouseup focus click', function() {
+                window.balanceTagTextareaCaretPos = $(this).prop("selectionStart");
+                window.balanceTagTextareaText = $(this).val();                
+            });
+
+            // $('#inputCreateNewTagName').focus();
+            $('.itemImgWrap').on('click', function() 
+            {
+                var symbolBeforeCaret = window.balanceTagTextareaText.substring(window.balanceTagTextareaCaretPos-1, window.balanceTagTextareaCaretPos);
+                console.log(symbolBeforeCaret);
+                if (symbolBeforeCaret == ' ')
+                {
+                    var clickedItemAliasSingle = '';
+                } else {
+                    var clickedItemAliasSingle = ' ';
+                }
+                clickedItemAliasSingle += '{i:' + $(this).find('img').attr('data-item-single') + '}';
+                
+                var balanceTagTextareaEl = jQuery("#balanceTagTextarea");
+
+                var newTextAreaTxt = window.balanceTagTextareaText.substring(0, window.balanceTagTextareaCaretPos) + clickedItemAliasSingle + window.balanceTagTextareaText.substring(window.balanceTagTextareaCaretPos);
+                if (window.balanceTagTextareaText == '')
+                {
+                    balanceTagTextareaEl.val(balanceTagTextareaEl.attr('placeholder') + newTextAreaTxt);
+                } else {
+                    balanceTagTextareaEl.val(newTextAreaTxt);
+                }
+                balanceTagTextareaEl.trigger('keyup');
             });
 
             $('#btnConfirmDialogOK').attr('disabled', 'disabled');
+
+            eXoActivateInactiveTooltips();            
         }
         ,onAfterShow : function ()
         {
-            // $('#inputCreateNewTagName').focus();
+
         }
         ,onUserClickedDelete : function ()
         {
@@ -1908,29 +2024,6 @@ function tagBalancePopupDo(addOrEdit, clickedEl)
 }
 
 
-                    function getHeroIcon(heroName, heroNameLocal)
-                    {
-                        var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
-                        var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
-                        var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
-                        return heroImg;
-                    }
-
-                    function getAbilityIcon(abilityCodeName, abilityId)
-                    {
-                        var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
-                        var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
-                        return abilityImg;
-                    }
-
-                    function getItemIcon(itemCodename, itemName)
-                    {
-                        var tooltip = "<div class='tooltipWrap'>"+itemName+'</div>';
-                        var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+itemCodename+'_lg.png';
-                        var itemImg = '<img src="'+itemIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
-                        return itemImg;
-                    }
-
 function changeNotesWrapHtml()
 {
     if ($('#balanceTagTextarea').val() != '')
@@ -1960,72 +2053,3 @@ function changeNotesWrapHtml()
     eXoActivateInactiveTooltips();
     addOnHoverTooltipsForAbilityImg('#notesWrap');
 }
-
-function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy)
-{
-    if (isReversedSynergy == 1)
-    {
-        // reverse {h1}{a1} and {h2}{a2} for this hero
-        balanceNoteTemplate = balanceNoteTemplate.replace(/{h1}/gi, '{temp_h1}')
-                                                 .replace(/{a1}/gi, '{temp_a1}')
-                                                 .replace(/{h2}/gi, '{h1}')
-                                                 .replace(/{a2}/gi, '{a1}')
-                                                 .replace(/{temp_h1}/gi, '{h2}')
-                                                 .replace(/{temp_a1}/gi, '{a2}');
-    }
-
-    var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + firstHeroId + '"]');
-    var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');
-
-    var firstHeroCodename = firstHeroOnPageEl.attr('data-hero-codename');
-    var secondHeroCodename = secondHeroOnPageEl.attr('data-hero-codename');
-
-    var firstHeroNamelocal = firstHeroOnPageEl.attr('data-hero-namelocal');
-    var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
-    var imgPath = secondHeroOnPageEl.find('img').attr('src');
-
-    var selAb1 = selAb1.split(' ');
-    var selAb2 = selAb2.split(' ');
-
-    firstHeroAbilitiesIcons = '';
-    for (var i = 0; i < selAb1.length; i++)
-    {
-        if (i != 0)
-        {
-            firstHeroAbilitiesIcons += ' ';
-        }
-        var abilityId = selAb1[i];
-        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
-        firstHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
-    }
-
-    secondHeroAbilitiesIcons = '';
-    for (var i = 0; i < selAb2.length; i++)
-    {
-        if (i != 0)
-        {
-            secondHeroAbilitiesIcons += ' ';
-        }
-        var abilityId = selAb2[i];
-        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
-        secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
-    }
-
-    var indexOfColon = balanceNoteTemplate.indexOf(':');
-    var indexOfSemicolon = balanceNoteTemplate.indexOf(';');
-    var itemAliasSingle = (balanceNoteTemplate.slice(indexOfColon+1, indexOfSemicolon)).toLowerCase();
-    var itemAliasSingleWithBraces = ('{i:'+balanceNoteTemplate.slice(indexOfColon+1, indexOfSemicolon)+'}').toLowerCase();
-    var itemAliasSingleRegExpObj = new RegExp(itemAliasSingleWithBraces,"gi");
-
-    if (typeof window.heroList[itemAliasSingle] != 'undefined')
-    {
-        balanceNoteTemplate = balanceNoteTemplate.replace(itemAliasSingleRegExpObj, getItemIcon(window.heroList[itemAliasSingle]['itemCodename'], window.heroList[itemAliasSingle]['itemName']));
-    }
-
-    return balanceNoteTemplate.replace(/{h1}/gi, getHeroIcon(firstHeroCodename, firstHeroNamelocal))
-                            .replace(/{a1}/gi, firstHeroAbilitiesIcons)
-                            .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
-                            .replace(/{a2}/gi, secondHeroAbilitiesIcons);
-                            // .replace(itemAliasSingleRegExpObj, getItemIcon(allItemsListArray[itemAliasSingle]['itemCodename'], allItemsListArray[itemAliasSingle]['itemName']));
-}
-

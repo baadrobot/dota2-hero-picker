@@ -455,7 +455,7 @@ function popupAndPicksFill()
         for(var i = 0; i < tempMatchedHeroIdsArray.length; i++)
         {
             var curHeroEl = $('.heroListImg[data-hero-id="'+tempMatchedHeroIdsArray[i]+'"]');
-            question += '<div class="matchedHeroesPopupListItem" data-hero-id="'+curHeroEl.attr('data-hero-id')+'" data-alias-single="'+curHeroEl.attr('data-alias-single')+'" data-active-tooltip="'+curHeroEl.attr('data-active-tooltip')+'">';
+            question += '<div class="matchedHeroesPopupListItem" data-hero-id="'+curHeroEl.attr('data-hero-id')+'" data-alias-single="'+curHeroEl.attr('data-alias-single')+'" data-inactive-tooltip="'+curHeroEl.attr('data-active-tooltip')+'">';
                 question += '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+curHeroEl.attr('data-hero-codename')+'_full.png?v=4212550">';
             question += '</div>';
         }
@@ -471,9 +471,7 @@ function popupAndPicksFill()
             ,onBeforeShow: function ()
             {
                 $('#btnConfirmDialogOK').hide();
-            }
-            ,onAfterShow : function ()
-            {
+
                 // клики на героев
                 $('.matchedHeroesPopupListItem').on('click', function() 
                 {
@@ -525,6 +523,12 @@ function popupAndPicksFill()
                     // снова вызвать текущую функцию, это будет до тех пор пока не останется конфликтных слов
                     popupAndPicksFill();
                 });
+
+                eXoActivateInactiveTooltips();                
+            }
+            ,onAfterShow : function ()
+            {
+
             }
             ,onUserClickedOK : function ()
             {
@@ -806,7 +810,8 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot)
         stop: function (event, ui) {
             if (ui.helper.attr('data-is-recieved-or-droped-out') == 0) {
                 var dragedFromSlotEl = $(this);
-                removeHeroFromSlot(dragedFromSlotEl, recountNeedOrNot);
+                // fix 2389
+                removeHeroFromSlot(dragedFromSlotEl, recountNeedOrNot = 1);
                 releaseHeroInList(dragedFromSlotEl.attr('data-hero-id'));
             }
         }
@@ -820,8 +825,6 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot)
         var imgWrapToRemoveEl = $(this).parent();
         removeHeroFromSlot(imgWrapToRemoveEl, 1);
         releaseHeroInList(deletedHeroId);
-
-        
     });       
 }
 
@@ -939,8 +942,16 @@ function doRecountCounterPickBalance()
             });
         });
 
-        window.maxRecomendations = 5;
-        var defaultEmptyVal = -9999;
+        var defaultEmptyVal = -9999;        
+        // remove already baned and picked heroes from recommendation
+        $('.enemyPick.slot, .friendPick.slot, .banPick.slot').each(function()
+        {
+            var curHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
+            tempCounterBalance[curHeroId] = defaultEmptyVal;
+        });
+
+        // order recommendation
+        window.maxRecomendations = 10;
         if ((enemyPickElements.length + friendPickElements.length) > 0)
         {
             var tempBalanceHeroIdArray = [];
@@ -950,6 +961,8 @@ function doRecountCounterPickBalance()
                 tempBalanceHeroValueArray[i] = defaultEmptyVal;
             }
 
+            // get top 5 suggested heroes and write it
+            // to tempBalanceHeroValueArray and tempBalanceHeroIdArray
             Object.keys(tempCounterBalance).forEach(function (keyHeroId)
             {
                 var val = tempCounterBalance[keyHeroId];
@@ -957,7 +970,9 @@ function doRecountCounterPickBalance()
                 {
                     if (val > tempBalanceHeroValueArray[iPos])
                     {
+                        // invoke function and 2 arrays to it
                         var tempResultArray = pushToBottom(tempBalanceHeroValueArray, iPos, val, tempBalanceHeroIdArray, keyHeroId);
+                        // we recieved 2 arrays from function (inside 1 array as single result, rewrite it back)
                         tempBalanceHeroValueArray = tempResultArray['heroValArray'];
                         tempBalanceHeroIdArray = tempResultArray['heroIdArray'];
                         break;
@@ -969,6 +984,11 @@ function doRecountCounterPickBalance()
             {
                 var curRecomHeroId = tempBalanceHeroIdArray[j];
                 var curRecomHeroVal = tempBalanceHeroValueArray[j];
+                // fix78132
+                if(curRecomHeroVal == defaultEmptyVal) // if -9999
+                {
+                    continue;
+                }
                 var recommendHtml = '';
                 var curHeroEl = $('#heroListWrap').find('[data-hero-id="'+curRecomHeroId+'"]');
                 var heroLocalName = curHeroEl.attr('data-hero-namelocal');
@@ -991,105 +1011,189 @@ function doRecountCounterPickBalance()
                     var recomHeroGreenNotes = [];
                     var greenNotesCount = -1;
                     var redNotesCount = -1;
-                    var internalCycleEnemyPickElements = enemyPickElements;
-                    enemyPickElements.each(function()
+
+
+                    for (var iSetType = 0; iSetType <= 1; iSetType++)
                     {
-                        var curEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
-                        var resultForCurHero = window.balance[curEnemyHeroId];
-
-                        Object.keys(resultForCurHero['hero_total_balance_result']).forEach(function (i)
+                        if (iSetType == 0)
                         {
-                            var setType = resultForCurHero['hero_total_balance_result'][i]['setType'];
-                            
-                            if (setType == 1)
-                            {
-                                var secondHeroId = resultForCurHero['hero_total_balance_result'][i]['hId'];
-                                if (curRecomHeroId == secondHeroId)
+                            var pickElements = friendPickElements;
+                        } else {
+                            var pickElements = enemyPickElements;
+                        }
+                        var internalCyclePickElements = pickElements;
+                        pickElements.each(function()
+                        {
+                            var curEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
+                            var resultForCurHero = window.balance[curEnemyHeroId];
+
+                                Object.keys(resultForCurHero['hero_total_balance_result']).forEach(function (i)
                                 {
-                                    
-                                    var balanceCoef = resultForCurHero['hero_total_balance_result'][i]['balCoef'];
-                                    var redOrGreen = balanceCoef > 0 ? 'red' : 'green';
-                                    var note = resultForCurHero['hero_total_balance_result'][i]['note'];
-
-                                    var key = redOrGreen + '_' + curEnemyHeroId + '_' + i;
-                                    if (typeof alreadyAddedNotes[key] == 'undefined')
+                                    var setType = resultForCurHero['hero_total_balance_result'][i]['setType'];
+                                    if (setType == iSetType)
                                     {
-                                        alreadyAddedNotes[key] = 1;                                    
-                                        redNotesCount++;
-
-                                        if (redOrGreen == 'green')
+                                        var secondHeroId = resultForCurHero['hero_total_balance_result'][i]['hId'];
+                                        if (curRecomHeroId == secondHeroId)
                                         {
-                                            // green
-                                            greenNotesCount++;
-                                            recomHeroGreenNotes[greenNotesCount] = [];
-                                            recomHeroGreenNotes[greenNotesCount]['note'] = note;
-                                            recomHeroGreenNotes[greenNotesCount]['heroes'] = [];
-                                            recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
-                                            //recomHeroGreenNotes[greenNotesCount]['abils'] = [];
-                                            //recomHeroGreenNotes[greenNotesCount]['abils'].push(curEnemyHeroId);                                            
-                                            // console.log(recomHeroGreenNotes);
-                                        } else {
-                                            // red
-                                            redNotesCount++;
-                                            recomHeroRedNotes[redNotesCount] = [];
-                                            recomHeroRedNotes[redNotesCount]['note'] = note;
-                                            recomHeroRedNotes[redNotesCount]['heroes'] = [];
-                                            recomHeroRedNotes[redNotesCount]['heroes'].push(curEnemyHeroId);
-                                        }
+                                            var balanceCoef = resultForCurHero['hero_total_balance_result'][i]['balCoef'];
+                                            var isReversedSynergy = resultForCurHero['hero_total_balance_result'][i]['isRvrs'];
 
-                                        // проходим по оставшимся героям и определяем нет ли у них тоже такого Note
-                                        internalCycleEnemyPickElements.each(function()
-                                        {
-                                            var internalCycleEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
-                                            if (internalCycleEnemyHeroId != curEnemyHeroId)
+                                            if ((setType == 1) && (balanceCoef <= 0))
                                             {
-                                                var internalCycleResultForCurHero = window.balance[internalCycleEnemyHeroId];
-                                                Object.keys(internalCycleResultForCurHero['hero_total_balance_result']).forEach(function (i2)
+                                                if (isReversedSynergy == 0)
                                                 {
-                                                    var internalSetType = internalCycleResultForCurHero['hero_total_balance_result'][i2]['setType'];
-                                                    
-                                                    if (internalSetType == 1)
+                                                    isReversedSynergy = 1;
+                                                } else {
+                                                    isReversedSynergy = 0;
+                                                }
+                                            }
+
+                                            if (iSetType == 0)
+                                            {
+                                                var redOrGreen = balanceCoef >= 0 ? 'green' : 'red';
+                                            } else {
+                                                var redOrGreen = balanceCoef > 0 ? 'red' : 'green';
+                                            }
+
+                                            var note = resultForCurHero['hero_total_balance_result'][i]['note'];
+
+                                            if (note == '')
+                                            {
+                                                if (setType == 1)
+                                                {
+                                                    note = getPreStr_js('EDITOR', '_DFLT_NOTE_COUNTER_');
+                                                } else
+                                                {
+                                                    if (balanceCoef >= 0) {
+                                                        note = getPreStr_js('EDITOR', '_DFLT_NOTE_SNRG_');
+                                                    } else {
+                                                        note = getPreStr_js('EDITOR', '_DFLT_NOTE_ANTISNRG_');
+                                                    }
+                                                }
+                                            }
+
+                                            // using enemy ID in key, as bellow we will add for each enemy hero id (with same)
+                                            var key = iSetType + '_' + redOrGreen + '_' + curEnemyHeroId + '_' + i;
+                                            if (typeof alreadyAddedNotes[key] == 'undefined')
+                                            {
+                                                alreadyAddedNotes[key] = 1;                                    
+                                                //redNotesCount++; // Kainax: что это?
+
+                                                if (redOrGreen == 'green')
+                                                {
+                                                    // green
+                                                    greenNotesCount++;
+                                                    recomHeroGreenNotes[greenNotesCount] = [];
+                                                    recomHeroGreenNotes[greenNotesCount]['note'] = note;
+                                                    recomHeroGreenNotes[greenNotesCount]['heroes'] = [];
+                                                    recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
+                                                    recomHeroGreenNotes[greenNotesCount]['abils'] = [];
+                                                    //recomHeroGreenNotes[greenNotesCount]['abils'].push(curEnemyHeroId);
+                                                    // console.log(recomHeroGreenNotes);
+                                                } else {
+                                                    // red
+                                                    redNotesCount++;
+                                                    recomHeroRedNotes[redNotesCount] = [];
+                                                    recomHeroRedNotes[redNotesCount]['note'] = note;
+                                                    recomHeroRedNotes[redNotesCount]['heroes'] = [];
+                                                    recomHeroRedNotes[redNotesCount]['heroes'].push(curEnemyHeroId);
+                                                }
+
+                                                // проходим по оставшимся героям и определяем нет ли у них тоже такого Note
+                                                internalCyclePickElements.each(function()
+                                                {
+                                                    var internalCycleEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
+                                                    if (internalCycleEnemyHeroId != curEnemyHeroId)
                                                     {
-                                                        var internalSecondHeroId = internalCycleResultForCurHero['hero_total_balance_result'][i2]['hId'];
-                                                        if (curRecomHeroId == internalSecondHeroId)
+                                                        var internalCycleResultForCurHero = window.balance[internalCycleEnemyHeroId];
+                                                        Object.keys(internalCycleResultForCurHero['hero_total_balance_result']).forEach(function (i2)
                                                         {
-                                                            var internalNote = internalCycleResultForCurHero['hero_total_balance_result'][i2]['note'];
+                                                            var internalSetType = internalCycleResultForCurHero['hero_total_balance_result'][i2]['setType'];
                                                             
-                                                            if (internalNote == note)
+                                                            if (internalSetType == iSetType)
                                                             {
-                                                                var internalBalanceCoef = internalCycleResultForCurHero['hero_total_balance_result'][i2]['balCoef'];                                                            
-                                                                var internalRedOrGreen = internalBalanceCoef > 0 ? 'red' : 'green';                                                            
-                                                                if (internalRedOrGreen == redOrGreen)
+                                                                var internalSecondHeroId = internalCycleResultForCurHero['hero_total_balance_result'][i2]['hId'];
+                                                                if (curRecomHeroId == internalSecondHeroId)
                                                                 {
-                                                                    var internalKey = internalRedOrGreen + '_' + internalCycleEnemyHeroId + '_' + i2;
-                                                                    if (typeof alreadyAddedNotes[internalKey] == 'undefined')
+                                                                    var internalNote = internalCycleResultForCurHero['hero_total_balance_result'][i2]['note'];
+                                                                    var internalBalanceCoef = internalCycleResultForCurHero['hero_total_balance_result'][i2]['balCoef'];
+
+                                                                    if (internalNote == '')
                                                                     {
-                                                                        alreadyAddedNotes[internalKey] = 1;
-                                                                        if (redOrGreen == 'green')
+                                                                        if (internalSetType == 1)
                                                                         {
-                                                                            // green
-                                                                            recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);                           
-                                                                        } else {
-                                                                            // red
-                                                                            recomHeroRedNotes[redNotesCount]['heroes'].push(curEnemyHeroId);
+                                                                            internalNote = getPreStr_js('EDITOR', '_DFLT_NOTE_COUNTER_');
+                                                                        } else
+                                                                        {
+                                                                            if (internalBalanceCoef >= 0) {
+                                                                                internalNote = getPreStr_js('EDITOR', '_DFLT_NOTE_SNRG_');
+                                                                            } else {
+                                                                                internalNote = getPreStr_js('EDITOR', '_DFLT_NOTE_ANTISNRG_');
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if (internalNote == note)
+                                                                    {
+                                                                        var internalRedOrGreen = internalBalanceCoef > 0 ? 'red' : 'green';                                                            
+                                                                        if (internalRedOrGreen == redOrGreen)
+                                                                        {
+                                                                            var internalKey = iSetType + '_' + internalRedOrGreen + '_' + internalCycleEnemyHeroId + '_' + i2;
+                                                                            if (typeof alreadyAddedNotes[internalKey] == 'undefined')
+                                                                            {
+                                                                                alreadyAddedNotes[internalKey] = 1;
+                                                                                if (redOrGreen == 'green')
+                                                                                {
+                                                                                    // green
+                                                                                    recomHeroGreenNotes[greenNotesCount]['heroes'].push(internalCycleEnemyHeroId);                           
+                                                                                } else {
+                                                                                    // red
+                                                                                    recomHeroRedNotes[redNotesCount]['heroes'].push(internalCycleEnemyHeroId);
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
                                                             }
-                                                        }
+                                                        });                                                                    
                                                     }
-                                                });                                                                    
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        });
-                    });
+                                                });
 
+                                                //recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
+                                                //recomHeroGreenNotes[greenNotesCount]['abils'] = [];
+                                                if (redOrGreen == 'green')
+                                                {
+                                                    // green
+                                                    balanceNoteTemplate = recomHeroGreenNotes[greenNotesCount]['note'];
+                                                    counterHeroesArray = recomHeroGreenNotes[greenNotesCount]['heroes'];
+                                                    secondHeroId = curRecomHeroId;
+                                                    selAb1 = '';
+                                                    selAb2 = '';
+                                                    allInvolvedAbilitiesResult = [];
+                                                    //isReversedSynergy = 0;
+
+                                                    recomHeroGreenNotes[greenNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
+                                                } else {
+                                                    // red
+                                                    balanceNoteTemplate = recomHeroRedNotes[redNotesCount]['note'];
+                                                    counterHeroesArray = recomHeroRedNotes[redNotesCount]['heroes'];
+                                                    secondHeroId = curRecomHeroId;
+                                                    selAb1 = '';
+                                                    selAb2 = '';
+                                                    allInvolvedAbilitiesResult = [];
+                                                    //isReversedSynergy = 0;
+
+                                                    recomHeroRedNotes[redNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                        });
+                    }
                     recommendHtml += '<div class="heroNotesWrapForBalance" style="display:none">';
-                    var colorClass = 'noticeGreen';
-                    for (var i3 = 0; i3 < recomHeroGreenNotes.length; i3++)
+                        var colorClass = 'noticeGreen';
+                        for (var i3 = 0; i3 < recomHeroGreenNotes.length; i3++)
                         {
                             var note = recomHeroGreenNotes[i3]['note'];
 
@@ -1108,6 +1212,27 @@ function doRecountCounterPickBalance()
                                 recommendHtml += '</div>';
                             recommendHtml += '</div>';                        
                         }
+
+                        var colorClass = 'noticeRed';
+                        for (var i3 = 0; i3 < recomHeroRedNotes.length; i3++)
+                        {
+                            var note = recomHeroRedNotes[i3]['note'];
+
+                            //recomHeroRedNotes[recomHeroRedNotes]['heroes'] = [];
+                            //recomHeroRedNotes[recomHeroRedNotes]['heroes'].push(curEnemyHeroId);
+
+                            recommendHtml += '<div class="noteForBalance '+colorClass+'">';
+                                recommendHtml += '<div class="noteTextForBalance">';
+                                        recommendHtml += note;
+                                        // for Counter-By we need to change H1 and H2 places
+                                        //recommendHtml += generateBalanceNote(note, secondHeroId, clickedheroId, selAb2, selAb1, allInvolvedAbilitiesResult, isReversedSynergy);
+                                        //recommendHtml += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
+                                recommendHtml += '</div>';
+                                recommendHtml += '<div class="coefForBalance">';
+                                    //recommendHtml += balanceCoef;
+                                recommendHtml += '</div>';
+                            recommendHtml += '</div>';                        
+                        }                        
                     recommendHtml += '</div>';
                 recommendHtml += '</div>';
 
@@ -1143,6 +1268,12 @@ function doRecountCounterPickBalance()
 //функция для заполнения инпута текстом пиков и банов
 function fillPickBanInput(friendPickElements, enemyPickElements, banPickElements) 
 {
+    // delete highlight from heroes if noone if pick/ban slots (fix 12900)
+    if(friendPickElements.length < 1 && enemyPickElements.length < 1 && banPickElements.length < 1)
+    {
+        $('img.highlight').remove();
+    }
+
     //текст для врагов
     var enemyPickText = '';
     var isCommaNeeded = false;
