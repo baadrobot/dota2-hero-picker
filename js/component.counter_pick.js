@@ -15,6 +15,7 @@ $(document).ready(function ()
     question += '</div>';
 
     window.balance = [];
+    window.involvedAbils = [];
     window.globalHeroAjaxRequests = 0;
 
 
@@ -850,6 +851,15 @@ function getAjaxBalanceForHeroId(draggedHeroId, recountNeedOrNot)
                 if (result.php_result == 'OK')
                 {
                     window.balance[draggedHeroId] = result;
+
+                    var curInvolvedAbils = result.all_involved_abilities_result;
+                    Object.keys(curInvolvedAbils).forEach(function (key)
+                    {
+                        console.log('k:'+key);
+                        console.log('v:'+ curInvolvedAbils[key]);
+                        window.involvedAbils[key] = curInvolvedAbils[key];
+                    });
+
                     window.globalHeroAjaxRequests--;
                     if(recountNeedOrNot == 1)
                     {
@@ -1079,7 +1089,19 @@ function doRecountCounterPickBalance()
                                             if (typeof alreadyAddedNotes[key] == 'undefined')
                                             {
                                                 alreadyAddedNotes[key] = 1;                                    
-                                                //redNotesCount++; // Kainax: что это?
+
+
+                                                // if (isReversedSynergy == 0)
+                                                // {
+                                                //     var selAb1 = resultForCurHero['hero_total_balance_result'][i]['selAb1'];
+                                                //     var selAb2 = resultForCurHero['hero_total_balance_result'][i]['selAb2'];
+                                                // } else {
+                                                //     var selAb1 = resultForCurHero['hero_total_balance_result'][i]['selAb1'];
+                                                //     var selAb2 = resultForCurHero['hero_total_balance_result'][i]['selAb2'];                                                    
+                                                // }
+
+                                                var selAb1 = resultForCurHero['hero_total_balance_result'][i]['selAb1'];
+                                                var selAb2 = resultForCurHero['hero_total_balance_result'][i]['selAb2'];
 
                                                 if (redOrGreen == 'green')
                                                 {
@@ -1089,7 +1111,9 @@ function doRecountCounterPickBalance()
                                                     recomHeroGreenNotes[greenNotesCount]['note'] = note;
                                                     recomHeroGreenNotes[greenNotesCount]['heroes'] = [];
                                                     recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
-                                                    recomHeroGreenNotes[greenNotesCount]['abils'] = [];
+                                                    recomHeroGreenNotes[greenNotesCount]['selAb1'] = selAb1;
+                                                    recomHeroGreenNotes[greenNotesCount]['selAb2'] = selAb2;
+                                                    
                                                     //recomHeroGreenNotes[greenNotesCount]['abils'].push(curEnemyHeroId);
                                                     if(setType == 1)
                                                     {
@@ -1097,8 +1121,6 @@ function doRecountCounterPickBalance()
                                                     } else {
                                                         recomHeroGreenNotes[greenNotesCount]['balCoef'] = Number(balanceCoef);
                                                     }
-
-                                                    // console.log(recomHeroGreenNotes);
                                                 } else {
                                                     // red
                                                     redNotesCount++;
@@ -1106,6 +1128,8 @@ function doRecountCounterPickBalance()
                                                     recomHeroRedNotes[redNotesCount]['note'] = note;
                                                     recomHeroRedNotes[redNotesCount]['heroes'] = [];
                                                     recomHeroRedNotes[redNotesCount]['heroes'].push(curEnemyHeroId);
+                                                    recomHeroRedNotes[redNotesCount]['selAb1'] = selAb1;
+                                                    recomHeroRedNotes[redNotesCount]['selAb2'] = selAb2;
                                                     if(setType == 1)
                                                     {
                                                         recomHeroRedNotes[redNotesCount]['balCoef'] = Number(balanceCoef) * -1;    
@@ -1157,6 +1181,10 @@ function doRecountCounterPickBalance()
                                                                             if (typeof alreadyAddedNotes[internalKey] == 'undefined')
                                                                             {
                                                                                 alreadyAddedNotes[internalKey] = 1;
+
+                                                                                var selAb1 = internalCycleResultForCurHero['hero_total_balance_result'][i2]['selAb1'];
+                                                                                var selAb2 = internalCycleResultForCurHero['hero_total_balance_result'][i2]['selAb2'];
+
                                                                                 if (redOrGreen == 'green')
                                                                                 {
                                                                                     // green
@@ -1166,7 +1194,13 @@ function doRecountCounterPickBalance()
                                                                                         recomHeroGreenNotes[greenNotesCount]['balCoef'] += Number(internalBalanceCoef) * -1;    
                                                                                     } else {
                                                                                         recomHeroGreenNotes[greenNotesCount]['balCoef'] += Number(internalBalanceCoef);
-                                                                                    }
+                                                                                    }  
+
+                                                                                    var selAbiOld = recomHeroGreenNotes[greenNotesCount]['selAb1'];
+                                                                                    recomHeroGreenNotes[greenNotesCount]['selAb1'] = uniteSpaceSeparatedTextByUniqueVal(selAbiOld, selAb1);
+
+                                                                                    var selAbiOld = recomHeroGreenNotes[greenNotesCount]['selAb2'];
+                                                                                    recomHeroGreenNotes[greenNotesCount]['selAb2'] = uniteSpaceSeparatedTextByUniqueVal(selAbiOld, selAb2);
                                                                                 } else {
                                                                                     // red
                                                                                     recomHeroRedNotes[redNotesCount]['heroes'].push(internalCycleEnemyHeroId);
@@ -1176,6 +1210,12 @@ function doRecountCounterPickBalance()
                                                                                     } else {
                                                                                         recomHeroRedNotes[redNotesCount]['balCoef'] += Number(internalBalanceCoef);
                                                                                     }
+
+                                                                                    var selAbiOld = recomHeroRedNotes[redNotesCount]['selAb1'];
+                                                                                    recomHeroRedNotes[redNotesCount]['selAb1'] = uniteSpaceSeparatedTextByUniqueVal(selAbiOld, selAb1);
+
+                                                                                    var selAbiOld = recomHeroRedNotes[redNotesCount]['selAb2'];
+                                                                                    recomHeroRedNotes[redNotesCount]['selAb2'] = uniteSpaceSeparatedTextByUniqueVal(selAbiOld, selAb2);
                                                                                 }
                                                                             }
                                                                         }
@@ -1195,23 +1235,21 @@ function doRecountCounterPickBalance()
                                                     balanceNoteTemplate = recomHeroGreenNotes[greenNotesCount]['note'];
                                                     counterHeroesArray = recomHeroGreenNotes[greenNotesCount]['heroes'];
                                                     secondHeroId = curRecomHeroId;
-                                                    selAb1 = '';
-                                                    selAb2 = '';
-                                                    allInvolvedAbilitiesResult = [];
+                                                    selAb1 = recomHeroGreenNotes[greenNotesCount]['selAb1'];
+                                                    selAb2 = recomHeroGreenNotes[greenNotesCount]['selAb2'];
                                                     //isReversedSynergy = 0;
 
-                                                    recomHeroGreenNotes[greenNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
+                                                    recomHeroGreenNotes[greenNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, isReversedSynergy);
                                                 } else {
                                                     // red
                                                     balanceNoteTemplate = recomHeroRedNotes[redNotesCount]['note'];
                                                     counterHeroesArray = recomHeroRedNotes[redNotesCount]['heroes'];
                                                     secondHeroId = curRecomHeroId;
-                                                    selAb1 = '';
-                                                    selAb2 = '';
-                                                    allInvolvedAbilitiesResult = [];
+                                                    selAb1 = recomHeroRedNotes[redNotesCount]['selAb1'];
+                                                    selAb2 = recomHeroRedNotes[redNotesCount]['selAb2'];
                                                     //isReversedSynergy = 0;
 
-                                                    recomHeroRedNotes[redNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
+                                                    recomHeroRedNotes[redNotesCount]['note'] = generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, isReversedSynergy);
                                                 }
                                             }
                                         }
@@ -1410,4 +1448,33 @@ function recognizeHeroesAndWriteToArray(commaSepStringofHeroes, tempArrayOfHeroe
         }
     }
     return tempArrayOfHeroes;
+}
+
+function uniteSpaceSeparatedTextByUniqueVal(oldString, newString)
+{
+    var resultText = oldString;
+    var selAbiNew = newString.split(' ');
+    var selAbiOld = oldString.split(' ');
+
+    for(var z = 0; z < selAbiNew.length; z++)
+    {
+        isFound = false;
+        for(var z2 = 0; z2 < selAbiOld.length; z2++)
+        {
+            if(selAbiNew[z] == selAbiOld[z2])
+            {
+                isFound = true;
+                break;
+            }
+        }
+        if (!isFound)
+        {
+            if (resultText != '')
+            {
+                resultText += ' ';
+            }                                                                                                
+            resultText += selAbiNew[z];
+        }
+    }
+    return resultText;
 }

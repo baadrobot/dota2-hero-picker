@@ -602,7 +602,7 @@ function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, sel
 }
 
 
-function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy)
+function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, isReversedSynergy)
 {
     if (isReversedSynergy == 1)
     {
@@ -625,7 +625,8 @@ function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, s
         } else {
             counterHeroesHTML += ', ';
         }
-        var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + counterHeroesArray[i] + '"]');
+        var heroId = counterHeroesArray[i];
+        var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + heroId + '"]');
         var firstHeroCodename = firstHeroOnPageEl.attr('data-hero-codename');
         var firstHeroNamelocal = firstHeroOnPageEl.attr('data-hero-namelocal');
 
@@ -650,7 +651,7 @@ function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, s
             firstHeroAbilitiesIcons += ' ';
         }
         var abilityId = selAb1[i];
-        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        var abilityCodename = window.involvedAbils[abilityId];
         firstHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
     }
 
@@ -662,7 +663,7 @@ function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, s
             secondHeroAbilitiesIcons += ' ';
         }
         var abilityId = selAb2[i];
-        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        var abilityCodename = window.involvedAbils[abilityId];
         secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
     }
 
