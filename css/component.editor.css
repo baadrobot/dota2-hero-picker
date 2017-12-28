@@ -418,3 +418,16 @@ line-height: 40px
 #editHeroPopup{
     min-height: 732px;
 }
+
+#itemsWrap {
+    margin-top: 15px;
+}
+
+.itemImgWrap {
+    display: inline-block;
+    margin: 0 3px;
+}
+
+.itemImgWrap > img{
+    border-radius: 3px;
+}

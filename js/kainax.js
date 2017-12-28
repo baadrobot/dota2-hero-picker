@@ -508,3 +508,178 @@ function kainaxPreloadImages(paramObj)
         });
     }
 }
+
+function getHeroIcon(heroName, heroNameLocal)
+{
+    var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
+    var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
+    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+    return heroImg;
+}
+
+function getAbilityIcon(abilityCodeName, abilityId)
+{
+    var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
+    var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
+    return abilityImg;
+}
+
+function getItemIcon(itemCodename, itemName)
+{
+    var tooltip = "<div class='tooltipWrap'>"+itemName+'</div>';
+    var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+itemCodename+'_lg.png';
+    var itemImg = '<img src="'+itemIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+    return itemImg;
+}
+
+function generateBalanceNote(balanceNoteTemplate, firstHeroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy)
+{
+    if (isReversedSynergy == 1)
+    {
+        // reverse {h1}{a1} and {h2}{a2} for this hero
+        balanceNoteTemplate = balanceNoteTemplate.replace(/{h1}/gi, '{temp_h1}')
+                                                 .replace(/{a1}/gi, '{temp_a1}')
+                                                 .replace(/{h2}/gi, '{h1}')
+                                                 .replace(/{a2}/gi, '{a1}')
+                                                 .replace(/{temp_h1}/gi, '{h2}')
+                                                 .replace(/{temp_a1}/gi, '{a2}');
+    }
+
+    var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + firstHeroId + '"]');
+    var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');
+
+    var firstHeroCodename = firstHeroOnPageEl.attr('data-hero-codename');
+    var secondHeroCodename = secondHeroOnPageEl.attr('data-hero-codename');
+
+    var firstHeroNamelocal = firstHeroOnPageEl.attr('data-hero-namelocal');
+    var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
+    var imgPath = secondHeroOnPageEl.find('img').attr('src');
+
+    var selAb1 = selAb1.split(' ');
+    var selAb2 = selAb2.split(' ');
+
+    firstHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb1.length; i++)
+    {
+        if (i != 0)
+        {
+            firstHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb1[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        firstHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    secondHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb2.length; i++)
+    {
+        if (i != 0)
+        {
+            secondHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb2[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    // fix 126723
+    var indexOfItemColon = balanceNoteTemplate.indexOf('{i:');
+    var indexOfBackItemCurlBrace = balanceNoteTemplate.indexOf('}', indexOfItemColon);
+    var itemAliasSingle = balanceNoteTemplate.slice(indexOfItemColon+3, indexOfBackItemCurlBrace).toLowerCase();
+    var itemAliasSingleWithBraces = ('{i:'+itemAliasSingle+'}').toLowerCase();
+    var itemAliasSingleRegExpObj = new RegExp(itemAliasSingleWithBraces,"gi");
+
+    if (typeof window.itemList[itemAliasSingle] != 'undefined')
+    {
+        balanceNoteTemplate = balanceNoteTemplate.replace(itemAliasSingleRegExpObj, getItemIcon(window.itemList[itemAliasSingle]['itemCodename'], window.itemList[itemAliasSingle]['itemName']));
+    }
+
+    return balanceNoteTemplate.replace(/{h1}/gi, getHeroIcon(firstHeroCodename, firstHeroNamelocal))
+                            .replace(/{a1}/gi, firstHeroAbilitiesIcons)
+                            .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
+                            .replace(/{a2}/gi, secondHeroAbilitiesIcons);
+                            // .replace(itemAliasSingleRegExpObj, getItemIcon(allItemsListArray[itemAliasSingle]['itemCodename'], allItemsListArray[itemAliasSingle]['itemName']));
+}
+
+
+function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy)
+{
+    if (isReversedSynergy == 1)
+    {
+        // reverse {h1}{a1} and {h2}{a2} for this hero
+        balanceNoteTemplate = balanceNoteTemplate.replace(/{h1}/gi, '{temp_h1}')
+                                                 .replace(/{a1}/gi, '{temp_a1}')
+                                                 .replace(/{h2}/gi, '{h1}')
+                                                 .replace(/{a2}/gi, '{a1}')
+                                                 .replace(/{temp_h1}/gi, '{h2}')
+                                                 .replace(/{temp_a1}/gi, '{a2}');
+    }
+
+    var counterHeroesHTML = '';
+    var isFirst = true;
+    for (var i = 0; i < counterHeroesArray.length; i++)
+    {
+        if (isFirst)
+        {
+            isFirst = false;
+        } else {
+            counterHeroesHTML += ', ';
+        }
+        var firstHeroOnPageEl = $('#heroListWrap [data-hero-id="' + counterHeroesArray[i] + '"]');
+        var firstHeroCodename = firstHeroOnPageEl.attr('data-hero-codename');
+        var firstHeroNamelocal = firstHeroOnPageEl.attr('data-hero-namelocal');
+
+        counterHeroesHTML += getHeroIcon(firstHeroCodename, firstHeroNamelocal);
+    }
+
+    var secondHeroOnPageEl = $('#heroListWrap [data-hero-id="' + secondHeroId + '"]');    
+    var secondHeroCodename = secondHeroOnPageEl.attr('data-hero-codename');
+    var secondHeroNamelocal = secondHeroOnPageEl.attr('data-hero-namelocal');
+
+
+    var imgPath = secondHeroOnPageEl.find('img.heroImgV').attr('src');
+
+    var selAb1 = selAb1.split(' ');
+    var selAb2 = selAb2.split(' ');
+
+    firstHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb1.length; i++)
+    {
+        if (i != 0)
+        {
+            firstHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb1[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        firstHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    secondHeroAbilitiesIcons = '';
+    for (var i = 0; i < selAb2.length; i++)
+    {
+        if (i != 0)
+        {
+            secondHeroAbilitiesIcons += ' ';
+        }
+        var abilityId = selAb2[i];
+        var abilityCodename = allInvolvedAbilitiesResult[abilityId];
+        secondHeroAbilitiesIcons += getAbilityIcon(abilityCodename, abilityId);
+    }
+
+    var indexOfItemColon = balanceNoteTemplate.indexOf('{i:');
+    var indexOfBackItemCurlBrace = balanceNoteTemplate.indexOf('}', indexOfItemColon);
+    var itemAliasSingle = balanceNoteTemplate.slice(indexOfItemColon+3, indexOfBackItemCurlBrace).toLowerCase();
+    var itemAliasSingleWithBraces = ('{i:'+itemAliasSingle+'}').toLowerCase();
+    var itemAliasSingleRegExpObj = new RegExp(itemAliasSingleWithBraces,"gi");
+
+    if (typeof window.itemList[itemAliasSingle] != 'undefined')
+    {
+        balanceNoteTemplate = balanceNoteTemplate.replace(itemAliasSingleRegExpObj, getItemIcon(window.itemList[itemAliasSingle]['itemCodename'], window.itemList[itemAliasSingle]['itemName']));
+    }
+
+    return balanceNoteTemplate.replace(/{h1}/gi, counterHeroesHTML)
+                            .replace(/{a1}/gi, firstHeroAbilitiesIcons)
+                            .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
+                            .replace(/{a2}/gi, secondHeroAbilitiesIcons);
+                            // .replace(itemAliasSingleRegExpObj, getItemIcon(allItemsListArray[itemAliasSingle]['itemCodename'], allItemsListArray[itemAliasSingle]['itemName']));
+}

@@ -174,7 +174,6 @@
                 ,'tag_value' => $tagValue
         ));
     }
-    // end of old
     elseif (($_POST['ajaxType'] == 'editorEditHeroTagDeleteHeroTag') && (isGotAccess(_ROLE_EDITOR)))
     {
         $query = 'DELETE FROM tb_dota2_heroTag_set
@@ -378,6 +377,17 @@
                                     'php_error_msg'=>'New tag has not been created! Error #k66km-77s-1p0sd-xcv7!'
             ));
         }
+    }
+    elseif (($_POST['ajaxType'] == 'editorGetItemList') && (isGotAccess(_ROLE_MASTER)))
+    {
+        $query = 'SELECT cf_d2ItemList_name as `itemName`, cf_d2ItemList_codename as `itemCodename`, cf_d2ItemList_alias_single as `itemAliasSingle`
+                    FROM tb_dota2_item_list;';
+
+        $itemList = $dbClass->select($query);
+
+        ajaxReturnAndExit(array('php_result' => 'OK',
+                                'item_list' => $itemList
+        ));
     }
     elseif (($_POST['ajaxType'] == 'masterGetAllIgnoredAbilities') && (isGotAccess(_ROLE_MASTER)))
     {
