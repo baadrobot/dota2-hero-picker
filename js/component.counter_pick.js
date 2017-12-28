@@ -1036,6 +1036,8 @@ function doRecountCounterPickBalance()
                                         if (curRecomHeroId == secondHeroId)
                                         {
                                             var balanceCoef = resultForCurHero['hero_total_balance_result'][i]['balCoef'];
+
+                                            // console.log(balanceCoef);
                                             var isReversedSynergy = resultForCurHero['hero_total_balance_result'][i]['isRvrs'];
 
                                             if ((setType == 1) && (balanceCoef <= 0))
@@ -1089,6 +1091,13 @@ function doRecountCounterPickBalance()
                                                     recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
                                                     recomHeroGreenNotes[greenNotesCount]['abils'] = [];
                                                     //recomHeroGreenNotes[greenNotesCount]['abils'].push(curEnemyHeroId);
+                                                    if(setType == 1)
+                                                    {
+                                                        recomHeroGreenNotes[greenNotesCount]['balCoef'] = Number(balanceCoef) * -1;    
+                                                    } else {
+                                                        recomHeroGreenNotes[greenNotesCount]['balCoef'] = Number(balanceCoef);
+                                                    }
+
                                                     // console.log(recomHeroGreenNotes);
                                                 } else {
                                                     // red
@@ -1097,6 +1106,12 @@ function doRecountCounterPickBalance()
                                                     recomHeroRedNotes[redNotesCount]['note'] = note;
                                                     recomHeroRedNotes[redNotesCount]['heroes'] = [];
                                                     recomHeroRedNotes[redNotesCount]['heroes'].push(curEnemyHeroId);
+                                                    if(setType == 1)
+                                                    {
+                                                        recomHeroRedNotes[redNotesCount]['balCoef'] = Number(balanceCoef) * -1;    
+                                                    } else {
+                                                        recomHeroRedNotes[redNotesCount]['balCoef'] = Number(balanceCoef);
+                                                    }
                                                 }
 
                                                 // проходим по оставшимся героям и определяем нет ли у них тоже такого Note
@@ -1145,10 +1160,22 @@ function doRecountCounterPickBalance()
                                                                                 if (redOrGreen == 'green')
                                                                                 {
                                                                                     // green
-                                                                                    recomHeroGreenNotes[greenNotesCount]['heroes'].push(internalCycleEnemyHeroId);                           
+                                                                                    recomHeroGreenNotes[greenNotesCount]['heroes'].push(internalCycleEnemyHeroId);
+                                                                                    if(setType == 1)
+                                                                                    {
+                                                                                        recomHeroGreenNotes[greenNotesCount]['balCoef'] += Number(internalBalanceCoef) * -1;    
+                                                                                    } else {
+                                                                                        recomHeroGreenNotes[greenNotesCount]['balCoef'] += Number(internalBalanceCoef);
+                                                                                    }
                                                                                 } else {
                                                                                     // red
                                                                                     recomHeroRedNotes[redNotesCount]['heroes'].push(internalCycleEnemyHeroId);
+                                                                                    if(setType == 1)
+                                                                                    {
+                                                                                        recomHeroRedNotes[redNotesCount]['balCoef'] += Number(internalBalanceCoef) * -1;    
+                                                                                    } else {
+                                                                                        recomHeroRedNotes[redNotesCount]['balCoef'] += Number(internalBalanceCoef);
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
@@ -1161,6 +1188,7 @@ function doRecountCounterPickBalance()
 
                                                 //recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
                                                 //recomHeroGreenNotes[greenNotesCount]['abils'] = [];
+                                                // console.log(balanceCoef);
                                                 if (redOrGreen == 'green')
                                                 {
                                                     // green
@@ -1193,6 +1221,7 @@ function doRecountCounterPickBalance()
                     }
                     recommendHtml += '<div class="heroNotesWrapForBalance" style="display:none">';
                         var colorClass = 'noticeGreen';
+                        // console.log(balanceCoef);
                         for (var i3 = 0; i3 < recomHeroGreenNotes.length; i3++)
                         {
                             var note = recomHeroGreenNotes[i3]['note'];
@@ -1207,8 +1236,9 @@ function doRecountCounterPickBalance()
                                         //recommendHtml += generateBalanceNote(note, secondHeroId, clickedheroId, selAb2, selAb1, allInvolvedAbilitiesResult, isReversedSynergy);
                                         //recommendHtml += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
                                 recommendHtml += '</div>';
+                                
                                 recommendHtml += '<div class="coefForBalance">';
-                                    //recommendHtml += balanceCoef;
+                                    recommendHtml += recomHeroGreenNotes[i3]['balCoef'];
                                 recommendHtml += '</div>';
                             recommendHtml += '</div>';                        
                         }
@@ -1229,7 +1259,7 @@ function doRecountCounterPickBalance()
                                         //recommendHtml += generateBalanceNote(note, clickedheroId, secondHeroId, selAb1, selAb2, allInvolvedAbilitiesResult, isReversedSynergy);
                                 recommendHtml += '</div>';
                                 recommendHtml += '<div class="coefForBalance">';
-                                    //recommendHtml += balanceCoef;
+                                    recommendHtml += recomHeroRedNotes[i3]['balCoef'];
                                 recommendHtml += '</div>';
                             recommendHtml += '</div>';                        
                         }                        
@@ -1253,6 +1283,15 @@ function doRecountCounterPickBalance()
             });
 
 
+            function sortTotalHeroCoefDESC(a, b) {
+                var contentA = Number($(a).find('.coefForBalance').text());
+                var contentB = Number($(b).find('.coefForBalance').text());
+                return contentA < contentB ? 1 : -1;
+            };
+            $('.heroNotesWrapForBalance').each(function(){
+                $(this).find('.noteForBalance').sort(sortTotalHeroCoefDESC).appendTo( $(this) );
+            });
+            
             // delete old highlighted from heroes
             $('img.highlight').remove();
             // подсветка рекомендованных героев
