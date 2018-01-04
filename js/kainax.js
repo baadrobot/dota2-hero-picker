@@ -119,13 +119,32 @@ function pleaseWaitClose()
     }
 }
 
-function addOnHoverTooltipsForAbilityImg(wrapIdEl)
+function addOnHoverTooltipsForAbilityImg(wrapIdEl, optionalArg)
 {
-    $(wrapIdEl).find('[data-ability-codename] > img')
-    .mouseenter(function ()
+    
+    var optionalArgIs = (typeof optionalArg === 'undefined') ? 'default' : optionalArg;
+    if(optionalArgIs == 'default')
     {
+        var abilityImg = $(wrapIdEl).find('[data-ability-codename] > img');
+        // console.log('if');
+    } else {
+        var abilityImg = $(wrapIdEl).find('.heroAbilityImg');
+        // console.log('else');
+    }
+    
+
+
+    // $(wrapIdEl).find('[data-ability-codename] > img')
+    abilityImg.mouseenter(function ()
+    {
+        // console.log('mouseenter');
         //var heroAbilityCodeName = $(this).attr('data-ability-codename');
-        var heroAbilityCodeName = $(this).parent().attr('data-ability-codename');
+        if(optionalArgIs != 'default')
+        {
+            var heroAbilityCodeName = $(this).attr('data-ability-codename');
+        } else {
+            var heroAbilityCodeName = $(this).parent().attr('data-ability-codename');
+        }
 
         var abilityTooltipEl = $('#abilityTooltip');
         if (typeof window.abilityData[heroAbilityCodeName] != 'undefined')
@@ -172,7 +191,14 @@ function addOnHoverTooltipsForAbilityImg(wrapIdEl)
             abilityTooltipEl.find('.abilityLore').html(window.abilityData[heroAbilityCodeName]['lore']);
             window.tooltipBox.html(abilityTooltipEl.html());
         } else {
-            var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
+            // var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
+            var heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename');
+            if(typeof heroCodenameLength == 'undefined')
+            {
+                heroCodenameLength = $(this).attr('data-ability-hero-codename').length;
+            } else {
+                heroCodenameLength = $(this).closest('[data-hero-codename]').attr('data-hero-codename').length;
+            }
 
             // cut from lone_druid_true_form_battle_cry hero namecode to leave: true_form_battle_cry
             var abilityNameFromAbilityCodeName = heroAbilityCodeName.substring(heroCodenameLength+1);
@@ -513,14 +539,23 @@ function getHeroIcon(heroName, heroNameLocal)
 {
     var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
     var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
-    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-inactive-tooltip="'+tooltip+'">';
+    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-hero-codename="'+heroName+'" data-inactive-tooltip="'+tooltip+'">';
     return heroImg;
 }
 
 function getAbilityIcon(abilityCodeName, abilityId)
 {
     var abilityIconUrl = 'http://cdn.dota2.com/apps/dota2/images/abilities/'+abilityCodeName+'_hp1.png?v=4238480';
-    var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" src="'+abilityIconUrl+'" height="18px">';
+    
+    // // var curAbilityHeroCodeName = abilityIconUrl.slice(49,-18);
+    // var abilityCodeNameIndexOfUnderscore = abilityCodeName.indexOf('_');
+    // var curAbilityHeroCodeName = abilityCodeName.slice(0,abilityCodeNameIndexOfUnderscore);
+
+    var curAbilityHeroCodeNameWithAbility = abilityIconUrl.slice(49,-18);
+    var abilityCodeNameIndexOfUnderscore = curAbilityHeroCodeNameWithAbility.indexOf('_');
+    var curAbilityHeroCodeName = curAbilityHeroCodeNameWithAbility.slice(0,abilityCodeNameIndexOfUnderscore);
+
+    var abilityImg = '<img class="heroAbilityImg" data-ability-id="'+abilityId+'" data-ability-codename="'+abilityCodeName+'" data-ability-hero-codename="'+curAbilityHeroCodeName+'" src="'+abilityIconUrl+'" height="18px">';
     return abilityImg;
 }
 
@@ -683,4 +718,36 @@ function generateMultiHeroBalanceNote(balanceNoteTemplate, counterHeroesArray, s
                             .replace(/{h2}/gi, getHeroIcon(secondHeroCodename, secondHeroNamelocal))
                             .replace(/{a2}/gi, secondHeroAbilitiesIcons);
                             // .replace(itemAliasSingleRegExpObj, getItemIcon(allItemsListArray[itemAliasSingle]['itemCodename'], allItemsListArray[itemAliasSingle]['itemName']));
+}
+
+function setCookie(name,value,days)
+{
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    } else {
+        var expires = "";
+    }
+    document.cookie = name+'='+value+expires+'; path=/';
+}
+
+function getCookie(name) {
+    var name = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+function deleteCookie(name)
+{
+    setCookie(name, null, -1);
 }

@@ -91,6 +91,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
 
         echo '<link rel="stylesheet" href="css/kainax.css">';
         echo '<script src="js/kainax.js"></script>';
+        // echo '<script src="js/carhartl-jquery-cookie-92b7715/jquery.cookie.js"></script>';
 
 
         if (isset($_GET['component']))
@@ -183,7 +184,11 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 // if problems with horisontal scroll in GB will apear, find "var gbHorizontalScrollsEl = jQuery('.horizontalScrollWrap');" in guidebook js
                 echo '<link rel="stylesheet" href="css/component.counter_pick.css" />';
                 echo '<script src="js/component.counter_pick.js"></script>';
-                // echo $externalData;
+                echo $externalData;
+                if(isGotAccess(_ROLE_EDITOR))
+                {
+                    echo '<script src="js/admin.counter_pick.js"></script>';
+                }
             }
         }
 

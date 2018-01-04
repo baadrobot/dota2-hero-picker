@@ -63,14 +63,13 @@
 
 .heroListImg img.highlight {
     width: 32px;
-    height: 37px;
-    margin: 2px;
+    height: 33px;
+    margin: 3px 2px 2px 0;
     position: absolute;
     -webkit-filter: grayscale(0%);
     filter: grayscale(0%);
-    margin-top: -1px;
-    margin-left: 0px;
     z-index: 10;
+    opacity: 0.8;
 }
 
 .heroListImg:hover:not(.pickedOrBaned) {
@@ -667,12 +666,41 @@ line-height: 40px
 }
 
 .matchedHeroesPopupListItem {
-    text-align: center;
+    max-width: 89px;
+    display: inline-block;
+    margin: 2px;
 }
 
 .matchedHeroesPopupListItem > img {
-    width: 200px;
-    margin-bottom: 5px;
+    width: 89px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.rating {
+    width: 85px;
+    height: 17px;
+    font-size: 0.9em;
+    margin-top: 10px;
+    margin-left: 5px;
+    float: right;
+}
+
+.unit-rating {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 85px;
+    height: 17px;
+    position: relative;
+    background: url(../images/rating.png) repeat-x;
+}
+
+.current-rating {
+    background: url(../images/rating.png) 0 -34px;
+    position: absolute;
+    height: 17px;
+    display: block;
+    text-indent: -9000px;
+    z-index: 1;
 }

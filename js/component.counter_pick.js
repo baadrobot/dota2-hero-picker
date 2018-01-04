@@ -170,10 +170,20 @@ $(document).ready(function ()
     });
 
 
-    
-    $('#fillHeroPickAndBanSlotsViaAliasSingleInput + span').on('click', function () 
+    $('#fillHeroPickAndBanSlotsViaAliasSingleInput').on('keypress', function(ev)
+    {
+        if(ev.keyCode == 13)
+        {
+            $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');
+        }
+    });
+
+
+    $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').on('click', function () 
     {
         var fillInputValue = $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val();
+
+        // console.log('okclick');
         
         // commaSepArray = '(E) Alchim, Axe, BS (B) Lina (F) Lion';
         //commaSepArray[0] = '';
@@ -720,8 +730,12 @@ function popupAndPicksFill()
             textForInput += '(F) ' + friendPickText;
         }
         
-        $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(textForInput);        
-
+        $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(textForInput);
+                
+        if (typeof addFillInputToCookie == 'function')
+        {
+            addFillInputToCookie(textForInput);
+        }
         // refresh fillPickBanInput
         // var friendPickElements = $('.friendPick.slot');
         // var enemyPickElements = $('.enemyPick.slot');
@@ -855,8 +869,8 @@ function getAjaxBalanceForHeroId(draggedHeroId, recountNeedOrNot)
                     var curInvolvedAbils = result.all_involved_abilities_result;
                     Object.keys(curInvolvedAbils).forEach(function (key)
                     {
-                        console.log('k:'+key);
-                        console.log('v:'+ curInvolvedAbils[key]);
+                        // console.log('k:'+key);
+                        // console.log('v:'+ curInvolvedAbils[key]);
                         window.involvedAbils[key] = curInvolvedAbils[key];
                     });
 
@@ -1013,6 +1027,11 @@ function doRecountCounterPickBalance()
                             recommendHtml += '<img src="' + heroImgPath + '" width="30px" height="auto">';
                         recommendHtml += '</div>';
                         recommendHtml += '<div class="heroNamelocalForBalance float-left align-middle">' + heroLocalName + '</div>';
+                        recommendHtml += '<div class="rating">';
+                            recommendHtml += '<ul class="unit-rating">';
+                            recommendHtml += '<li class="current-rating"></li>';
+                            recommendHtml += '</ul>';
+                        recommendHtml += '</div>';
                         recommendHtml += '<div class="heroTotalCoefForBalance ' + colorCoefColor + ' float-right align-middle">' + tempBalanceHeroValueTotalText + '</div>';
                     recommendHtml += '</div>';
                 
@@ -1138,6 +1157,7 @@ function doRecountCounterPickBalance()
                                                     }
                                                 }
 
+/*
                                                 // проходим по оставшимся героям и определяем нет ли у них тоже такого Note
                                                 internalCyclePickElements.each(function()
                                                 {
@@ -1225,6 +1245,7 @@ function doRecountCounterPickBalance()
                                                         });                                                                    
                                                     }
                                                 });
+*/
 
                                                 //recomHeroGreenNotes[greenNotesCount]['heroes'].push(curEnemyHeroId);
                                                 //recomHeroGreenNotes[greenNotesCount]['abils'] = [];
@@ -1339,6 +1360,9 @@ function doRecountCounterPickBalance()
                 $('.heroListImg[data-hero-id="'+curRecomHeroId+'"]').prepend('<img src="images/suggested_hero.png" class="highlight">');
             });
         }
+
+        addOnHoverTooltipsForAbilityImg($('.noteTextForBalance'), 'forSuggestions')
+        eXoActivateInactiveTooltips(); 
     }        
 }
 
@@ -1417,6 +1441,11 @@ function fillPickBanInput(friendPickElements, enemyPickElements, banPickElements
     }
 
     $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(textForInput);
+    
+    if (typeof addFillInputToCookie == 'function')
+    {
+        addFillInputToCookie(textForInput);
+    }
 }
 
 function pushToBottom(array, pos, newVal, heroIdArray, newHeroId)

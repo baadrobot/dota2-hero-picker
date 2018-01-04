@@ -78,7 +78,7 @@
 
                 echo '<div class="input-group smlGrp smlGrpWidth">';
                     echo '<input id="fillHeroPickAndBanSlotsViaAliasSingleInput" type="text" class="form-control" placeholder="(E) sk, wk, bm (B) doom, kotl (F) ss, sd, brew"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-telegram"></i></span>';
+                    echo '<span id="fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn" class="input-group-addon"><i class="fa fa-telegram"></i></span>';
                 echo '</div>';
                 
             echo '</div>';
