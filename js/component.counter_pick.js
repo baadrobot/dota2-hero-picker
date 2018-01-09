@@ -427,8 +427,17 @@ $(document).ready(function ()
         }
         popupAndPicksFill();
     });
-});
 
+    putHeroOnMinimap('radiant', 'easy', 'axe');
+    putHeroOnMinimap('radiant', 'easy', 'axe');
+    putHeroOnMinimap('radiant', 'jungle', 'slark');
+    putHeroOnMinimap('dire', 'jungle', 'slark');
+
+    // deleteHeroFromMinimap('axe');
+
+    $('#miniMapWrap [id^="dire"]').addClass('iconGlowGreen');
+    
+});
 // - end jQuery ready
 
 
@@ -461,8 +470,9 @@ function popupAndPicksFill()
 
         // вывод попапа с выбором героя
         var question = '';
-        question += '<div id="matchedHeroesListPopup">';
-        question += '<p>' + getPreStr_js('COUNTER_PICK', '_CLARIFY_HERO_') + window.conflictWordsArray[0] + '</p>';
+        question += '<div id="matchedHeroesListPopup" style="text-align:center">';
+        question += '<b>"' + window.conflictWordsArray[0] + '"?</b>';
+        question += '<p>' + getPreStr_js('COUNTER_PICK', '_CLARIFY_HERO_') + '</p>';
         for(var i = 0; i < tempMatchedHeroIdsArray.length; i++)
         {
             var curHeroEl = $('.heroListImg[data-hero-id="'+tempMatchedHeroIdsArray[i]+'"]');
@@ -1008,16 +1018,25 @@ function doRecountCounterPickBalance()
             {
                 var curRecomHeroId = tempBalanceHeroIdArray[j];
                 var curRecomHeroVal = tempBalanceHeroValueArray[j];
-                // fix78132
-                if(curRecomHeroVal == defaultEmptyVal) // if -9999
+
+                //if(curRecomHeroVal == defaultEmptyVal) // if -9999
+                if(curRecomHeroVal < 0)
                 {
                     continue;
                 }
+
+                // creating min/max vars for percent stars
+                var minScoreVal = curRecomHeroVal;                
+                if (j == 0)
+                {
+                    var maxScoreVal = curRecomHeroVal;
+                }
+
                 var recommendHtml = '';
                 var curHeroEl = $('#heroListWrap').find('[data-hero-id="'+curRecomHeroId+'"]');
                 var heroLocalName = curHeroEl.attr('data-hero-namelocal');
                 var heroImgPath = curHeroEl.find('img.heroImgV').attr('src');
-
+                                             
                 var colorCoefColor = curRecomHeroVal >= 0 ? 'noticeGreen' : 'noticeRed';
                 var tempBalanceHeroValueTotalText = curRecomHeroVal > 0 ? '+'+ curRecomHeroVal : curRecomHeroVal;
                 
@@ -1363,6 +1382,15 @@ function doRecountCounterPickBalance()
 
         addOnHoverTooltipsForAbilityImg($('.noteTextForBalance'), 'forSuggestions')
         eXoActivateInactiveTooltips(); 
+
+        var starOnePercentVal = maxScoreVal / 100;
+
+        $('.heroTotalCoefForBalance').each(function() {
+            var curVal = Number($(this).text());
+            var curStarPercent = curVal / starOnePercentVal;
+            $(this).siblings('.rating').find('.current-rating').css('width', curStarPercent+'%');
+        });
+        //minScoreVal
     }        
 }
 
@@ -1506,4 +1534,166 @@ function uniteSpaceSeparatedTextByUniqueVal(oldString, newString)
         }
     }
     return resultText;
+}
+
+function putHeroOnMinimap(side, lane, heroCodename)
+{
+    if(typeof side == 'undefined' || typeof lane == 'undefined' || heroCodename == 'undefined')
+    {
+        return false;
+    }
+
+    var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodename+'_icon.png?v=4299287';
+    if(side == 'radiant')
+    {
+        if(lane == 'easy')
+        {
+            if(typeof $('#radiantEasy1 > img').attr('src') == 'undefined')
+            {
+                $('#radiantEasy1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+                // console.log(123);
+            } 
+            else if(typeof $('#radiantEasy2 > img').attr('src') == 'undefined')
+            {
+                $('#radiantEasy2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#radiantEasy3 > img').attr('src') == 'undefined')
+            {
+                $('#radiantEasy3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        } 
+        else if(lane == 'mid')
+        {
+            if(typeof $('#radiantMid1 > img').attr('src') == 'undefined')
+            {
+                $('#radiantMid1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } 
+            else if(typeof $('#radiantMid2 > img').attr('src') == 'undefined')
+            {
+                $('#radiantMid2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#radiantMid3 > img').attr('src') == 'undefined')
+            {
+                $('#radiantMid3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'hard')
+        {
+            if(typeof $('#radiantHard1 > img').attr('src') == 'undefined')
+            {
+                $('#radiantHard1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } 
+            else if(typeof $('#radiantHard2 > img').attr('src') == 'undefined')
+            {
+                $('#radiantHard2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#radiantHard3 > img').attr('src') == 'undefined')
+            {
+                $('#radiantHard3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'jungle')
+        {
+            if(typeof $('#radiantJungle > img').attr('src') == 'undefined')
+            {
+                $('#radiantJungle > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'roam')
+        {
+            if(typeof $('#radiantRoam > img').attr('src') == 'undefined')
+            {
+                $('#radiantRoam > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+    } 
+    else if(side == 'dire')
+    {
+        if(lane == 'easy')
+        {
+            if(typeof $('#direEasy1 > img').attr('src') == 'undefined')
+            {
+                $('#direEasy1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } 
+            else if(typeof $('#direEasy2 > img').attr('src') == 'undefined')
+            {
+                $('#direEasy2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#direEasy3 > img').attr('src') == 'undefined')
+            {
+                $('#direEasy3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        } 
+        else if(lane == 'mid')
+        {
+            if(typeof $('#direMid1 > img').attr('src') == 'undefined')
+            {
+                $('#direMid1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } 
+            else if(typeof $('#direMid2 > img').attr('src') == 'undefined')
+            {
+                $('#direMid2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#direMid3 > img').attr('src') == 'undefined')
+            {
+                $('#direMid3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'hard')
+        {
+            if(typeof $('#direHard1 > img').attr('src') == 'undefined')
+            {
+                $('#direHard1 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } 
+            else if(typeof $('#direHard2 > img').attr('src') == 'undefined')
+            {
+                $('#direHard2 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            }
+            else if(typeof $('#direHard3 > img').attr('src') == 'undefined')
+            {
+                $('#direHard3 > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'jungle')
+        {
+            if(typeof $('#direJungle > img').attr('src') == 'undefined')
+            {
+                $('#direJungle > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+        else if(lane == 'roam')
+        {
+            if(typeof $('#direRoam > img').attr('src') == 'undefined')
+            {
+                $('#direRoam > img').attr({'src':curHeroIconUrl, 'data-hero-codename':heroCodename});
+            } else {
+                return false;
+            }
+        }
+    } else {
+        return false;
+    }
+}
+
+function deleteHeroFromMinimap(heroCodename)
+{
+    $('#miniMapWrap > div > img[data-hero-codename="'+heroCodename+'"').removeAttr('src data-hero-codename');
 }

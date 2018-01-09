@@ -102,7 +102,7 @@ $(document).ready(function ()
                         var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+result.item_list[i]['itemCodename']+'_lg.png';                        
 
                         itemsHtml += '<div class="itemImgWrap">';
-                            itemsHtml += '<img src="'+itemIconUrl+'" height="30px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
+                            itemsHtml += '<img src="'+itemIconUrl+'" height="27px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
                         itemsHtml += '</div>';
                     }
                     

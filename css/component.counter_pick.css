@@ -488,8 +488,9 @@ line-height: 40px
 }
 
 #pickedHeroWrap{
-    margin: 0 0 10px 0;
-    padding: 0 0 10px 0;
+    /* margin: 0 0 10px 0; */
+    /* padding: 0 0 10px 0; */
+    padding: 0 0 5px 0;
 }
 #pickedHeroWrap div{
     padding: 0;
@@ -697,10 +698,133 @@ line-height: 40px
 }
 
 .current-rating {
-    background: url(../images/rating.png) 0 -34px;
+    background: url(../images/rating.png) 0 17px;
     position: absolute;
     height: 17px;
     display: block;
     text-indent: -9000px;
     z-index: 1;
 }
+
+#mainContent {
+    height: 295px;
+}
+
+#miniMapWrap > img {
+    border: 1px solid black;
+}
+
+#miniMapWrap > div {
+    display: inline-block;
+    position: absolute;
+}
+
+/* Radiant */
+#radiantEasy1 {
+    top: 161px;
+    left: 160px;
+}
+
+#radiantEasy2 {
+    top: 161px;
+    left: 131px;
+}
+
+#radiantEasy3 {
+    top: 161px;
+    left: 101px;
+}
+
+#radiantMid1 {
+    left: 80px;
+    top: 98px;
+}
+
+#radiantMid2 {
+    left: 60px;
+    top: 118px;
+}
+
+#radiantMid3 {
+    left: 40px;
+    top: 138px;
+}
+
+#radiantHard1 {
+    top: 50px;
+}
+
+#radiantHard2 {
+    top: 77px;
+}
+
+#radiantHard3 {
+    top: 104px;
+}
+
+#radiantJungle {
+    left: 101px;
+    top: 133px;
+}
+
+#radiantRoam {
+    left: 59px;
+    top: 28px;
+}
+/* End of Radiant */
+
+/* Dire */
+#direEasy1 {
+    left: 29px;
+}
+
+#direEasy2 {
+    left: 59px;
+}
+
+#direEasy3 {
+    left: 89px;
+}
+
+#direMid1 {
+    left: 105px;
+    top: 75px;
+}
+
+#direMid2 {
+    left: 125px;
+    top: 55px;
+}
+
+#direMid3 {
+    left: 145px;
+    top: 35px;
+}
+
+#direHard1 {
+    left: 174px;
+    top: 120px;
+}
+
+#direHard2 {
+    left: 174px;
+    top: 93px;
+}
+
+#direHard3 {
+    left: 174px;
+    top: 66px;
+}
+
+#direJungle {
+    left: 89px;
+    top: 28px;
+}
+
+#direRoam {
+    left: 131px;
+    top: 133px;
+}
+
+/* End of Dire */
+

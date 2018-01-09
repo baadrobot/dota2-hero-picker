@@ -67,7 +67,7 @@
             echo '</div>';
         echo '</div>';
 
-        echo '<div class="row">';
+        echo '<div id="mainContent" class="row">';
 
             echo '<div id="heroListWrap" class="col-8">';
 
@@ -86,6 +86,70 @@
 // ----------------------------- Editor panel
             echo '<div id="heroCounterBalanceListWrap" class="col-4 scrollablePanelYAuto">';
             
+            echo '</div>';
+        echo '</div>';
+
+        echo '<div class="row">';
+            echo '<div class="col-3">';
+                echo '<div id="miniMapWrap">';
+                    // divs for radiant easy lane
+                    // echo '<div id="radiantEasy1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/mirana_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantEasy2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantEasy3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/sven_icon.png?v=4299287"></div>';
+                    echo '<div id="radiantEasy1"><img></div>';
+                    echo '<div id="radiantEasy2"><img></div>';
+                    echo '<div id="radiantEasy3"><img></div>';
+                    // divs for radiant mid lane
+                    // echo '<div id="radiantMid1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/axe_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantMid2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/lina_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantMid3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/centaur_icon.png?v=4299287"></div>';
+                    echo '<div id="radiantMid1"><img></div>';
+                    echo '<div id="radiantMid2"><img></div>';
+                    echo '<div id="radiantMid3"><img></div>';
+                    // divs for radiant hard lane
+                    // echo '<div id="radiantHard1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantHard2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/clinkz_icon.png?v=4299287"></div>';
+                    // echo '<div id="radiantHard3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/sniper_icon.png?v=4299287"></div>';
+                    echo '<div id="radiantHard1"><img></div>';
+                    echo '<div id="radiantHard2"><img></div>';
+                    echo '<div id="radiantHard3"><img></div>';
+                    // divs for radiant jungle
+                    // echo '<div id="radiantJungle"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/morphling_icon.png?v=4299287"></div>';
+                    echo '<div id="radiantJungle"><img></div>';
+                    // div for radiant roamer
+                    // echo '<div id="radiantRoam"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/pangolier_icon.png?v=4299287"></div>';
+                    echo '<div id="radiantRoam"><img ></div>';
+
+                    // divs for dire easy lane
+                    // echo '<div id="direEasy1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/spectre_icon.png?v=4299287"></div>';
+                    // echo '<div id="direEasy2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/weaver_icon.png?v=4299287"></div>';
+                    // echo '<div id="direEasy3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/ursa_icon.png?v=4299287"></div>';
+                    echo '<div id="direEasy1"><img ></div>';
+                    echo '<div id="direEasy2"><img ></div>';
+                    echo '<div id="direEasy3"><img ></div>';
+                    // divs for dire mid lane
+                    // echo '<div id="direMid1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/riki_icon.png?v=4299287"></div>';
+                    // echo '<div id="direMid2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/razor_icon.png?v=4299287"></div>';
+                    // echo '<div id="direMid3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/bane_icon.png?v=4299287"></div>';
+                    echo '<div id="direMid1"><img ></div>';
+                    echo '<div id="direMid2"><img ></div>';
+                    echo '<div id="direMid3"><img ></div>';
+                    // divs for dire hard lane
+                    // echo '<div id="direHard1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/oracle_icon.png?v=4299287"></div>';
+                    // echo '<div id="direHard2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/dazzle_icon.png?v=4299287"></div>';
+                    // echo '<div id="direHard3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/disruptor_icon.png?v=4299287"></div>';
+                    echo '<div id="direHard1"><img ></div>';
+                    echo '<div id="direHard2"><img ></div>';
+                    echo '<div id="direHard3"><img ></div>';
+                    // div for dire jungle
+                    // echo '<div id="direJungle"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/pugna_icon.png?v=4299287"></div>';
+                    echo '<div id="direJungle"><img ></div>';
+                    // div for dire roamer
+                    // echo '<div id="direRoam"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/lion_icon.png?v=4299287"></div>';
+                    echo '<div id="direRoam"><img ></div>';
+
+                    echo '<img src="images/mini-map.png">';
+                echo '</div>';
             echo '</div>';
         echo '</div>';
     //echo '</div>';
@@ -123,7 +187,7 @@ echo '<script>';
     echo 'window.LangPreStr["COUNTER_PICK"]["_BACK_"] = "Назад";';
 
     echo 'window.LangPreStr["COUNTER_PICK"]["_CHOOSE_HERO_"] = "Выбор героя";';
-    echo 'window.LangPreStr["COUNTER_PICK"]["_CLARIFY_HERO_"] = "Уточните какого героя Вы имелли в виду под словом - ";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_CLARIFY_HERO_"] = "Какого героя Вы подразумевали?";';
 
 
 echo '</script>';

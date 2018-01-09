@@ -431,3 +431,7 @@ line-height: 40px
 .itemImgWrap > img{
     border-radius: 3px;
 }
+
+.itemImgWrap > img:hover{
+    cursor: pointer;
+}
