@@ -36,3 +36,8 @@ function addFillInputToCookie(textForInput)
     // $.cookie('fillInputValue', textForInput, { expires: 1 });
     setCookie('fillInputValue', textForInput, 1)
 }
+
+function showRecommendationsValue()
+{
+    $('.heroTotalCoefForBalance').css('display','block');
+}

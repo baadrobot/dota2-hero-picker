@@ -22,13 +22,86 @@
         $itemListArray[$itemListResult[$i]['itemAliasSingle']] = array('itemCodename'=>$itemListResult[$i]['itemCodename'], 'itemName'=>$itemListResult[$i]['itemName']);
     }
 
+    $query = 'SELECT tb_d2laning_tactics_id as `tacticId`
+                    ,tb_d2laning_lane as `lane`
+                    ,tb_d2laning_role as `role`
+                FROM tb_dota2_laning;';
+
+    $strategies_array = $dbClass->select($query);
+
+    $query = 'SELECT cf_d2HeroTagSet_hero_id as `heroId`
+                    ,cf_d2HeroTagSet_tag_id as `tagId`
+                    ,cf_d2HeroTagSet_tag_val as `val`
+                FROM tb_dota2_heroTag_set 
+                WHERE cf_d2HeroTagSet_tag_id IN (32, 33, 34, 35, 36, 37, 38, 39, 40);';
+
+    $roles_array = $dbClass->select($query);
+
+    // 1
+    $roles['carry'] = [];
+    // 2
+    $roles['mider'] = [];
+    // 3
+    $roles['offlane_solo'] = [];
+    $roles['offlane_core'] = [];
+    // 4
+    $roles['mid_supp'] = [];
+    $roles['offlane_supp'] = [];
+    $roles['roamer'] = [];
+    $roles['jungler'] = [];
+    // 5
+    $roles['full_supp'] = [];
+
+    for($i = 0; $i < count($roles_array); $i++)
+    {
+        if ($roles_array[$i]['tagId'] == 32)
+        {
+            $roles['carry'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+            // $roles['carry'][] = array($roles_array[$i]['heroId'] => $roles_array[$i]['val']);
+        }
+        else if($roles_array[$i]['tagId'] == 33)
+        {
+            $roles['mider'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 34)
+        {
+            $roles['offlane_solo'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 35)
+        {
+            $roles['jungler'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 36)
+        {
+            $roles['roamer'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 37)
+        {
+            $roles['full_supp'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 38)
+        {
+            $roles['offlane_supp'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 39)
+        {
+            $roles['mid_supp'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+        else if($roles_array[$i]['tagId'] == 40)
+        {
+            $roles['offlane_core'][$roles_array[$i]['heroId']] = $roles_array[$i]['val'];
+        }
+    }
+
     echo '<script>';
         echo 'window.heroList = '.json_encode($hero_array).';';
         echo 'window.itemList = '.json_encode($itemListArray).';';
+        echo 'window.strategyList = '.json_encode($strategies_array).';';
+        echo 'window.roleList = '.json_encode($roles).';';
     echo '</script>';
 
 
-    //echo '<div class="container-fluid">';
+    
 
         echo '<div id="dragNdropInstructions" class="row">';
             echo '<div class="col-4">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ ПРОТИВНИКОВ</div>';
@@ -37,7 +110,7 @@
         echo '</div>';
 
         echo '<div id="pickedHeroWrap" class="row">';
-            echo '<div id="enemyPickList" class="col-4">';
+            echo '<div id="enemyPickList" class="col-4 radiant">';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="enemyPick emptySlot"><div class="plyrClr"></div></div>';
@@ -58,7 +131,7 @@
                 echo '<div id="gameMode" data-mode="ap">ALL PICK</div>';
             echo '</div>';
 
-            echo '<div id="friendPickList" class="col-4">';
+            echo '<div id="friendPickList" class="col-4 dire">';
                 echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
                 echo '<div class="friendPick emptySlot"><div class="plyrClr"></div></div>';
@@ -90,69 +163,70 @@
         echo '</div>';
 
         echo '<div class="row">';
-            echo '<div class="col-3">';
+            echo '<div class="col-2">';
                 echo '<div id="miniMapWrap">';
                     // divs for radiant easy lane
-                    // echo '<div id="radiantEasy1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/mirana_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantEasy2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantEasy3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/sven_icon.png?v=4299287"></div>';
-                    echo '<div id="radiantEasy1"><img></div>';
-                    echo '<div id="radiantEasy2"><img></div>';
-                    echo '<div id="radiantEasy3"><img></div>';
+                     echo '<div id="radiantEasy1" data-slot-role="1"></div>';
+                    echo '<div id="radiantEasy2" data-slot-role="5"></div>';
+                    echo '<div id="radiantEasy3" data-slot-role="4"></div>';
+
                     // divs for radiant mid lane
-                    // echo '<div id="radiantMid1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/axe_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantMid2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/lina_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantMid3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/centaur_icon.png?v=4299287"></div>';
-                    echo '<div id="radiantMid1"><img></div>';
-                    echo '<div id="radiantMid2"><img></div>';
-                    echo '<div id="radiantMid3"><img></div>';
+                     echo '<div id="radiantMid1" data-slot-role="2"></div>';
+                    echo '<div id="radiantMid2" data-slot-role="4"></div>';
+                    echo '<div id="radiantMid3" data-slot-role="5"></div>';
+
                     // divs for radiant hard lane
-                    // echo '<div id="radiantHard1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/kunkka_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantHard2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/clinkz_icon.png?v=4299287"></div>';
-                    // echo '<div id="radiantHard3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/sniper_icon.png?v=4299287"></div>';
-                    echo '<div id="radiantHard1"><img></div>';
-                    echo '<div id="radiantHard2"><img></div>';
-                    echo '<div id="radiantHard3"><img></div>';
+                     echo '<div id="radiantHard1" data-slot-role="3"></div>';
+                    echo '<div id="radiantHard2" data-slot-role="4"></div>';
+                    echo '<div id="radiantHard3" data-slot-role="5"></div>';
+
                     // divs for radiant jungle
-                    // echo '<div id="radiantJungle"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/morphling_icon.png?v=4299287"></div>';
-                    echo '<div id="radiantJungle"><img></div>';
+                    echo '<div id="radiantJungle" data-slot-role="4"></div>';
+
                     // div for radiant roamer
-                    // echo '<div id="radiantRoam"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/pangolier_icon.png?v=4299287"></div>';
-                    echo '<div id="radiantRoam"><img ></div>';
+                    echo '<div id="radiantRoam" data-slot-role="4"></div>';
 
                     // divs for dire easy lane
-                    // echo '<div id="direEasy1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/spectre_icon.png?v=4299287"></div>';
-                    // echo '<div id="direEasy2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/weaver_icon.png?v=4299287"></div>';
-                    // echo '<div id="direEasy3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/ursa_icon.png?v=4299287"></div>';
-                    echo '<div id="direEasy1"><img ></div>';
-                    echo '<div id="direEasy2"><img ></div>';
-                    echo '<div id="direEasy3"><img ></div>';
-                    // divs for dire mid lane
-                    // echo '<div id="direMid1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/riki_icon.png?v=4299287"></div>';
-                    // echo '<div id="direMid2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/razor_icon.png?v=4299287"></div>';
-                    // echo '<div id="direMid3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/bane_icon.png?v=4299287"></div>';
-                    echo '<div id="direMid1"><img ></div>';
-                    echo '<div id="direMid2"><img ></div>';
-                    echo '<div id="direMid3"><img ></div>';
-                    // divs for dire hard lane
-                    // echo '<div id="direHard1"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/oracle_icon.png?v=4299287"></div>';
-                    // echo '<div id="direHard2"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/dazzle_icon.png?v=4299287"></div>';
-                    // echo '<div id="direHard3"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/disruptor_icon.png?v=4299287"></div>';
-                    echo '<div id="direHard1"><img ></div>';
-                    echo '<div id="direHard2"><img ></div>';
-                    echo '<div id="direHard3"><img ></div>';
-                    // div for dire jungle
-                    // echo '<div id="direJungle"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/pugna_icon.png?v=4299287"></div>';
-                    echo '<div id="direJungle"><img ></div>';
-                    // div for dire roamer
-                    // echo '<div id="direRoam"><img src="http://cdn.dota2.com/apps/dota2/images/heroes/lion_icon.png?v=4299287"></div>';
-                    echo '<div id="direRoam"><img ></div>';
+                    echo '<div id="direEasy1" data-slot-role="1"></div>';
+                    echo '<div id="direEasy2" data-slot-role="5"></div>';
+                    echo '<div id="direEasy3" data-slot-role="4"></div>';
 
-                    echo '<img src="images/mini-map.png">';
+                    // divs for dire mid lane
+                    echo '<div id="direMid1" data-slot-role="2"></div>';
+                    echo '<div id="direMid2" data-slot-role="4"></div>';
+                    echo '<div id="direMid3" data-slot-role="5"></div>';
+
+                    // divs for dire hard lane
+                    
+                    echo '<div id="direHard1" data-slot-role="3"></div>';
+                    echo '<div id="direHard2" data-slot-role="4"></div>';
+                    echo '<div id="direHard3" data-slot-role="5"></div>';
+
+                    // div for dire jungle
+                    echo '<div id="direJungle" data-slot-role="4"></div>';
+
+                    // div for dire roamer
+                    echo '<div id="direRoam" data-slot-role="4"></div>';
+
+                    echo '<img src="images/mini-map-dire.png">';
+                echo '</div>';
+
+            echo '</div>';
+
+            echo '<div class="col-3">';
+                echo '<div id="uncertainDireHeroesWrap" class="align-top">';
+                    echo '<span>Dire: </span>';
+                    // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/lion_icon.png?v=4299287">';
+                echo '</div>';
+
+                echo '<div id="uncertainRadiantHeroesWrap" class="align-top">';
+                    echo '<span>Radiant: </span>';
+                    // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287">';
                 echo '</div>';
             echo '</div>';
+            
         echo '</div>';
-    //echo '</div>';
+        echo '<button id="swapSidesBtn">Swap sides</button>';
 
 
 require 'php/template_d2_hero_ability_tooltip.php';
