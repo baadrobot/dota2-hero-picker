@@ -47,17 +47,17 @@ $(document).ready(function ()
     buildHeroList('#heroListWrap');
 
     // drag'n'drop
+        // drag for hero list img
+        window.draggableEl;
         $('.heroListImg').draggable({
-             cursor: 'default'
+             cursor: 'pointer'
             ,helper: "clone"
             ,revert: 'invalid'
+            , zIndex: 200
             , drag: function (event, ui)
             {
-
-
                 var draggedHero = $(this);
-
-
+                window.draggableEl = $(this)
                 //var dragHeroId = draggedHero.attr('data-hero-id');
                 draggedHero.addClass('grayscale');
                 ui.helper.addClass('draggable');
@@ -72,14 +72,27 @@ $(document).ready(function ()
                 }
 
                 ui.helper.attr('data-dragged-from', 'fromHeroList');
+
+                // highlight free slots on map
+                $('#miniMapWrap > div[data-slot-role]').each(function(){
+                    if($(this).html() == '')
+                    {
+                        $(this).addClass('highlightSlot');
+                    }
+                });
             },
             stop: function (event, ui) {
                 var draggedHero = $(this);
                 draggedHero.removeClass('grayscale');
                 ui.helper.removeClass('draggable');
+
+                // remove highlight from free slots on map
+                $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
             }
         });
+        // end of drag for hero list img
 
+        // drop for empty slot
         $(".emptySlot").droppable({
             drop: function (event, ui)
             {
@@ -99,17 +112,18 @@ $(document).ready(function ()
                     if (ui.helper.attr('data-dragged-from') == 'fromPlaceHolder')
                     {
                         // ------- hero dragged from another slot - previous hero must be swapped with new one
-                        lockNewHeroInSlot($('.pickedHeroImgWrap[data-hero-id="' + draggedHeroId + '"]').parent(), prevSlotHeroId, 0);
-                        lockNewHeroInSlot(recieverEl, draggedHeroId, 0);
+                        lockNewHeroInSlot($('.pickedHeroImgWrap[data-hero-id="' + draggedHeroId + '"]').parent(), prevSlotHeroId, 0, 1);
+                        lockNewHeroInSlot(recieverEl, draggedHeroId, 0, 1);
                         $('.pickedHeroImgWrap[data-hero-id="' + prevSlotHeroId + '"]').parent().addClass('slot').removeClass('emptySlot');                
                     } else {
                         // ------- hero dragged in from hero list
                         releaseHeroInList(prevSlotHeroId);
+                        deleteHeroFromMinimap(prevSlotHeroId);
                         slotImgWrap.remove();
-                        lockNewHeroInSlot(recieverEl, draggedHeroId, 0);
+                        lockNewHeroInSlot(recieverEl, draggedHeroId, 0, 1);
                     }
                 } else {
-                    lockNewHeroInSlot(recieverEl, draggedHeroId, 0);
+                    lockNewHeroInSlot(recieverEl, draggedHeroId, 0, 1);
                 }
 
                 getAjaxBalanceForHeroId(draggedHeroId, 1);
@@ -138,6 +152,182 @@ $(document).ready(function ()
             $(this).find('.pickedHeroImgDelete').hide();
         });
     // end of drag'n'drop
+
+    // droppable for mini map slots
+    var recieverEl;
+    $("#miniMapWrap div[data-slot-role]").droppable({
+        drop: function (event, ui)
+        {
+            // recived in placeholder (not droped out for delete)
+            ui.helper.attr('data-is-recieved-or-droped-out', 1);
+
+            recieverEl = $(this);
+
+            var draggedHeroId = ui.helper.attr('data-hero-id');
+            var draggedHeroCodename = ui.helper.attr('data-hero-codename');
+
+            // check if slot is NOT empty
+            var lockedHero = recieverEl.find('img[data-hero-id]');
+            if (lockedHero.length)
+            {
+                // slot is NOT empty
+                var recieverElId = $(recieverEl).attr('id');
+                if(ui.helper.attr('data-dragged-from') == 'fromHeroList')
+                {
+                    //dragged from hero list
+
+                    // remove locked hero from map and pick slots
+                    var lockedHeroEl = recieverEl.find('img');
+                    var lockedHeroId = lockedHeroEl.attr('data-hero-id');
+                    removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
+                    releaseHeroInList(lockedHeroId);
+                    lockedHeroEl.remove();
+                    
+                    // add dragged hero
+                    // console.log(ui.helper);
+                    // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                    var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+
+                    $(recieverEl)
+                    .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+
+                    // make it like it picked
+                    // releaseHeroInList(prevSlotHeroId);
+                    // deleteHeroFromMinimap(heroId);
+                    // slotImgWrap.remove();
+                    if(recieverElId.indexOf('radiant') >= 0)
+                    {
+                        // radiant
+                        var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                    } else if(recieverElId.indexOf('dire') >= 0)
+                    {
+                        // dire
+                        var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                    }
+                    // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                    lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+
+                } else if(ui.helper.attr('data-dragged-from') == 'fromMiniMap') {
+                    // dragged from mini-map
+                    // console.log(ui.helper);
+                    var draggedElSlotId = ui.helper.attr('data-dragged-from-id');
+                    if( (recieverElId.indexOf('dire') >= 0 && draggedElSlotId.indexOf('radiant') >= 0) 
+                        || (recieverElId.indexOf('radiant') >= 0 && draggedElSlotId.indexOf('dire') >= 0) )
+                    {
+                        // heroes from different sides
+                        console.log('different teams');
+
+                        // get id of recieving el hero, only then swap
+                        var recievedElHeroId = recieverEl.find('img').attr('data-hero-id');
+
+                        var qweasdzc = $('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]').parent();
+                        var yhrbh = $('#pickedHeroWrap div[data-hero-id="'+recievedElHeroId+'"]').parent();
+
+
+                        // swap heroes on map
+                        window.draggableElParent.prepend(lockedHero);
+                        recieverEl.append(window.draggableEl);
+
+                        
+                        console.log(draggedHeroId);
+                        console.log(recievedElHeroId);
+
+                        
+                        
+                        // swap heroes in picks
+                        lockNewHeroInSlotForDroppableEmptySlot(qweasdzc, recievedElHeroId, 1, 0);
+                        lockNewHeroInSlotForDroppableEmptySlot(yhrbh, draggedHeroId, 1, 0);
+
+                        // // ------- hero dragged from another slot - previous hero must be swapped with new one
+                        // lockNewHeroInSlot($('.pickedHeroImgWrap[data-hero-id="' + draggedHeroId + '"]').parent(), prevSlotHeroId, 0, 1);
+                        // lockNewHeroInSlot(recieverEl, draggedHeroId, 0, 1);
+                        // $('.pickedHeroImgWrap[data-hero-id="' + prevSlotHeroId + '"]').parent().addClass('slot').removeClass('emptySlot');
+                    } else {
+                        window.draggableElParent.prepend(lockedHero);
+                        recieverEl.append(window.draggableEl);
+                    }
+                }
+            } else {
+                if(ui.helper.attr('data-dragged-from') == 'fromHeroList')
+                {
+                    // var draggedHeroId = window.draggableEl.attr('data-hero-id');
+                    // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                    var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+
+                    $(recieverEl)
+                    .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+
+                    // make it like it picked
+                    // releaseHeroInList(prevSlotHeroId);
+                    // deleteHeroFromMinimap(heroId);
+                    // slotImgWrap.remove();
+                    var recieverElId = $(recieverEl).attr('id');
+                    if(recieverElId.indexOf('radiant') >= 0)
+                    {
+                        // radiant
+                        var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                    } else if(recieverElId.indexOf('dire') >= 0)
+                    {
+                        // dire
+                        var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                    }
+                    // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                    lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                } else {
+                    // console.log(recieverEl.attr('id'));
+                    // console.log(window.draggableEl.parent().attr('id'));
+                    // console.log(window.draggableElParent.attr('id'));
+
+                    if( (recieverEl.attr('id').indexOf('dire') >= 0 && draggableElParent.attr('id').indexOf('radiant') >= 0) 
+                    || recieverEl.attr('id').indexOf('radiant') >= 0 && draggableElParent.attr('id').indexOf('dire') >= 0)
+                    {
+                        // moved to another team
+                        // console.log('moved to another team');
+                        recieverEl.append(window.draggableEl);
+                        if(recieverEl.attr('id').indexOf('dire') >= 0)
+                        {
+                            // hero was in radiant, moved to dire
+                            removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]'), 0);
+                            lockNewHeroInSlotForDroppableEmptySlot($('#pickedHeroWrap .dire > div.emptySlot:first'), draggedHeroId, 1, 0);
+                            // $('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]');
+                        } else {
+                            // hero was in dire, moved to radiant
+                            removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]'), 0);
+                            lockNewHeroInSlotForDroppableEmptySlot($('#pickedHeroWrap .radiant > div.emptySlot:first'), draggedHeroId, 1, 0);
+                        }
+                    } else {
+                        // stayed in same team
+                        recieverEl.append(window.draggableEl);
+                    }
+                }
+            }
+
+            getAjaxBalanceForHeroId(draggedHeroId, 1);
+
+
+            // refresh fillPickBanInput
+            // var friendPickElements = $('.friendPick.slot');
+            // var enemyPickElements = $('.enemyPick.slot');
+            // var banPickElements = $('.banPick.slot');
+            // fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);                                     
+        },
+        over: function(event, ui) {
+            ui.helper.addClass('highlightHoveredSlot');
+        },
+        out: function(event, ui) {
+            ui.helper.removeClass('highlightHoveredSlot');
+        }
+    });
+
+    // $('.emptySlot')
+    // .mouseenter(function()
+    // {
+    //     $(this).find('.pickedHeroImgDelete').show();
+    // })
+    // .mouseleave(function() {
+    //     $(this).find('.pickedHeroImgDelete').hide();
+    // });
+    // end of droppable for mini map slots
 
 
     // hero search
@@ -236,6 +426,7 @@ $(document).ready(function ()
             var curHeroIdInSlot = $(this).attr('data-hero-id');
             removeHeroFromSlot( $(this), 0 );
             releaseHeroInList(curHeroIdInSlot);
+            deleteHeroFromMinimap(heroId);
         });
 
         // создаем массив со словами, которые не совпали с alias-single
@@ -608,7 +799,7 @@ function popupAndPicksFill()
                     var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-hero-id');
                     var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
 
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                     getAjaxBalanceForHeroId(curHeroId, 1);
                 } else {
                     $('[data-hero-aliases]').each(function ()
@@ -624,7 +815,7 @@ function popupAndPicksFill()
                             var curHeroId = ($(this).attr('data-hero-id'));
                             var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                             getAjaxBalanceForHeroId(curHeroId, 1);
                         }
                     });
@@ -642,7 +833,7 @@ function popupAndPicksFill()
                     var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-hero-id');
                     var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
 
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                     getAjaxBalanceForHeroId(curHeroId, 1);
                 } else {
                     $('[data-hero-aliases]').each(function ()
@@ -658,7 +849,7 @@ function popupAndPicksFill()
                             var curHeroId = ($(this).attr('data-hero-id'));
                             var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                             getAjaxBalanceForHeroId(curHeroId, 1);
                         }
                     });
@@ -676,7 +867,7 @@ function popupAndPicksFill()
                     var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-hero-id');
                     var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
 
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                     getAjaxBalanceForHeroId(curHeroId, 1);
                 } else {
                     $('[data-hero-aliases]').each(function ()
@@ -692,7 +883,7 @@ function popupAndPicksFill()
                             var curHeroId = ($(this).attr('data-hero-id'));
                             var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0);
+                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
                             getAjaxBalanceForHeroId(curHeroId, 1);
                         }
                     });
@@ -812,22 +1003,24 @@ function removeHeroFromSlot(slotItemEl, recountNeedOrNot)
     
     //remove hero from mini-map and uncertain heroes list
     var heroId = slotItemEl.attr('data-hero-id');
-    deleteHeroFromMinimap(heroId);
-    deleteHeroFromUncertainList(heroId);
+    // deleteHeroFromMinimap(heroId);
+    // deleteHeroFromUncertainList(heroId);
 }
 
 function releaseHeroInList(heroId)
 {
     $('.heroListImg[data-hero-id="' + heroId + '"]')
     .removeClass('pickedOrBaned')
-    .find('.redLine').remove();           
+    .find('.redLine').remove();  
+    // deleteHeroFromMinimap(heroId);
 }
 
-function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot)
+function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot, needAddHeroToTheMap)
 {
     // clear all old elements
     removeHeroFromSlot( $('.pickedHeroImgWrap[data-hero-id="' + heroId + '"]'), recountNeedOrNot);
     releaseHeroInList(heroId);
+    deleteHeroFromMinimap(heroId);
 
     slotEl.removeClass('emptySlot').addClass('slot');
     var heroListEl = $('.heroListImg[data-hero-id="' + heroId + '"]');
@@ -872,13 +1065,14 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot)
             var draggedHero = $(this);
             ui.helper.attr('data-is-recieved-or-droped-out', 0);
             ui.helper.attr('data-dragged-from', 'fromPlaceHolder');
+            $('#miniMapWrap img[data-hero-id="'+draggedHero.attr('data-hero-id')+'"').remove();
         },
         stop: function (event, ui) {
             if (ui.helper.attr('data-is-recieved-or-droped-out') == 0) {
                 var dragedFromSlotEl = $(this);
-                // fix 2389
                 removeHeroFromSlot(dragedFromSlotEl, recountNeedOrNot = 1);
                 releaseHeroInList(dragedFromSlotEl.attr('data-hero-id'));
+                deleteHeroFromMinimap(heroId);
             }
         }
     });
@@ -891,23 +1085,221 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot)
         var imgWrapToRemoveEl = $(this).parent();
         removeHeroFromSlot(imgWrapToRemoveEl, 1);
         releaseHeroInList(deletedHeroId);
+        deleteHeroFromMinimap(heroId);
     });
 
     // appending uncertain heroes into #uncertainDireHeroesWrap
     // console.log(draggedHeroCodename);
-    if(slotEl.parent().hasClass('dire'))
+    if(needAddHeroToTheMap == 1)
     {
-        // friends
-        var pickedHeroSide = 'dire';
-        $('#uncertainDireHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
-        heroMapAutoShuffle('dire');
-    } else if(slotEl.parent().hasClass('radiant')) {
-        // enemy
-        var pickedHeroSide = 'radiant';
-        $('#uncertainRadiantHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
-        heroMapAutoShuffle('radiant');
+        if(slotEl.parent().hasClass('dire'))
+        {
+            // friends
+            // $('#uncertainDireHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
+            // heroMapAutoShuffle('dire');
+            addHeroToTheMap('dire', heroId, draggedHeroCodename);   
+        } else if(slotEl.parent().hasClass('radiant')) {
+            // enemy
+            // $('#uncertainRadiantHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
+            // heroMapAutoShuffle('radiant');
+            addHeroToTheMap('radiant', heroId, draggedHeroCodename);
+        }
     }
+    
+
+    //drag n drop for mini-map icons
+    // drag'n'drop
+    $('#miniMapWrap img[data-hero-id]').draggable({
+        cursor: 'default'
+        ,helper: "clone"
+        ,revert: 'invalid'
+        // , zIndex: 99999999
+        , drag: function (event, ui)
+        {
+            var draggedHero = $(this);
+            window.draggableEl = $(this);
+            window.draggableElParent = $(this).parent();
+
+            //var dragHeroId = draggedHero.attr('data-hero-id');
+            draggedHero.addClass('grayscale');
+            // ui.helper.addClass('draggable');
+        },
+        start: function (e, ui)
+        {
+            var draggedHero = $(this);
+            // if (draggedHero.hasClass('pickedOrBaned'))
+            // {
+            //     //This will prevent moving the element from it's position
+            //     e.preventDefault();
+            // }
+
+            ui.helper.attr('data-dragged-from', 'fromMiniMap');
+            ui.helper.attr('data-dragged-from-id', draggedHero.parent().attr('id'));
+
+            // highlight free slots on map
+            $('#miniMapWrap > div[data-slot-role]').each(function(){
+                if($(this).html() == '')
+                {
+                    $(this).addClass('highlightSlot');
+                }
+            });
+        },
+        stop: function (event, ui) {
+            var draggedHero = $(this);
+            draggedHero.removeClass('grayscale');
+            // ui.helper.removeClass('draggable');
+
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+        }
+    });
+    // end of drag'n'drop for mini map
 }
+
+// for Nurax and droppable for empty slot
+function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot, needAddHeroToTheMap)
+{
+    // clear all old elements
+    removeHeroFromSlot( $('.pickedHeroImgWrap[data-hero-id="' + heroId + '"]'), recountNeedOrNot);
+    releaseHeroInList(heroId);
+    // deleteHeroFromMinimap(heroId);
+
+    slotEl.removeClass('emptySlot').addClass('slot');
+    var heroListEl = $('.heroListImg[data-hero-id="' + heroId + '"]');
+    var draggedHeroCodename = heroListEl.attr('data-hero-codename');
+    var draggedHeroAliasSingle = heroListEl.attr('data-alias-single');
+
+    heroListEl.addClass('pickedOrBaned');
+
+    // cross out hero (if ban)
+    if (slotEl.hasClass('banPick'))
+    {
+        // do not add another if already has one
+        if (heroListEl.find('.redLine').length == 0) {
+            // cross out
+            heroListEl.prepend('<img src="images/redline.png" class="redLine">');
+        }
+    } else {
+        heroListEl.find('.redLine').remove();
+    }
+
+    // create new img_wrap and img
+    slotEl.prepend('<div class="pickedHeroImgWrap" data-hero-id="' + heroId + '" data-hero-codename="' + draggedHeroCodename + '" data-alias-single="'+draggedHeroAliasSingle+'"><span class="pickedHeroImgDelete fa fa-times"></span><img data-img-src="//cdn.dota2.com/apps/dota2/images/heroes/' + draggedHeroCodename + '_hphover.png?v=4238480"></div>');
+    
+    // preload new img
+    kainaxPreloadImages({
+        wrapElement: slotEl.find('.pickedHeroImgWrap')
+        , gifNameOrFalse: 'spinner.gif'
+        //, gifNameOrFalse: 'eco-ajax-loader-01.gif'
+        , opacity: 0.6
+        , loaderIntH: 10
+        , loaderIntW: 10
+        //, missingPicOrFalse: false
+    });
+
+    slotEl.find('.pickedHeroImgWrap').draggable({
+        cursor: 'default'
+        , helper: "clone"
+        , zIndex: 200
+        //,revert: 'invalid'
+        ,
+        start: function (e, ui) {
+            var draggedHero = $(this);
+            ui.helper.attr('data-is-recieved-or-droped-out', 0);
+            ui.helper.attr('data-dragged-from', 'fromPlaceHolder');
+            $('#miniMapWrap img[data-hero-id="'+draggedHero.attr('data-hero-id')+'"').remove();
+        },
+        stop: function (event, ui) {
+            if (ui.helper.attr('data-is-recieved-or-droped-out') == 0) {
+                var dragedFromSlotEl = $(this);
+                removeHeroFromSlot(dragedFromSlotEl, recountNeedOrNot = 1);
+                releaseHeroInList(dragedFromSlotEl.attr('data-hero-id'));
+                deleteHeroFromMinimap(heroId);
+            }
+        }
+    });
+
+    // cross button (remove pick/ban)
+    slotEl.find('.pickedHeroImgDelete').on('mousedown', function ()
+    {
+        // console.log($(this).parent().attr('data-hero-id'));
+        var deletedHeroId = $(this).parent().attr('data-hero-id');
+        var imgWrapToRemoveEl = $(this).parent();
+        removeHeroFromSlot(imgWrapToRemoveEl, 1);
+        releaseHeroInList(deletedHeroId);
+        deleteHeroFromMinimap(heroId);
+    });
+
+    // appending uncertain heroes into #uncertainDireHeroesWrap
+    // console.log(draggedHeroCodename);
+    if(needAddHeroToTheMap == 1)
+    {
+        if(slotEl.parent().hasClass('dire'))
+        {
+            // friends
+            // $('#uncertainDireHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
+            // heroMapAutoShuffle('dire');
+            addHeroToTheMap('dire', heroId, draggedHeroCodename);   
+        } else if(slotEl.parent().hasClass('radiant')) {
+            // enemy
+            // $('#uncertainRadiantHeroesWrap').append('<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287" data-hero-id="'+heroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(heroId)+'" width="28px">');
+            // heroMapAutoShuffle('radiant');
+            addHeroToTheMap('radiant', heroId, draggedHeroCodename);
+        }
+    }
+    
+
+    //drag n drop for mini-map icons
+    // drag'n'drop
+    $('#miniMapWrap img[data-hero-id]').draggable({
+        cursor: 'default'
+        ,helper: "clone"
+        ,revert: 'invalid'
+        // , zIndex: 99999999
+        , drag: function (event, ui)
+        {
+            var draggedHero = $(this);
+            window.draggableEl = $(this);
+            window.draggableElParent = $(this).parent();
+
+            //var dragHeroId = draggedHero.attr('data-hero-id');
+            draggedHero.addClass('grayscale');
+            // ui.helper.addClass('draggable');
+        },
+        start: function (e, ui)
+        {
+            var draggedHero = $(this);
+            // if (draggedHero.hasClass('pickedOrBaned'))
+            // {
+            //     //This will prevent moving the element from it's position
+            //     e.preventDefault();
+            // }
+
+            ui.helper.attr('data-dragged-from', 'fromMiniMap');
+            ui.helper.attr('data-dragged-from-id', draggedHero.parent().attr('id'));
+
+            // highlight free slots on map
+            $('#miniMapWrap > div[data-slot-role]').each(function(){
+                if($(this).html() == '')
+                {
+                    $(this).addClass('highlightSlot');
+                }
+            });
+        },
+        stop: function (event, ui) {
+            var draggedHero = $(this);
+            draggedHero.removeClass('grayscale');
+            // ui.helper.removeClass('draggable');
+
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+        }
+    });
+    // end of drag'n'drop for mini map
+}
+// for Nurax
+
+
 
 function getAjaxBalanceForHeroId(draggedHeroId, recountNeedOrNot)
 {
@@ -1096,6 +1488,7 @@ function doRecountCounterPickBalance()
                 var colorCoefColor = curRecomHeroVal >= 0 ? 'noticeGreen' : 'noticeRed';
                 var tempBalanceHeroValueTotalText = curRecomHeroVal > 0 ? '+'+ curRecomHeroVal : curRecomHeroVal;
                 
+
                 recommendHtml += '<div class="finalBalaceItem">';
                     recommendHtml += '<div class="heroInfoWrapForBalance clearFix">';
                         recommendHtml += '<div class="heroImgWrapForBalance float-left align-middle" data-hero-id="'+curRecomHeroId+'">';
@@ -1108,8 +1501,10 @@ function doRecountCounterPickBalance()
                             recommendHtml += '</ul>';
                         recommendHtml += '</div>';
                         recommendHtml += '<div class="heroTotalCoefForBalance ' + colorCoefColor + ' float-right align-middle">' + tempBalanceHeroValueTotalText + '</div>';
+                        recommendHtml += '<div class="heroRolesForBalance">As pos: '+getHeroRolesNamesByHeroIdAsHtml(curRecomHeroId)+'</div>';
                     recommendHtml += '</div>';
-                
+                    // console.log(getHeroRolesByHeroId(curRecomHeroId));
+                    // console.log(getHeroRolesNamesByHeroIdAsHtml(curRecomHeroId));
                     var alreadyAddedNotes = [];
                     var recomHeroRedNotes = [];
                     var recomHeroGreenNotes = [];
@@ -1404,6 +1799,44 @@ function doRecountCounterPickBalance()
                 jQuery('#heroCounterBalanceListWrap').append(recommendHtml);
             }
 
+            // creating radios for sorting
+            var balanceSortHtml = '';
+            balanceSortHtml += '<div id="balanceSortWrap">';
+                    // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
+                    // echo '<input id="sortByRole" type="radio" name="balanceSort">';
+                    
+                balanceSortHtml += '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
+
+                    balanceSortHtml += '<label class="btn btn-info btn-sm active">';
+                        balanceSortHtml += '<input type="radio" name="sortBalance" id="sortByRating" autocomplete="off" checked> sortByRating';
+                    balanceSortHtml += '</label>';
+
+                    balanceSortHtml += '<label class="btn btn-info btn-sm">';
+                        balanceSortHtml += '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off"> sortByRole';
+                    balanceSortHtml += '</label>';
+
+                balanceSortHtml += '</div>';
+
+            balanceSortHtml += '</div>';
+            jQuery('#heroCounterBalanceListWrap').prepend(balanceSortHtml);
+
+            // making radios work
+            // if( $('#sortByRating:checked') )
+            // {
+            //     $('.heroNotesWrapForBalance').each(function(){
+            //         $(this).find('.noteForBalance').sort(sortTotalHeroCoefDESC).appendTo( $(this) );
+            //     });
+            // } else if( $('#sortByRole:checked') ) {
+            //     function sortTotalHeroCoefDESC(a, b) {
+            //         var contentA = Number($(a).find('.coefForBalance').text());
+            //         var contentB = Number($(b).find('.coefForBalance').text());
+            //         return contentA < contentB ? 1 : -1;
+            //     };
+            //     $('.heroRolesForBalance > span[data-hero-role]:not(.lineThrough)').each(function(){
+            //         $(this).find('.finalBalaceItem').sort(sortTotalHeroCoefDESC).appendTo( $(this) );
+            //     });
+            // }
+
             // click on recommended hero
             $('.heroInfoWrapForBalance').on('click', function()
             {
@@ -1453,7 +1886,45 @@ function doRecountCounterPickBalance()
         {
             showRecommendationsValue();
         }
-    }        
+
+        // line through all friend locked roles
+        lineThroughLockedRoles();
+
+        // draggable for recommend heroes
+        $('.heroImgWrapForBalance').draggable({
+            cursor: 'pointer'
+            ,helper: "clone"
+            ,revert: 'invalid'
+            ,appendTo: 'body'
+            
+            , zIndex: 9999
+            , drag: function (event, ui)
+            {
+                var draggedHero = $(this);
+
+                //var dragHeroId = draggedHero.attr('data-hero-id');
+                draggedHero.addClass('grayscale');
+                ui.helper.addClass('draggable');
+            },
+            start: function (e, ui)
+            {
+                var draggedHero = $(this);
+                // if (draggedHero.hasClass('pickedOrBaned'))
+                // {
+                //     //This will prevent moving the element from it's position
+                //     e.preventDefault();
+                // }
+
+                ui.helper.attr('data-dragged-from', 'fromRecommendList');
+            },
+            stop: function (event, ui) {
+                var draggedHero = $(this);
+                draggedHero.removeClass('grayscale');
+                ui.helper.removeClass('draggable');
+            }
+        });
+        // end of draggable for recommend heroes
+    }
 }
 
 //функция для заполнения инпута текстом пиков и банов
@@ -2016,6 +2487,52 @@ function getHeroRolesByHeroId(heroId)
     return heroRolesValues;
 }
 
+function getHeroRolesNamesByHeroIdAsHtml(heroId)
+{
+    // carry/mider/hardlaner/semi-supp/supp
+    var allHeroRoles = getHeroRolesByHeroId(heroId);
+    var heroNamesRolesHtml = '';
+    var arrayIsAlreadyAdded = [];
+    for (var i = 5; i > 0; i--)
+    {
+        if((allHeroRoles.charAt(0) > 0)
+        && (allHeroRoles.charAt(0) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="1"> Carry</span>';
+        }
+        if((allHeroRoles.charAt(1) > 0)
+        && (allHeroRoles.charAt(1) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="2"> Mider</span>';
+        }
+        if(((allHeroRoles.charAt(2) > 0 || allHeroRoles.charAt(3) > 0))
+        &&((allHeroRoles.charAt(2) == i) || (allHeroRoles.charAt(3) == i)))
+        {
+            if (typeof arrayIsAlreadyAdded[3] == 'undefined')
+            {
+                arrayIsAlreadyAdded[3] = 1;
+                heroNamesRolesHtml += '<span data-hero-role="3"> Hardlaner</span>';
+            }
+        }
+        if((allHeroRoles.charAt(4) > 0 || allHeroRoles.charAt(5) > 0 || allHeroRoles.charAt(6) > 0 || allHeroRoles.charAt(7) > 0)
+        &&((allHeroRoles.charAt(4) == i) || (allHeroRoles.charAt(5) == i)) || (allHeroRoles.charAt(6) == i) || (allHeroRoles.charAt(7) == i))
+        {
+            if (typeof arrayIsAlreadyAdded[4] == 'undefined')
+            {
+                arrayIsAlreadyAdded[4] = 1;
+                heroNamesRolesHtml += '<span data-hero-role="4"> Semi-support</span>';
+            }
+        }
+        if((allHeroRoles.charAt(8) > 0)
+        && (allHeroRoles.charAt(8) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="5"> Support</span>';
+        }
+    }
+
+    return heroNamesRolesHtml;
+}
+
 function getAllHeroesByRole(role)
 {
     return window.roleList[role];
@@ -2032,171 +2549,180 @@ function getRoleValueByHeroIdAndRole(heroId, role)
     return curHeroRoleValue;
 }
 
-function heroMapAutoShuffle(side)
-{
-    var isNeedFunctionRepeat = false;
+// function heroMapAutoShuffle(side)
+// {
+//     var isNeedFunctionRepeat = false;
 
-    if(side == 'dire')
-    {
-        var uncertainHereosEl = $('#uncertainDireHeroesWrap > img');
-    } else if(side == 'radiant') {
-        var uncertainHereosEl = $('#uncertainRadiantHeroesWrap > img');
-    }
+//     if(side == 'dire')
+//     {
+//         var uncertainHereosEl = $('#uncertainDireHeroesWrap > img');
+//     } else if(side == 'radiant') {
+//         var uncertainHereosEl = $('#uncertainRadiantHeroesWrap > img');
+//     }
 
-    // making roles values data-attribute copies for each uncertain hero
-    uncertainHereosEl.each(function () {
-        var curHeroRolesValues = $(this).attr('data-roles-values');
-        $(this).attr('data-heroes-values-copy', curHeroRolesValues);
-    });
+//     // making roles values data-attribute copies for each uncertain hero
+//     uncertainHereosEl.each(function () {
+//         var curHeroRolesValues = $(this).attr('data-roles-values');
+//         $(this).attr('data-heroes-values-copy', curHeroRolesValues);
+//     });
 
-    // changing all locked roles from roles values to 0 in data-heroes-values-copy
-    $('#miniMapWrap [id^="'+side+'"] img[data-hero-role]').each(function() 
-    {
-        var curSlotRoleOnMap = $(this).attr('data-hero-role');
-        uncertainHereosEl.each(function() 
-        {
-            var curUncertainHeroRolesValuesCopy = $(this).attr('data-heroes-values-copy');
-            // console.log(curUncertainHeroRolesValuesCopy);
-            if(curSlotRoleOnMap == 1 || curSlotRoleOnMap == 2)
-            {
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, curSlotRoleOnMap-1, '0');
-            }
-            else if (curSlotRoleOnMap == 5)
-            {
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 8, '0');
-            }
-            else if(curSlotRoleOnMap == 3)
-            {
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 2, '0');
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 3, '0');
-            } else if(curSlotRoleOnMap == 4)
-            {
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 4, '0');
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 5, '0');
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 6, '0');
-                curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 7, '0');
-            }
+//     // changing all locked roles from roles values to 0 in data-heroes-values-copy
+//     $('#miniMapWrap [id^="'+side+'"] img[data-hero-role]').each(function() 
+//     {
+//         var curSlotRoleOnMap = $(this).attr('data-hero-role');
+//         uncertainHereosEl.each(function() 
+//         {
+//             var curUncertainHeroRolesValuesCopy = $(this).attr('data-heroes-values-copy');
+//             // console.log(curUncertainHeroRolesValuesCopy);
+//             if(curSlotRoleOnMap == 1 || curSlotRoleOnMap == 2)
+//             {
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, curSlotRoleOnMap-1, '0');
+//             }
+//             else if (curSlotRoleOnMap == 5)
+//             {
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 8, '0');
+//             }
+//             else if(curSlotRoleOnMap == 3)
+//             {
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 2, '0');
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 3, '0');
+//             } else if(curSlotRoleOnMap == 4)
+//             {
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 4, '0');
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 5, '0');
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 6, '0');
+//                 curUncertainHeroRolesValuesCopy = replaceAt(curUncertainHeroRolesValuesCopy, 7, '0');
+//             }
             
-            // console.log(curUncertainHeroRolesValuesCopy);
+//             // console.log(curUncertainHeroRolesValuesCopy);
 
-            $(this).attr('data-heroes-values-copy', curUncertainHeroRolesValuesCopy);
-        });
-    });
+//             $(this).attr('data-heroes-values-copy', curUncertainHeroRolesValuesCopy);
+//         });
+//     });
 
-    // checking if there is hero left with only 1 role, if yes put him to the map
-    uncertainHereosEl.each(function()
-    {
-        var curUncertainHeroRolesValuesCopyForCheck = $(this).attr('data-heroes-values-copy');
-        var curUncertainHeroCodename = $(this).attr('data-hero-codename');
+//     // checking if there is hero left with only 1 role, if yes put him to the map
+//     uncertainHereosEl.each(function()
+//     {
+//         var curUncertainHeroRolesValuesCopyForCheck = $(this).attr('data-heroes-values-copy');
+//         var curUncertainHeroCodename = $(this).attr('data-hero-codename');
 
-        var goToRole = false;
-        var goTolane = '';
-        var lastRoleValue = [];
-        var curHeroRolesLeft = 0;
-
-
-        if (curUncertainHeroRolesValuesCopyForCheck.charAt(0) > 0)
-        {
-            curHeroRolesLeft++;
-            goToRole = 1;
-            goTolane = 'easy';
-        }
-        if (curUncertainHeroRolesValuesCopyForCheck.charAt(1) > 0)
-        {
-            curHeroRolesLeft++;
-            goToRole = 2;
-            goTolane = 'mid';
-        }
-        if ((curUncertainHeroRolesValuesCopyForCheck.charAt(2) > 0)     // solo offlane
-         || (curUncertainHeroRolesValuesCopyForCheck.charAt(3) > 0))    // core offlane
-        {
-            curHeroRolesLeft++;
-            goToRole = 3;
-            goTolane = 'hard';
-            // isCanSoloHard = 1
-
-            var roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(2);
-            if (curUncertainHeroRolesValuesCopyForCheck.charAt(3) > roleVal)
-            {
-                // isCanSoloHard = 0;
-            }
-        }
-        if (   (curUncertainHeroRolesValuesCopyForCheck.charAt(4) > 0)  // mid support
-            || (curUncertainHeroRolesValuesCopyForCheck.charAt(5) > 0)  // offlane support
-            || (curUncertainHeroRolesValuesCopyForCheck.charAt(6) > 0)  // roamer
-            || (curUncertainHeroRolesValuesCopyForCheck.charAt(7) > 0)) // jungler
-        {
-            curHeroRolesLeft++;
-            goToRole = 4;
-            goTolane = 'mid';
-            var roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(4);
+//         var goToRole = false;
+//         var goTolane = '';
+//         var lastRoleValue = [];
+//         var curHeroRolesLeft = 0;
 
 
-            if (curUncertainHeroRolesValuesCopyForCheck.charAt(5) > roleVal)
-            {
-                goTolane = 'hard';
-                roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(5);
-            }
-            if (curUncertainHeroRolesValuesCopyForCheck.charAt(6) > roleVal)
-            {
-                goTolane = 'roam';
-                roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(6);
-            }
-            if (curUncertainHeroRolesValuesCopyForCheck.charAt(7) > roleVal)
-            {
-                goTolane = 'jungle';
-                roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(7);
-            }            
-        }
-        if (curUncertainHeroRolesValuesCopyForCheck.charAt(8) > 0)      // full support
-        {
-            curHeroRolesLeft++;
-            goTolane = 'easy';
-            goToRole = 5;
-        }
+//         if (curUncertainHeroRolesValuesCopyForCheck.charAt(0) > 0)
+//         {
+//             curHeroRolesLeft++;
+//             goToRole = 1;
+//             goTolane = 'easy';
+//         }
+//         if (curUncertainHeroRolesValuesCopyForCheck.charAt(1) > 0)
+//         {
+//             curHeroRolesLeft++;
+//             goToRole = 2;
+//             goTolane = 'mid';
+//         }
+//         if ((curUncertainHeroRolesValuesCopyForCheck.charAt(2) > 0)     // solo offlane
+//          || (curUncertainHeroRolesValuesCopyForCheck.charAt(3) > 0))    // core offlane
+//         {
+//             curHeroRolesLeft++;
+//             goToRole = 3;
+//             goTolane = 'hard';
+//             // isCanSoloHard = 1
 
-        // if only 1 role value left in copy
-        if(curHeroRolesLeft == 1)
-        {
-            // put hero on minimap
-            putHeroOnMinimap(side, goTolane, goToRole, curUncertainHeroCodename)
+//             var roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(2);
+//             if (curUncertainHeroRolesValuesCopyForCheck.charAt(3) > roleVal)
+//             {
+//                 // isCanSoloHard = 0;
+//             }
+//         }
+//         if (   (curUncertainHeroRolesValuesCopyForCheck.charAt(4) > 0)  // mid support
+//             || (curUncertainHeroRolesValuesCopyForCheck.charAt(5) > 0)  // offlane support
+//             || (curUncertainHeroRolesValuesCopyForCheck.charAt(6) > 0)  // roamer
+//             || (curUncertainHeroRolesValuesCopyForCheck.charAt(7) > 0)) // jungler
+//         {
+//             curHeroRolesLeft++;
+//             goToRole = 4;
+//             goTolane = 'mid';
+//             var roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(4);
+
+
+//             if (curUncertainHeroRolesValuesCopyForCheck.charAt(5) > roleVal)
+//             {
+//                 goTolane = 'hard';
+//                 roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(5);
+//             }
+//             if (curUncertainHeroRolesValuesCopyForCheck.charAt(6) > roleVal)
+//             {
+//                 goTolane = 'roam';
+//                 roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(6);
+//             }
+//             if (curUncertainHeroRolesValuesCopyForCheck.charAt(7) > roleVal)
+//             {
+//                 goTolane = 'jungle';
+//                 roleVal = curUncertainHeroRolesValuesCopyForCheck.charAt(7);
+//             }            
+//         }
+//         if (curUncertainHeroRolesValuesCopyForCheck.charAt(8) > 0)      // full support
+//         {
+//             curHeroRolesLeft++;
+//             goTolane = 'easy';
+//             goToRole = 5;
+//         }
+
+//         // if only 1 role value left in copy
+//         if(curHeroRolesLeft == 1)
+//         {
+//             // put hero on minimap
+//             putHeroOnMinimap(side, goTolane, goToRole, curUncertainHeroCodename)
             
-            // remove hero from uncertain list
-            $(this).remove();
+//             // remove hero from uncertain list
+//             $(this).remove();
 
-            isNeedFunctionRepeat = true;
-        }
-    });
+//             isNeedFunctionRepeat = true;
+//         }
+//     });
 
-    if (isNeedFunctionRepeat == true)
-    {
-        heroMapAutoShuffle(side);
-    }
+//     if (isNeedFunctionRepeat == true)
+//     {
+//         heroMapAutoShuffle(side);
+//     }
 
-}
+// }
 
 function replaceAt(string, index, replace) 
 {
     return string.substring(0, index) + replace + string.substring(index + 1);
 }
 
-function deleteHeroFromUncertainList(heroId)
-{
-    $('#uncertainDireHeroesWrap > img[data-hero-id="'+heroId+'"]').remove();
-    $('#uncertainRadiantHeroesWrap > img[data-hero-id="'+heroId+'"]').remove();    
-}
+// function deleteHeroFromUncertainList(heroId)
+// {
+//     $('#uncertainDireHeroesWrap > img[data-hero-id="'+heroId+'"]').remove();
+//     $('#uncertainRadiantHeroesWrap > img[data-hero-id="'+heroId+'"]').remove();    
+// }
 
 function swapSides()
 {
     // change side title
-    var friendTitle = $('#dragNdropInstructions div:first');
-    var enemyTitile = $('#dragNdropInstructions div:last');
+    var friendTitle = $('#dragNdropInstructions div:last');
+    var enemyTitle = $('#dragNdropInstructions div:first');
+
+    if(friendTitle.hasClass('sideTitleGlowGreen') && enemyTitle.hasClass('sideTitleGlowRed'))
+    {
+        friendTitle.removeClass('sideTitleGlowGreen').addClass('sideTitleGlowRed');
+        enemyTitle.removeClass('sideTitleGlowRed').addClass('sideTitleGlowGreen');
+    } else if(friendTitle.hasClass('sideTitleGlowRed') && enemyTitle.hasClass('sideTitleGlowGreen')) {
+        friendTitle.removeClass('sideTitleGlowRed').addClass('sideTitleGlowGreen');
+        enemyTitle.removeClass('sideTitleGlowGreen').addClass('sideTitleGlowRed');
+    }
 
     var friendTitleText = friendTitle.text();
-    var enemyTitileText = enemyTitile.text();
+    var enemyTitleText = enemyTitle.text();
 
-    friendTitle.text(enemyTitileText);
-    enemyTitile.text(friendTitleText);
+    friendTitle.text(enemyTitleText);
+    enemyTitle.text(friendTitleText);
 
 
     // change slots with heroes
@@ -2220,12 +2746,12 @@ function swapSides()
     }
 
     // change uncertain heroes
-    var direUncertainHeroes = $('#uncertainDireHeroesWrap');
-    var radiantUncertainHeroes = $('#uncertainRadiantHeroesWrap');
-    var direUncertainHeroesHtml = $('#uncertainDireHeroesWrap').html();
-    var radiantUncertainHeroesHtml = $('#uncertainRadiantHeroesWrap').html();
-    direUncertainHeroes.html(radiantUncertainHeroesHtml);
-    radiantUncertainHeroes.html(direUncertainHeroesHtml);
+    // var direUncertainHeroes = $('#uncertainDireHeroesWrap');
+    // var radiantUncertainHeroes = $('#uncertainRadiantHeroesWrap');
+    // var direUncertainHeroesHtml = $('#uncertainDireHeroesWrap').html();
+    // var radiantUncertainHeroesHtml = $('#uncertainRadiantHeroesWrap').html();
+    // direUncertainHeroes.html(radiantUncertainHeroesHtml);
+    // radiantUncertainHeroes.html(direUncertainHeroesHtml);
 
     // change icons on mini-map
     // for #radiantEasy1 and #direEasy1
@@ -2315,4 +2841,188 @@ function swapSides()
     var direRoamHtml = direRoamEl.html();
     radiantRoamEl.html(direRoamHtml);
     direRoamEl.html(radiantRoamHtml);
+}
+
+function addHeroToTheMap(side, heroId, heroCodename)
+{
+    if(typeof side == 'undefined' || typeof heroId == 'undefined' || heroCodename == 'undefined')
+    {
+        console.log('undefined');
+        return false;
+    }
+
+    if(side == 'dire')
+    {
+        var slotIdAttrBeginWith = 'dire';
+    } 
+    else if(side == 'radiant') {
+        var slotIdAttrBeginWith = 'radiant';
+    } else {
+        return false;
+    }
+
+    
+    var roleslist = getHeroRolesByHeroId(heroId);
+    var orderedRolesArray = [];
+    for (var iVal=5; iVal>0; iVal--)
+    {
+      for (var i=0; i < roleslist.length; i++)
+      {
+        if (roleslist.charAt(i) == iVal)
+        {
+          orderedRolesArray['r'+ (i+1)] = iVal;
+        }
+      }
+    }
+    // console.log(orderedRolesArray);
+    var isAddedOnMap;
+    Object.keys(orderedRolesArray).some(function (key)
+    {
+        // console.log(orderedRolesArray[key]);
+        isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, key, heroId, heroCodename);
+        return isAddedOnMap; //break
+    });
+    
+    // console.log(isAddedOnMap + ' + true');
+    if (!isAddedOnMap)
+    {
+        // console.log(isAddedOnMap + ' + false');
+        // e)...
+        // или Эмиль ошибся случайно и надо делать f)...
+        // то пытаться добавлять так: хард 4, роам, изи 4, мид 4, хард кор
+        tryToAddHeroToTheMapSomwhere(slotIdAttrBeginWith, heroId, heroCodename)
+    }
+}
+
+function tryToAddHeroToTheMap(sideTry, slotRole, heroIdTry, heroCodenameTry)
+{
+    var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameTry+'_icon.png?v=4299287" data-hero-id="'+heroIdTry+'" data-hero-codename="'+heroCodenameTry+'" data-roles-values="'+getHeroRolesByHeroId(heroIdTry)+'" width="28px">';
+    if(slotRole == 'r1')
+    {
+        var sidePlusLane = sideTry+'Easy1';
+    } 
+    else if (slotRole == 'r2')
+    {
+        var sidePlusLane = sideTry+'Mid1';
+    }
+    else if (slotRole == 'r3')
+    {
+        var sidePlusLane = sideTry+'Hard1';
+    }
+    else if (slotRole == 'r4')
+    {
+        var sidePlusLane = sideTry+'Hard1';
+    }
+    else if (slotRole == 'r5')
+    {
+        var sidePlusLane = sideTry+'Mid2';
+    }
+    else if (slotRole == 'r6')
+    {
+        var sidePlusLane = sideTry+'Hard2';
+    }
+    else if (slotRole == 'r7')
+    {
+        var sidePlusLane = sideTry+'Roam';
+    }
+    else if (slotRole == 'r8')
+    {
+        var sidePlusLane = sideTry+'Jungle';
+    }
+    else if (slotRole == 'r9')
+    {
+        var sidePlusLane = sideTry+'Easy2';
+    }
+    
+    if($('#miniMapWrap > div[id="'+sidePlusLane+'"]').html() == '')
+    {
+        // если слот пустой то добавить героя и вернуть true
+        $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function tryToAddHeroToTheMapSomwhere(sideTry, heroIdTry, heroCodenameTry)
+{
+    var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameTry+'_icon.png?v=4299287" data-hero-id="'+heroIdTry+'" data-hero-codename="'+heroCodenameTry+'" data-roles-values="'+getHeroRolesByHeroId(heroIdTry)+'" width="28px">';
+    var whereToAppend;
+
+    if($('#miniMapWrap > div[id="'+sideTry+'Hard2"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Hard2"]');
+    }
+    else if($('#miniMapWrap > div[id="'+sideTry+'Roam"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Roam"]');
+    }
+    else if($('#miniMapWrap > div[id="'+sideTry+'Easy3"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Easy3"]');
+    }
+    else if($('#miniMapWrap > div[id="'+sideTry+'Mid2"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Mid2"]');
+    } 
+    else if($('#miniMapWrap > div[id="'+sideTry+'Hard1"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Hard1"]');
+    }
+    else if($('#miniMapWrap > div[id="'+sideTry+'Easy1"]').html() == '')
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Easy1"]');
+    } else {
+        return false;
+    }
+
+    whereToAppend.append(iconHtml);
+}
+
+function lineThroughLockedRoles()
+{
+    if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+    {
+        var friendTeam = 'dire';
+    } else if($('#miniMapImg').attr('src') == 'images/mini-map-radiant.png')
+    {
+        var friendTeam = 'radiant';
+    }
+
+    // remove all old lineThrough classes
+    $('.heroRolesForBalance > .lineThrough').removeClass('lineThrough');
+    
+    // add new lineThrough classes
+    var allFriendTeamSlots = $('#miniMapWrap > div[id^="'+friendTeam+'"]');
+    allFriendTeamSlots.each(function() {
+        if( $(this).html() != '') // do not remove
+        {
+            var curLockedRole = $(this).attr('data-slot-role');
+            $('.heroRolesForBalance > span[data-hero-role="'+curLockedRole+'"]').addClass('lineThrough');
+            // console.log(curLockedRole);
+            // console.log($('.heroRolesForBalance > span[data-hero-role="'+curLockedRole+'"]'));
+        }
+    });
+
+    if ($('#balanceSortWrap label.active').length)
+    {
+        $('.heroRolesForBalance').each(function() {
+            $(this).attr('data-has-good-role', '0');
+
+            $(this).find('span:not(.lineThrough)').each(function()
+            {
+                $(this).parent().attr('data-has-good-role', '1');
+            });
+        });
+
+        // kainax
+        function sortByAvailableRole(a, b) {
+            var contentA = Number($(a).find('.heroRolesForBalance').attr('data-has-good-role'));
+            var contentB = Number($(b).find('.heroRolesForBalance').attr('data-has-good-role'));
+            return contentA < contentB ? 1 : -1;
+        };    
+        $('#heroCounterBalanceListWrap').each(function(){
+            $(this).find('.finalBalaceItem').sort(sortByAvailableRole).appendTo( $(this) );
+        });
+    }
 }

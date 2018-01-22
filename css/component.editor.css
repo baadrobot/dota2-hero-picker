@@ -426,6 +426,7 @@ line-height: 40px
 .itemImgWrap {
     display: inline-block;
     margin: 0 3px;
+    width: 33px;
 }
 
 .itemImgWrap > img{
@@ -434,4 +435,16 @@ line-height: 40px
 
 .itemImgWrap > img:hover{
     cursor: pointer;
+}
+
+#editAccordion1 {
+    max-height: 450px;
+    overflow: auto;
+    width: 365px;
+}
+
+#editAccordion2 {
+    max-height: 450px;
+    overflow: auto;
+    width: 365px;
 }

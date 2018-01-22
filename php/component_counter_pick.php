@@ -104,9 +104,9 @@
     
 
         echo '<div id="dragNdropInstructions" class="row">';
-            echo '<div class="col-4">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ ПРОТИВНИКОВ</div>';
+            echo '<div class="col-4 colorWhite sideTitleGlowRed">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ ПРОТИВНИКОВ</div>';
             echo '<div class="col-3">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ БАНЫ</div>';
-            echo '<div class="col-4">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ СОЮЗНИКОВ</div>';
+            echo '<div class="col-4 colorWhite sideTitleGlowGreen">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ СОЮЗНИКОВ</div>';
         echo '</div>';
 
         echo '<div id="pickedHeroWrap" class="row">';
@@ -208,22 +208,22 @@
                     // div for dire roamer
                     echo '<div id="direRoam" data-slot-role="4"></div>';
 
-                    echo '<img src="images/mini-map-dire.png">';
+                    echo '<img id="miniMapImg" src="images/mini-map-dire.png">';
                 echo '</div>';
 
             echo '</div>';
 
-            echo '<div class="col-3">';
-                echo '<div id="uncertainDireHeroesWrap" class="align-top">';
-                    echo '<span>Dire: </span>';
-                    // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/lion_icon.png?v=4299287">';
-                echo '</div>';
+            // echo '<div class="col-3">';
+            //     echo '<div id="uncertainDireHeroesWrap" class="align-top">';
+            //         echo '<span>Dire: </span>';
+            //         // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/lion_icon.png?v=4299287">';
+            //     echo '</div>';
 
-                echo '<div id="uncertainRadiantHeroesWrap" class="align-top">';
-                    echo '<span>Radiant: </span>';
-                    // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287">';
-                echo '</div>';
-            echo '</div>';
+            //     echo '<div id="uncertainRadiantHeroesWrap" class="align-top">';
+            //         echo '<span>Radiant: </span>';
+            //         // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287">';
+            //     echo '</div>';
+            // echo '</div>';
             
         echo '</div>';
         echo '<button id="swapSidesBtn">Swap sides</button>';
