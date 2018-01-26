@@ -66,8 +66,8 @@
     height: 33px;
     margin: 3px 2px 2px 0;
     position: absolute;
-    -webkit-filter: grayscale(0%);
-    filter: grayscale(0%);
+    /* -webkit-filter: grayscale(0%);
+    filter: grayscale(0%); */
     z-index: 10;
     opacity: 0.8;
 }
@@ -376,7 +376,7 @@ line-height: 40px
 
 
 .heroInfoWrapForBalance {
-    width: 350px;
+    width: 345px;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
@@ -851,16 +851,21 @@ line-height: 40px
 
 /* End of Dire */
 
+#heroCounterBalanceListWrap {
+    overflow: hidden;
+}
+
+
 #balanceSortWrap {
-    text-align: center;
+    /* text-align: center; */
 }
 
-#balanceSortWrap label:hover {
+#balanceSortWrap label {
+    margin-left: 10px;
+}
+
+#balanceSortWrap label:hover, #balanceSortWrap input:hover {
     cursor: pointer
-}
-
-#balanceSortWrap label.active {
-    box-shadow: none;
 }
 
 .highlightSlot {
@@ -887,4 +892,25 @@ line-height: 40px
     display: inline-block;
     float: left;
     margin-left: 8px;
+    font-size: 11px;
+}
+
+.heroRolesForBalance > span[data-hero-role] {
+    margin-left: 4px;
+}
+
+.highlightFilter {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {  
+    1% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
 }

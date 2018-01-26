@@ -157,8 +157,25 @@
             echo '</div>';
 
 // ----------------------------- Editor panel
-            echo '<div id="heroCounterBalanceListWrap" class="col-4 scrollablePanelYAuto">';
-            
+            echo '<div id="heroCounterBalanceListWrap" class="col-4">';
+
+                echo '<div id="balanceSortWrap" style="display:none">';
+                    // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
+                    // echo '<input id="sortByRole" type="radio" name="balanceSort">';     
+                    // echo '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
+                        echo '<label>';
+                            echo '<input type="radio" name="sortBalance" id="sortByRating" autocomplete="off" checked> sortByRating';
+                        echo '</label>';
+
+                        echo '<label>';
+                            echo '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off"> sortByRole';
+                        echo '</label>';
+                    // echo '</div>';
+                echo '</div>';
+
+                echo '<div id="finalBalanceItemListWrap" class="scrollablePanelYAuto">';                
+                echo '</div>';
+
             echo '</div>';
         echo '</div>';
 

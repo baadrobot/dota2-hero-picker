@@ -438,13 +438,13 @@ line-height: 40px
 }
 
 #editAccordion1 {
-    max-height: 450px;
+    /* max-height: 450px; */
     overflow: auto;
     width: 365px;
 }
 
 #editAccordion2 {
-    max-height: 450px;
+    /* max-height: 450px; */
     overflow: auto;
     width: 365px;
 }

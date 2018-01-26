@@ -589,34 +589,34 @@
             $dbClass->select($query);
 
             // update "lanes meta" tags
-                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=mid');
+                        // $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=mid');
                         // mid core
-                        setLaneTagValue($tagId = 33, $html, $minPresence = 40, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 33, $html, $minPresence = 40, $minWinRate = 50);
                         // mid support
-                        setLaneTagValue($tagId = 39, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 39, $html, $minPresence = 0, $minWinRate = 50);
 
-                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=roaming');
+                        // $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=roaming');
                         // roamer
-                        setLaneTagValue($tagId = 36, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 36, $html, $minPresence = 0, $minWinRate = 50);
 
-                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=off');
+                        // $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=off');
                         // offlane solo
-                        setLaneTagValue($tagId = 34, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 34, $html, $minPresence = 0, $minWinRate = 50);
                         // offlane core
-                        setLaneTagValue($tagId = 40, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 40, $html, $minPresence = 0, $minWinRate = 50);
                         // offlane support
-                        setLaneTagValue($tagId = 38, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 38, $html, $minPresence = 0, $minWinRate = 50);
 
 
-                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=jungle');
+                        // $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=jungle');
                         // jungler
-                        setLaneTagValue($tagId = 35, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 35, $html, $minPresence = 0, $minWinRate = 50);
 
-                        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=safe');
+                        // $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/lanes?lane=safe');
                         // carry
-                        setLaneTagValue($tagId = 32, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 32, $html, $minPresence = 0, $minWinRate = 50);
                         // support safe lane
-                        setLaneTagValue($tagId = 37, $html, $minPresence = 0, $minWinRate = 50);
+                        // setLaneTagValue($tagId = 37, $html, $minPresence = 0, $minWinRate = 50);
 
                         //exit;
 

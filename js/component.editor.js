@@ -1,5 +1,17 @@
 $(document).ready(function ()
 {
+    // set height of accordions
+    // console.log(window.innerHeight);
+    // console.log(window.outerHeight);
+    var innerHeight = window.innerHeight;
+    var firstAccordionTopOffset = $("#editAccordion1").offset().top;
+    var secondAccordionTopOffset = firstAccordionTopOffset + 29;
+
+    $("#editAccordion1").css('max-height', innerHeight - firstAccordionTopOffset - 40);
+    $("#editAccordion2").css('max-height', innerHeight - secondAccordionTopOffset - 10);
+
+
+
     buildHeroList('#heroListWrap');
 
     $('#editAccordion i').click(function ()
@@ -1272,6 +1284,7 @@ function rebuildEditorBalanceTags()
 
                     $('#tagBalanceListWrap .tagBalanceItem').click(function ()
                     {
+                        // console.log($("#editAccordion2").offset().top);
                         var clickedBalanceEl = $(this);
                         var itemsHtml = '<div id="itemsWrap">';
 
