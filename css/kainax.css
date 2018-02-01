@@ -72,10 +72,12 @@ body {
     display: inline-flex;
     float: left;
 }
-#heroListWrap .smlGrp:nth-child(2){
+#heroListWrap .smlGrp:nth-child(3){
     float: right;
 }
-
+#heroListWrap .smlGrp:nth-child(1){
+    width: 42px;
+}
 .smlGrp .input-group-addon,
 .smlGrp input
 {
@@ -112,7 +114,7 @@ body {
 	font-size: 12px;
 }
 
-.balanceTag:hover {
+.balanceTag:hover, input+span.input-group-addon {
     cursor: pointer;
     /* color: rgb(18, 168, 23); */
 }

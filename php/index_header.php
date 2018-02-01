@@ -76,7 +76,6 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">';
         echo '<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>';
         echo '<script src="js/jquery.ui.autocomplete.js"></script>';
-        echo '<script src="js/jquery.shuffle.min.js"></script>';
 
 
         echo '<script>';

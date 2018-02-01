@@ -1,16 +1,9 @@
 $(document).ready(function ()
 {
-    // set height of accordions
-    // console.log(window.innerHeight);
-    // console.log(window.outerHeight);
-    var innerHeight = window.innerHeight;
-    var firstAccordionTopOffset = $("#editAccordion1").offset().top;
-    var secondAccordionTopOffset = firstAccordionTopOffset + 29;
-
-    $("#editAccordion1").css('max-height', innerHeight - firstAccordionTopOffset - 40);
-    $("#editAccordion2").css('max-height', innerHeight - secondAccordionTopOffset - 10);
-
-
+    resizeAccordions();
+    $(window).resize(function () {
+        resizeAccordions();
+    });
 
     buildHeroList('#heroListWrap');
 
@@ -284,7 +277,7 @@ $(document).ready(function ()
 
     $('.heroListImg').click(function ()
     {
-        var curSelectedTagEl = $('.selectedTag');
+        var curSelectedTagEl = $('#tagListWrap .selectedTag');
         if (curSelectedTagEl.length > 0)
         {
             pleaseWaitOpen();
@@ -909,11 +902,6 @@ $(document).ready(function ()
     .on('keyup', function ()
     {
         // checking if another (ability) search is active
-        // var abilitySearchInputEl = $('#searchAbilityInput');
-        // if (abilitySearchInputEl.val() != '')
-        // {
-        //     abilitySearchInputEl.siblings('.input-group-addon').find('i').trigger('click');
-        // }
 
         var tagSearchVal = $(this).val().toLowerCase();
         if (tagSearchVal != '')
@@ -1112,6 +1100,8 @@ $(document).ready(function ()
         searchInputEl.trigger('keyup');
     });
 
+    getLastInputValue('#searchTagInput');
+
     $('#editAccordion').on('hidden.bs.collapse', function ()
     {
         $(window).trigger('resize');
@@ -1143,40 +1133,50 @@ function colorizeAllHeroes()
 
 function sortEditorBalanceTags()
 {
-        //Shuffle
-        jQuery('#tagBalanceListWrap')
-        .shuffle('sort',
-        {    itemSelector: '.tagBalanceItem'
-            ,reverse: true
-            ,by: function (el)
+    // function sortEditorBalanceTagsDESC(a, b) {
+    //     var contentA = Number($(a).find('[data-tag-value]').attr('data-tag-value'));
+    //     var contentB = Number($(b).find('[data-tag-value]').attr('data-tag-value'));
+    //     return contentA < contentB ? 1 : -1;
+    // };
+    // $('#tagBalanceListWrap').each(function(){
+    //     $(this).find('.tagBalanceItem').sort(sortEditorBalanceTagsDESC).appendTo( $(this) );
+    // });
+
+    // if we have 1 selected tag, then sort its balances to top
+
+    function sortEditorBalanceTagsBySelectedTag(a, b)
+    {
+        var contentA = Number($(a).find('[data-tag-value]').attr('data-tag-value'));
+        var contentB = Number($(b).find('[data-tag-value]').attr('data-tag-value'));
+
+        var selectedTagEl = $('#tagListWrap .selectedTag');
+        if (selectedTagEl.length)
+        {
+            var selectedTagId = selectedTagEl.attr('data-tag-id');
+            if (($(a).find('[data-tag-id]:first').attr('data-tag-id') == selectedTagId)
+            || ($(a).find('[data-tag-id]:last').attr('data-tag-id') == selectedTagId))
             {
-                var order = Number(el.find('[data-tag-value]').attr('data-tag-value'));
-
-                var selectedTagEl = $('#tagListWrap .selectedTag');
-                if (selectedTagEl.length)
-                {
-                    var selectedTagId = selectedTagEl.attr('data-tag-id');
-                    if ((el.find('[data-tag-id]:first').attr('data-tag-id') == selectedTagId)
-                    || (el.find('[data-tag-id]:last').attr('data-tag-id') == selectedTagId))
-                    {
-                        order = 10000 + order;
-                    }
-
-                    if (order >= 6000)
-                    {
-                        el.removeClass('balanceSetItemOpacity');
-                    } else {
-                        el.addClass('balanceSetItemOpacity');
-                    }
-                } else {
-                    el.removeClass('balanceSetItemOpacity');
-                }
-
-                return Number(order);
+                contentA = contentA + 1000;
+                $(a).removeClass('balanceSetItemOpacity');
+            } else {
+                $(a).addClass('balanceSetItemOpacity');
             }
-            //,delimeter: ','
-            //,columnWidth: '100%'
-        });
+            if (($(b).find('[data-tag-id]:first').attr('data-tag-id') == selectedTagId)
+            || ($(b).find('[data-tag-id]:last').attr('data-tag-id') == selectedTagId))
+            {
+                contentB = contentB + 1000;
+                $(b).removeClass('balanceSetItemOpacity');
+            } else {
+                $(b).addClass('balanceSetItemOpacity');
+            }
+        }
+
+        return contentA < contentB ? 1 : -1;
+    };
+
+    $('#tagBalanceListWrap').each(function(){
+        $(this).find('.tagBalanceItem').sort(sortEditorBalanceTagsBySelectedTag).appendTo( $(this) );
+    });
 }
 
 function rebuildEditorBalanceTags()
@@ -1413,6 +1413,7 @@ function rebuildEditorTags(tagsList)
     // add click listener
     tagListEl.find('.tag').click(function ()
     {
+        var selectedTagEl = $(this);
         if ($(this).hasClass('selectedTag'))
         {
             // tag off
@@ -1420,10 +1421,13 @@ function rebuildEditorTags(tagsList)
 
             colorizeAllHeroes();
 
+            // remove selected tag from center between inputs
+            $('#forSelectedTag > span:first').text('').removeClass('selectedTag');
+            $('#forSelectedTag > span:last').hide();
         } else
         {
             // tag on
-            $('.selectedTag').removeClass('selectedTag');
+            $('#tagListWrap .selectedTag').removeClass('selectedTag');
             $(this).addClass('selectedTag');
 
             var selectedTagName = $(this).text();
@@ -1511,6 +1515,15 @@ function rebuildEditorTags(tagsList)
                 }
             });
 
+            // add selected tag in center between inputs
+            var selectedTagText = selectedTagEl.text();
+            $('#forSelectedTag > span:first').text(selectedTagText).addClass('selectedTag');
+            $('#forSelectedTag > span:last').show()
+            .on('click', function(){
+                $('#tagListWrap > .selectedTag').trigger('click');
+                $('#forSelectedTag > span:first').text('');
+                $('#forSelectedTag > span:last').hide();
+            });
         }
 
         sortEditorBalanceTags();
@@ -2065,4 +2078,17 @@ function changeNotesWrapHtml()
 
     eXoActivateInactiveTooltips();
     addOnHoverTooltipsForAbilityImg('#notesWrap');
+}
+
+function resizeAccordions()
+{
+    // set height of accordions
+    // console.log(window.innerHeight);
+    // console.log(window.outerHeight);
+    var innerHeight = window.innerHeight;
+    var firstAccordionTopOffset = $("#editAccordion1").offset().top;
+    var secondAccordionTopOffset = firstAccordionTopOffset + 29;
+
+    $("#editAccordion1").css('max-height', innerHeight - firstAccordionTopOffset - 40);
+    $("#editAccordion2").css('max-height', innerHeight - secondAccordionTopOffset - 140);
 }

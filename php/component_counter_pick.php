@@ -93,11 +93,44 @@
         }
     }
 
+
+    $query = 'SELECT
+                    b.cf_d2HeroTagSet_hero_id AS weakHeroId,
+                    a.cf_d2HeroTagSet_hero_id AS strongHeroId
+                FROM tb_dota2_tag_balance_set
+                    INNER JOIN tb_dota2_heroTag_set a
+                    ON tb_dota2_tag_balance_set.cf_d2TagBalanceSet_first_tag_id = a.cf_d2HeroTagSet_tag_id
+                    AND a.cf_d2HeroTagSet_tag_val = 5
+                    INNER JOIN tb_dota2_heroTag_set b
+                    ON tb_dota2_tag_balance_set.cf_d2TagBalanceSet_second_tag_id = b.cf_d2HeroTagSet_tag_id
+                    AND b.cf_d2HeroTagSet_tag_val = 5
+                WHERE tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value > 49
+                ORDER BY weakHeroId;';
+                
+    $result_dontPickHeroesBeforeBanArray = $dbClass->select($query);
+
+    $lastWeakHeroId = '-1';
+    $ready_dontPickHeroesBeforeBanArray = [];  
+    for($i = 0; $i < count($result_dontPickHeroesBeforeBanArray); $i++)
+    {
+        $curWeakHeroId = $result_dontPickHeroesBeforeBanArray[$i]['weakHeroId'];
+        $curStrongHeroId = $result_dontPickHeroesBeforeBanArray[$i]['strongHeroId'];
+
+        if ($lastWeakHeroId != $curWeakHeroId)
+        {
+            $ready_dontPickHeroesBeforeBanArray[$curWeakHeroId] = [];
+        }
+        $ready_dontPickHeroesBeforeBanArray[$curWeakHeroId][$curStrongHeroId] = 1;
+        $lastWeakHeroId = $curWeakHeroId;
+    }
+
+
     echo '<script>';
         echo 'window.heroList = '.json_encode($hero_array).';';
         echo 'window.itemList = '.json_encode($itemListArray).';';
         echo 'window.strategyList = '.json_encode($strategies_array).';';
         echo 'window.roleList = '.json_encode($roles).';';
+        echo 'window.dontPickHeroesBeforeBanArray = '.json_encode($ready_dontPickHeroesBeforeBanArray).';';        
     echo '</script>';
 
 
@@ -144,6 +177,10 @@
 
             echo '<div id="heroListWrap" class="col-8">';
 
+                echo '<div id="swapSidesBtn" class="input-group smlGrp">';
+                    echo '<span class="input-group-addon"><i class="fa fa-exchange"></i></span>';
+                echo '</div>';
+    
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
                     echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
@@ -163,17 +200,21 @@
                     // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
                     // echo '<input id="sortByRole" type="radio" name="balanceSort">';     
                     // echo '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
+                        echo 'Sort by:';
                         echo '<label>';
-                            echo '<input type="radio" name="sortBalance" id="sortByRating" autocomplete="off" checked> sortByRating';
+                            echo '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off" checked> Role';
                         echo '</label>';
 
                         echo '<label>';
-                            echo '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off"> sortByRole';
+                            echo '<input type="radio" name="sortBalance" id="sortByRating" autocomplete="off"> Rating';
                         echo '</label>';
                     // echo '</div>';
                 echo '</div>';
 
-                echo '<div id="finalBalanceItemListWrap" class="scrollablePanelYAuto">';                
+                echo '<div id="counterPleaseWait" style="display:none">';                
+                    echo 'Loading...';
+                echo '</div>';                
+                echo '<div id="finalBalanceItemListWrap" class="scrollablePanelYAuto">';
                 echo '</div>';
 
             echo '</div>';
@@ -183,7 +224,7 @@
             echo '<div class="col-2">';
                 echo '<div id="miniMapWrap">';
                     // divs for radiant easy lane
-                     echo '<div id="radiantEasy1" data-slot-role="1"></div>';
+                    echo '<div id="radiantEasy1" data-slot-role="1"></div>';
                     echo '<div id="radiantEasy2" data-slot-role="5"></div>';
                     echo '<div id="radiantEasy3" data-slot-role="4"></div>';
 
@@ -243,7 +284,6 @@
             // echo '</div>';
             
         echo '</div>';
-        echo '<button id="swapSidesBtn">Swap sides</button>';
 
 
 require 'php/template_d2_hero_ability_tooltip.php';

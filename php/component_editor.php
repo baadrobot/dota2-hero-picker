@@ -38,11 +38,16 @@
                     echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
                 echo '</div>';
 
+
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchAbilityInput" type="text" class="form-control" disabled="disabled" placeholder="Поиск по способностям"/>';
                     echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
                 echo '</div>';
 
+                echo '<div id="forSelectedTag">';
+                    echo '<span></span>';
+                    echo '<span class="fa fa-times" style="display:none"></span>';
+                echo '</div>';
             echo '</div>';
 
 

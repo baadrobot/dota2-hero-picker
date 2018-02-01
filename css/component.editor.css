@@ -332,7 +332,7 @@ line-height: 40px
 
 
 .heroInfoWrapForBalance{
-    width: 440px;
+    width: 450px;
     text-align: center;
     vertical-align: middle;
     display: inline-block;
@@ -342,7 +342,7 @@ line-height: 40px
     background-clip: border-box;
     border: 1px solid rgba(0,0,0,.125);
     border-radius: .25rem;
-    margin: 4px 1px;
+    margin: 4px 1px 4px 2px;
 }
 
 .heroInfoWrapForBalance:hover{
@@ -433,7 +433,7 @@ line-height: 40px
     border-radius: 3px;
 }
 
-.itemImgWrap > img:hover{
+.itemImgWrap > img:hover, #forSelectedTag > span:last-of-type{
     cursor: pointer;
 }
 
@@ -447,4 +447,8 @@ line-height: 40px
     /* max-height: 450px; */
     overflow: auto;
     width: 365px;
+}
+
+#forSelectedTag {
+    display: inline-block;
 }

@@ -751,3 +751,35 @@ function deleteCookie(name)
 {
     setCookie(name, null, -1);
 }
+
+function getLastInputValue(inputId)
+{
+    var searchInputEl = $(inputId);
+
+    searchInputEl.on('keyup', function() {
+        var searchVal = searchInputEl.val();
+        if(searchVal == '')
+        {
+            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+            
+        } else {
+            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
+        }
+    });
+
+    $(searchInputEl).siblings('.input-group-addon').on('click', function() {
+        // click on search btn
+        var searchVal = searchInputEl.val();
+        if (searchVal != '')
+        {
+            // если чтото есть
+            searchInputEl.attr('data-last-search', searchVal).val('');
+            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+        } else {
+            // если пусто
+            searchInputEl.val( searchInputEl.attr('data-last-search') );
+            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
+        }
+        searchInputEl.trigger('keyup');
+    });
+}
