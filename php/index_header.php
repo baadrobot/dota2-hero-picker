@@ -93,6 +93,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         // echo '<script src="js/carhartl-jquery-cookie-92b7715/jquery.cookie.js"></script>';
 
 
+        $bodyClass = '';
         if (isset($_GET['component']))
         {
 
@@ -154,6 +155,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 echo '<script src="js/component.editor.js"></script>';
                 echo $externalData;
 
+                $bodyClass = $_GET['component'];
                 // KainaxMinifyTools::compressAndLinkOut('css', 'SIMPLE', 'guidebook');
                 // KainaxMinifyTools::compressAndLinkOut('js', 'DEFAULT', 'guidebook');
             }
@@ -163,16 +165,20 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 echo '<script src="js/component.master.js"></script>';
                 echo '<link rel="stylesheet" href="css/component.master.css">';
                 echo $externalData;
+                $bodyClass = $_GET['component'];
             }
             else if ($_GET['component'] == 'registration')
             {
                 echo '<script src="js/component.registration.js"></script>';
                 echo '<link rel="stylesheet" href="css/component.registration.css">';
+                $bodyClass = $_GET['component'];
             }
             else if ($_GET['component'] == 'user_profile')
             {
                 echo '<script src="js/component.user_profile.js"></script>';
                 echo '<link rel="stylesheet" href="css/component.user_profile.css">';
+
+                $bodyClass = $_GET['component'];
             }
             else if ($_GET['component'] == 'counter_pick')
             {
@@ -188,11 +194,17 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 {
                     echo '<script src="js/admin.counter_pick.js"></script>';
                 }
+                $bodyClass = $_GET['component'];
             }
         }
 
     echo '</head>';
-    echo '<body>';
+    if ($bodyClass == '')
+    {
+        echo '<body>';
+    } else {
+        echo '<body class="'.$bodyClass.'">';
+    }
 
     echo '<div class="background-image"></div>';
     // Menu

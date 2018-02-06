@@ -1424,6 +1424,9 @@ function rebuildEditorTags(tagsList)
             // remove selected tag from center between inputs
             $('#forSelectedTag > span:first').text('').removeClass('selectedTag');
             $('#forSelectedTag > span:last').hide();
+
+            //remove transparrency from all balance items
+            $('#tagBalanceListWrap .balanceSetItemOpacity').removeClass('balanceSetItemOpacity');
         } else
         {
             // tag on

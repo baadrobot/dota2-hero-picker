@@ -153,7 +153,10 @@ hr {
     color: red;
 }
 
-.noticeGreen {
+.noticeGreen{
+    color: rgb(0, 199, 0);
+}
+.roleFilterGreen {
     color: rgb(0, 199, 0);
 }
 
@@ -904,7 +907,7 @@ line-height: 40px
 .highlightSlot {
     width: 27px;
     height: 27px;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 13px;
     text-align: center;
@@ -959,4 +962,24 @@ line-height: 40px
 
 .opacityForHighlight {
     opacity: 0.5;
+}
+
+#userRole {
+    left: 15px;
+    position: relative;
+}
+
+.questionMark {
+    cursor: pointer;
+    font-size: 28px;
+    border: 2px solid #05880d;
+    border-radius: 17px;
+    width: 28px;
+    height: 28px;
+    background-color: #09b715;
+    margin: 0;
+    padding: 0;
+    line-height: 24px;
+    color: black;
+    font-weight: bold;
 }

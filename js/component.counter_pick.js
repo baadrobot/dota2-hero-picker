@@ -94,7 +94,7 @@ $(document).ready(function ()
 
                 // highlight free slots on map
                 $('#miniMapWrap > div[data-slot-role]').each(function(){
-                    if($(this).find('img').length == 0)
+                    if($(this).find('img').length == 0 && $(this).find('i.questionMark').length == 0)
                     {
                         $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
                         $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
@@ -195,6 +195,56 @@ $(document).ready(function ()
         });
     // end of drag'n'drop
 
+    // drag for hero user role
+    $('#userRole').draggable({
+            cursor: 'pointer'
+        ,helper: "clone"
+        ,revert: 'invalid'
+        , zIndex: 200
+        , drag: function (event, ui)
+        {
+            // $(this).addClass('grayscale');
+        },
+        start: function (e, ui)
+        {
+            ui.helper.attr('data-dragged-from', 'userRole');
+
+            // highlight free slots on map
+            if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+            {
+                // our team in dire
+                $('#miniMapWrap > div[id^="dire"]').each(function(){
+                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                    {
+                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                        $('#direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                        .addClass('opacityForHighlight');
+                    }
+                });
+            } else {
+                // our team in radiant
+                $('#miniMapWrap > div[id^="radiant"]').each(function(){
+                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                    {
+                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                        $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3')
+                        .addClass('opacityForHighlight');
+                    }
+                });
+            }
+        },
+        stop: function (event, ui) 
+        {
+            // $(this).addClass('grayscale');
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+
+            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+            .removeClass('opacityForHighlight');
+        }
+    });
+    // end of drag for hero user role
+
     // droppable for mini map slots
     var recieverEl;
     $("#miniMapWrap div[data-slot-role]").droppable({
@@ -210,121 +260,395 @@ $(document).ready(function ()
 
             // check if slot is NOT empty
             var lockedHero = recieverEl.find('img[data-hero-id]');
-            if (lockedHero.length)
+            var lockedQuestionMark = recieverEl.find('i.questionMark');
+            if (lockedHero.length || lockedQuestionMark.length)
             {
                 // slot is NOT empty
+                // check what is in slot hero or question?
                 var recieverElId = $(recieverEl).attr('id');
-                if(ui.helper.attr('data-dragged-from') == 'fromHeroList')
+                if(lockedHero.length)
                 {
-                    //dragged from hero list
-
-                    // remove locked hero from map and pick slots
-                    var lockedHeroEl = recieverEl.find('img');
-                    var lockedHeroId = lockedHeroEl.attr('data-hero-id');
-                    removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
-                    releaseHeroInList(lockedHeroId);
-                    lockedHeroEl.remove();
-                    
-                    // add dragged hero
-                    // console.log(ui.helper);
-                    // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
-                    var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
-
-                    $(recieverEl)
-                    .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
-
-                    // make it like it picked
-                    // releaseHeroInList(prevSlotHeroId);
-                    // deleteHeroFromMinimap(heroId);
-                    // slotImgWrap.remove();
-                    if(recieverElId.indexOf('radiant') >= 0)
+                    // hero in slot
+                    if(ui.helper.attr('data-dragged-from') == 'fromHeroList')
                     {
-                        // radiant
-                        var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
-                    } else if(recieverElId.indexOf('dire') >= 0)
-                    {
-                        // dire
-                        var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
-                    }
-                    // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
-                    lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
-
-                } 
-                else if(ui.helper.attr('data-dragged-from') == 'fromMiniMap') 
-                {
-                    // dragged from mini-map
-                    // console.log(ui.helper);
-                    var draggedElSlotId = ui.helper.attr('data-dragged-from-id');
-                    if( (recieverElId.indexOf('dire') >= 0 && draggedElSlotId.indexOf('radiant') >= 0) 
-                        || (recieverElId.indexOf('radiant') >= 0 && draggedElSlotId.indexOf('dire') >= 0) )
-                    {
-                        // heroes from different sides
-                        // console.log('different teams');
-
-                        // get id of recieving el hero, only then swap
-                        var recievedElHeroId = recieverEl.find('img').attr('data-hero-id');
-
-                        var qweasdzc = $('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]').parent();
-                        var yhrbh = $('#pickedHeroWrap div[data-hero-id="'+recievedElHeroId+'"]').parent();
-
-
-                        // swap heroes on map
-                        window.draggableElParent.prepend(lockedHero);
-                        recieverEl.append(window.draggableEl);
-
+                        //dragged from hero list
+    
+                        // remove locked hero from map and pick slots
+                        var lockedHeroEl = recieverEl.find('img');
+                        var lockedHeroId = lockedHeroEl.attr('data-hero-id');
+                        removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
+                        releaseHeroInList(lockedHeroId);
+                        lockedHeroEl.remove();
                         
-                        // console.log(draggedHeroId);
-                        // console.log(recievedElHeroId);
-
-                        
-                        
-                        // swap heroes in picks
-                        lockNewHeroInSlotForDroppableEmptySlot(qweasdzc, recievedElHeroId, 1, 0);
-                        lockNewHeroInSlotForDroppableEmptySlot(yhrbh, draggedHeroId, 1, 0);
-
-                        // // ------- hero dragged from another slot - previous hero must be swapped with new one
-                        // lockNewHeroInSlot($('.pickedHeroImgWrap[data-hero-id="' + draggedHeroId + '"]').parent(), prevSlotHeroId, 0, 1);
-                        // lockNewHeroInSlot(recieverEl, draggedHeroId, 0, 1);
-                        // $('.pickedHeroImgWrap[data-hero-id="' + prevSlotHeroId + '"]').parent().addClass('slot').removeClass('emptySlot');
-                    } else {
-                        window.draggableElParent.prepend(lockedHero);
-                        recieverEl.append(window.draggableEl);
-                    }
-                } else if(ui.helper.attr('data-dragged-from') == 'fromRecommendList')
-                {
-                    // dragged from recommend list
-
-                    // remove locked hero from map and pick slots
-                    var lockedHeroEl = recieverEl.find('img');
-                    var lockedHeroId = lockedHeroEl.attr('data-hero-id');
-                    removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
-                    releaseHeroInList(lockedHeroId);
-                    lockedHeroEl.remove();
-                    
-                    // add dragged hero
-                    // console.log(ui.helper);
-                    // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
-                    draggedHeroCodename = $('#heroListWrap [data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
-                    var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
-
-                    $(recieverEl)
-                    .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
-
-                    // make it like it picked
-                    // releaseHeroInList(prevSlotHeroId);
-                    // deleteHeroFromMinimap(heroId);
-                    // slotImgWrap.remove();
-                    if(recieverElId.indexOf('radiant') >= 0)
+                        // add dragged hero
+                        // console.log(ui.helper);
+                        // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+    
+                        $(recieverEl)
+                        .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+    
+                        // make it like it picked
+                        // releaseHeroInList(prevSlotHeroId);
+                        // deleteHeroFromMinimap(heroId);
+                        // slotImgWrap.remove();
+                        if(recieverElId.indexOf('radiant') >= 0)
+                        {
+                            // radiant
+                            var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                        } else if(recieverElId.indexOf('dire') >= 0)
+                        {
+                            // dire
+                            var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                        }
+                        // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                        lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                    } 
+                    else if(ui.helper.attr('data-dragged-from') == 'fromMiniMap') 
                     {
-                        // radiant
-                        var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
-                    } else if(recieverElId.indexOf('dire') >= 0)
+                        // dragged from mini-map
+                        // console.log(ui.helper);
+                        var draggedElSlotId = ui.helper.attr('data-dragged-from-id');
+                        if( (recieverElId.indexOf('dire') >= 0 && draggedElSlotId.indexOf('radiant') >= 0) 
+                            || (recieverElId.indexOf('radiant') >= 0 && draggedElSlotId.indexOf('dire') >= 0) )
+                        {
+                            // heroes from different sides    
+                            // get id of recieving el hero, only then swap
+                            var recievedElHeroId = recieverEl.find('img').attr('data-hero-id');
+
+                            var draggedHeroParent = $('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]').parent();
+                            var receivedHeroParent = $('#pickedHeroWrap div[data-hero-id="'+recievedElHeroId+'"]').parent();
+    
+                            // swap heroes on map
+                            window.draggableElParent.prepend(lockedHero);
+                            recieverEl.append(window.draggableEl);
+                        
+                            // swap heroes in picks
+                            lockNewHeroInSlotForDroppableEmptySlot(draggedHeroParent, recievedElHeroId, 1, 0);
+                            lockNewHeroInSlotForDroppableEmptySlot(receivedHeroParent, draggedHeroId, 1, 0);
+                            $(draggedHeroParent).addClass('slot').removeClass('emptySlot');  
+                       } else {
+                            window.draggableElParent.prepend(lockedHero);
+                            recieverEl.append(window.draggableEl);
+                        }
+                    } else if(ui.helper.attr('data-dragged-from') == 'fromRecommendList')
                     {
-                        // dire
-                        var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                        // dragged from recommend list
+    
+                        // remove locked hero from map and pick slots
+                        var lockedHeroEl = recieverEl.find('img');
+                        var lockedHeroId = lockedHeroEl.attr('data-hero-id');
+                        removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
+                        releaseHeroInList(lockedHeroId);
+                        lockedHeroEl.remove();
+                        
+                        // add dragged hero
+                        // console.log(ui.helper);
+                        // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        draggedHeroCodename = $('#heroListWrap [data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+    
+                        $(recieverEl)
+                        .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+    
+                        // make it like it picked
+                        // releaseHeroInList(prevSlotHeroId);
+                        // deleteHeroFromMinimap(heroId);
+                        // slotImgWrap.remove();
+                        if(recieverElId.indexOf('radiant') >= 0)
+                        {
+                            // radiant
+                            var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                        } else if(recieverElId.indexOf('dire') >= 0)
+                        {
+                            // dire
+                            var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                        }
+                        // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                        lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                    } 
+                    else if(ui.helper.attr('data-dragged-from') == 'userRole')
+                    {
+                        recieverEl.removeClass('highlightHoveredSlot');
+                    } 
+                    else if(ui.helper.attr('data-dragged-from') == 'userRoleFromMiniMap')
+                    {
+                        // dragged userRole from mini map
+                        recieverEl.removeClass('highlightHoveredSlot');
+
+                        // check if dragger came from another team
+                        if( (recieverEl.attr('id').indexOf('dire') >= 0 && window.draggableElParent.attr('id').indexOf('radiant') >= 0) 
+                        || recieverEl.attr('id').indexOf('radiant') >= 0 && window.draggableElParent.attr('id').indexOf('dire') >= 0)
+                        {
+                            // another team
+                            console.log('u cant put question in enemy team!');
+                        } else {
+                            // same team
+                            window.draggableElParent.prepend(lockedHero);
+                            $('#miniMapWrap i.questionMark').remove();
+                            recieverEl.append('<i class="questionMark fa fa-question-circle"></i>');
+    
+                            // make the question inside map draggable
+                            $('#miniMapWrap i.questionMark').draggable({
+                                cursor: 'default'
+                                ,helper: "clone"
+                                ,revert: 'invalid'
+                                // , zIndex: 99999999
+                                , drag: function (event, ui)
+                                {
+                                    var draggedHero = $(this);
+                                    window.draggableEl = $(this);
+                                    window.draggableElParent = $(this).parent();
+                        
+                                    //var dragHeroId = draggedHero.attr('data-hero-id');
+                                    draggedHero.addClass('grayscale');
+                                    // ui.helper.addClass('draggable');
+                                },
+                                start: function (e, ui)
+                                {
+                                    var draggedHero = $(this);
+                                    // if (draggedHero.hasClass('pickedOrBaned'))
+                                    // {
+                                    //     //This will prevent moving the element from it's position
+                                    //     e.preventDefault();
+                                    // }
+                        
+                                    // ui.helper.attr('data-dragged-from', 'fromMiniMap');
+                                    ui.helper.attr('data-dragged-from-id', $(this).parent().attr('id'));
+                        
+                                    // highlight free slots on map
+                                    // $('#miniMapWrap > div[data-slot-role]').each(function(){
+                                    //     if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    //     {
+                                    //         $(this).addClass('highlightSlot');
+                                    //     }
+                                    // });
+        
+                                    ui.helper.attr('data-dragged-from', 'userRoleFromMiniMap');
+        
+                                    // highlight free slots on map
+                                    if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                                    {
+                                        // our team in dire
+                                        $('#miniMapWrap > div[id^="dire"]').each(function(){
+                                            if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                            {
+                                                $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                                $('#direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                                .addClass('opacityForHighlight');
+                                            }
+                                        });
+                                    } else {
+                                        // our team in radiant
+                                        $('#miniMapWrap > div[id^="radiant"]').each(function(){
+                                            if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                            {
+                                                $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                                $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3')
+                                                .addClass('opacityForHighlight');
+                                            }
+                                        });
+                                    }
+                                },
+                                stop: function (event, ui) {
+                                    var draggedHero = $(this);
+                                    draggedHero.removeClass('grayscale');
+                                    // ui.helper.removeClass('draggable');
+                        
+                                    // remove highlight from free slots on map
+                                    // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+        
+                                    // remove highlight from free slots on map
+                                    $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+        
+                                    $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                    .removeClass('opacityForHighlight');
+                                }
+                            });
+                            // end of make the question inside map draggable
+                        }
                     }
-                    // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
-                    lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                } else if(lockedQuestionMark.length) {
+                    // question in slot
+                    console.log('question in slot');
+                    if(ui.helper.attr('data-dragged-from') == 'fromMiniMap')
+                    {
+                        // dragged from mini map
+                        recieverEl.removeClass('highlightHoveredSlot');
+
+                        // check if dragger came from another team
+                        if( (recieverEl.attr('id').indexOf('dire') >= 0 && window.draggableElParent.attr('id').indexOf('radiant') >= 0) 
+                        || recieverEl.attr('id').indexOf('radiant') >= 0 && window.draggableElParent.attr('id').indexOf('dire') >= 0)
+                        {
+                            // another team
+                            recieverEl.html(window.draggableEl);
+                        } else {
+                            // same team
+
+                            // window.draggableElParent.prepend(lockedHero);
+                            // recieverEl.append(window.draggableEl);
+                            $('#miniMapWrap i.questionMark').remove();
+                            recieverEl.append(window.draggableEl);
+                            window.draggableElParent.append('<i class="questionMark fa fa-question-circle"></i>');
+
+                            // console.log(window.draggableElParent);
+                            // console.log(recieverEl);
+                            
+
+                            // make the question inside map draggable
+                            $('#miniMapWrap i.questionMark').draggable({
+                                cursor: 'default'
+                                ,helper: "clone"
+                                ,revert: 'invalid'
+                                // , zIndex: 99999999
+                                , drag: function (event, ui)
+                                {
+                                    var draggedHero = $(this);
+                                    window.draggableEl = $(this);
+                                    window.draggableElParent = $(this).parent();
+                        
+                                    //var dragHeroId = draggedHero.attr('data-hero-id');
+                                    draggedHero.addClass('grayscale');
+                                    // ui.helper.addClass('draggable');
+                                },
+                                start: function (e, ui)
+                                {
+                                    var draggedHero = $(this);
+                                    // if (draggedHero.hasClass('pickedOrBaned'))
+                                    // {
+                                    //     //This will prevent moving the element from it's position
+                                    //     e.preventDefault();
+                                    // }
+                        
+                                    // ui.helper.attr('data-dragged-from', 'fromMiniMap');
+                                    ui.helper.attr('data-dragged-from-id', $(this).parent().attr('id'));
+                        
+                                    // highlight free slots on map
+                                    // $('#miniMapWrap > div[data-slot-role]').each(function(){
+                                    //     if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    //     {
+                                    //         $(this).addClass('highlightSlot');
+                                    //     }
+                                    // });
+        
+                                    ui.helper.attr('data-dragged-from', 'userRoleFromMiniMap');
+        
+                                    // highlight free slots on map
+                                    if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                                    {
+                                        // our team in dire
+                                        $('#miniMapWrap > div[id^="dire"]').each(function(){
+                                            if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                            {
+                                                $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                                $('#direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                                .addClass('opacityForHighlight');
+                                            }
+                                        });
+                                    } else {
+                                        // our team in radiant
+                                        $('#miniMapWrap > div[id^="radiant"]').each(function(){
+                                            if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                            {
+                                                $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                                $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3')
+                                                .addClass('opacityForHighlight');
+                                            }
+                                        });
+                                    }
+                                },
+                                stop: function (event, ui) {
+                                    var draggedHero = $(this);
+                                    draggedHero.removeClass('grayscale');
+                                    // ui.helper.removeClass('draggable');
+                        
+                                    // remove highlight from free slots on map
+                                    // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+        
+                                    // remove highlight from free slots on map
+                                    $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+        
+                                    $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                    .removeClass('opacityForHighlight');
+                                }
+                            });
+                            // end of make the question inside map draggable
+                        }
+                    }
+                    else if(ui.helper.attr('data-dragged-from') == 'fromHeroList')
+                    {
+                        // dragged from hero list
+
+                        // remove locked hero from map and pick slots
+                        // var lockedHeroEl = recieverEl.find('img');
+                        // var lockedHeroId = lockedHeroEl.attr('data-hero-id');
+                        // removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
+                        // releaseHeroInList(lockedHeroId);
+                        // lockedHeroEl.remove();
+                        
+                        // add dragged hero
+                        // console.log(ui.helper);
+                        // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+                        
+                        $(recieverEl).find('i.questionMark').remove();
+
+                        $(recieverEl)
+                        .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+    
+                        // make it like it picked
+                        // releaseHeroInList(prevSlotHeroId);
+                        // deleteHeroFromMinimap(heroId);
+                        // slotImgWrap.remove();
+                        if(recieverElId.indexOf('radiant') >= 0)
+                        {
+                            // radiant
+                            var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                        } else if(recieverElId.indexOf('dire') >= 0)
+                        {
+                            // dire
+                            var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                        }
+                        // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                        lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                    }
+                    else if(ui.helper.attr('data-dragged-from') == 'fromRecommendList')
+                    {
+                        // dragged from recommend list
+                        // remove locked hero from map and pick slots
+                        // var lockedHeroEl = recieverEl.find('img');
+                        // var lockedHeroId = lockedHeroEl.attr('data-hero-id');
+                        // removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+lockedHeroId+'"'), 1);
+                        // releaseHeroInList(lockedHeroId);
+                        // lockedHeroEl.remove();
+                        
+                        $(recieverEl).find('i.questionMark').remove();
+
+                        // add dragged hero
+                        // console.log(ui.helper);
+                        // var draggableHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        draggedHeroCodename = $('#heroListWrap [data-hero-id="'+draggedHeroId+'"]').attr('data-hero-codename');
+                        var curHeroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+draggedHeroCodename+'_icon.png?v=4299287';
+    
+                        $(recieverEl)
+                        .append('<img src="'+curHeroIconUrl+'" data-hero-id="'+draggedHeroId+'" data-hero-codename="'+draggedHeroCodename+'" data-roles-values="'+getHeroRolesByHeroId(draggedHeroId)+'" width="28px">');
+    
+                        // make it like it picked
+                        // releaseHeroInList(prevSlotHeroId);
+                        // deleteHeroFromMinimap(heroId);
+                        // slotImgWrap.remove();
+                        if(recieverElId.indexOf('radiant') >= 0)
+                        {
+                            // radiant
+                            var recieverElForHeroLock = $('#pickedHeroWrap .radiant > .emptySlot:first');
+                        } else if(recieverElId.indexOf('dire') >= 0)
+                        {
+                            // dire
+                            var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
+                        }
+                        // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);
+                        lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                    }
                 }
             } else {
                 // slot is empty
@@ -352,10 +676,10 @@ $(document).ready(function ()
                     lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
 
                     // refresh fillPickBanInput
-                    var friendPickElements = $('.friendPick.slot');
-                    var enemyPickElements = $('.enemyPick.slot');
-                    var banPickElements = $('.banPick.slot');
-                    fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
+                    // var friendPickElements = $('.friendPick.slot');
+                    // var enemyPickElements = $('.enemyPick.slot');
+                    // var banPickElements = $('.banPick.slot');
+                    // fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
                 } 
                 else if(ui.helper.attr('data-dragged-from') == 'fromRecommendList')
                 {
@@ -375,17 +699,180 @@ $(document).ready(function ()
                     {
                         // dire
                         var recieverElForHeroLock = $('#pickedHeroWrap .dire > .emptySlot:first');
-                    }
-                    // lockNewHeroInSlot(recieverElForHeroLock, draggedHeroId, 1, 0);                    
+                    }                  
                     lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0)
+                }
+                else if(ui.helper.attr('data-dragged-from') == 'userRoleFromMiniMap')
+                {
+                    // dragged from userRole from mini map
+                    // $('#miniMapWrap i.questionMark').remove();
+                    recieverEl.append('<i class="questionMark fa fa-question-circle"></i>').removeClass('highlightHoveredSlot');
+                    window.draggableElParent.html('');
+                    
+                    // make the question inside map - draggable
+                    $('#miniMapWrap i.questionMark').draggable({
+                        cursor: 'default'
+                        ,helper: "clone"
+                        ,revert: 'invalid'
+                        // , zIndex: 99999999
+                        , drag: function (event, ui)
+                        {
+                            var draggedHero = $(this);
+                            window.draggableEl = $(this);
+                            window.draggableElParent = $(this).parent();
+                
+                            //var dragHeroId = draggedHero.attr('data-hero-id');
+                            draggedHero.addClass('grayscale');
+                            // ui.helper.addClass('draggable');
+                        },
+                        start: function (e, ui)
+                        {
+                            var draggedHero = $(this);
+                            // if (draggedHero.hasClass('pickedOrBaned'))
+                            // {
+                            //     //This will prevent moving the element from it's position
+                            //     e.preventDefault();
+                            // }
+                
+                            // ui.helper.attr('data-dragged-from', 'fromMiniMap');
+                            ui.helper.attr('data-dragged-from-id', $(this).parent().attr('id'));
+                
+                            // highlight free slots on map
+                            // $('#miniMapWrap > div[data-slot-role]').each(function(){
+                            //     if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                            //     {
+                            //         $(this).addClass('highlightSlot');
+                            //     }
+                            // });
 
-                    // refresh fillPickBanInput
-                    var friendPickElements = $('.friendPick.slot');
-                    var enemyPickElements = $('.enemyPick.slot');
-                    var banPickElements = $('.banPick.slot');
-                    fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
-                } 
-                else {
+                            ui.helper.attr('data-dragged-from', 'userRoleFromMiniMap');
+
+                            // highlight free slots on map
+                            if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                            {
+                                // our team in dire
+                                $('#miniMapWrap > div[id^="dire"]').each(function(){
+                                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    {
+                                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                        $('#direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                        .addClass('opacityForHighlight');
+                                    }
+                                });
+                            } else {
+                                // our team in radiant
+                                $('#miniMapWrap > div[id^="radiant"]').each(function(){
+                                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    {
+                                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                        $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3')
+                                        .addClass('opacityForHighlight');
+                                    }
+                                });
+                            }
+                        },
+                        stop: function (event, ui) {
+                            var draggedHero = $(this);
+                            draggedHero.removeClass('grayscale');
+                            // ui.helper.removeClass('draggable');
+                
+                            // remove highlight from free slots on map
+                            // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+
+                            // remove highlight from free slots on map
+                            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+
+                            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                            .removeClass('opacityForHighlight');
+                        }
+                    });
+                    // end of make the question inside map draggable
+                }
+                else if(ui.helper.attr('data-dragged-from') == 'userRole')
+                {
+                    // dragged from userRole
+                    // $('#miniMapWrap i.questionMark').remove();
+                    recieverEl.append('<i class="questionMark fa fa-question-circle"></i>').removeClass('highlightHoveredSlot');
+                    
+                    // make the question inside map - draggable
+                    $('#miniMapWrap i.questionMark').draggable({
+                        cursor: 'default'
+                        ,helper: "clone"
+                        ,revert: 'invalid'
+                        // , zIndex: 99999999
+                        , drag: function (event, ui)
+                        {
+                            var draggedHero = $(this);
+                            window.draggableEl = $(this);
+                            window.draggableElParent = $(this).parent();
+                
+                            //var dragHeroId = draggedHero.attr('data-hero-id');
+                            draggedHero.addClass('grayscale');
+                            // ui.helper.addClass('draggable');
+                        },
+                        start: function (e, ui)
+                        {
+                            var draggedHero = $(this);
+                            // if (draggedHero.hasClass('pickedOrBaned'))
+                            // {
+                            //     //This will prevent moving the element from it's position
+                            //     e.preventDefault();
+                            // }
+                
+                            // ui.helper.attr('data-dragged-from', 'fromMiniMap');
+                            ui.helper.attr('data-dragged-from-id', $(this).parent().attr('id'));
+                
+                            // highlight free slots on map
+                            // $('#miniMapWrap > div[data-slot-role]').each(function(){
+                            //     if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                            //     {
+                            //         $(this).addClass('highlightSlot');
+                            //     }
+                            // });
+
+                            ui.helper.attr('data-dragged-from', 'userRoleFromMiniMap');
+
+                            // highlight free slots on map
+                            if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                            {
+                                // our team in dire
+                                $('#miniMapWrap > div[id^="dire"]').each(function(){
+                                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    {
+                                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                        $('#direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                                        .addClass('opacityForHighlight');
+                                    }
+                                });
+                            } else {
+                                // our team in radiant
+                                $('#miniMapWrap > div[id^="radiant"]').each(function(){
+                                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                                    {
+                                        $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                                        $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3')
+                                        .addClass('opacityForHighlight');
+                                    }
+                                });
+                            }
+                        },
+                        stop: function (event, ui) {
+                            var draggedHero = $(this);
+                            draggedHero.removeClass('grayscale');
+                            // ui.helper.removeClass('draggable');
+                
+                            // remove highlight from free slots on map
+                            // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+
+                            // remove highlight from free slots on map
+                            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+
+                            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                            .removeClass('opacityForHighlight');
+                        }
+                    });
+                    // end of make the question inside map draggable
+                } else {
                     // dragged from mini map
 
                     // console.log(recieverEl.attr('id'));
@@ -404,26 +891,40 @@ $(document).ready(function ()
                             removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]'), 0);
                             lockNewHeroInSlotForDroppableEmptySlot($('#pickedHeroWrap .dire > div.emptySlot:first'), draggedHeroId, 1, 0);
                             // $('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]');
+                            // console.log('moved to dire');
+                            // var friendPickElements = $('.friendPick.slot');
+                            // var enemyPickElements = $('.enemyPick.slot');
+                            // var banPickElements = $('.banPick.slot');
+                            // fillPickBanInput(friendPickElements, enemyPickElements, banPickElements); 
                         } else {
                             // hero was in dire, moved to radiant
                             removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"]'), 0);
                             lockNewHeroInSlotForDroppableEmptySlot($('#pickedHeroWrap .radiant > div.emptySlot:first'), draggedHeroId, 1, 0);
+                            // console.log('moved to radiant');
                         }
                     } else {
                         // stayed in same team
+
                         recieverEl.append(window.draggableEl);
+                        window.draggableElParent.html(''); //do not remove
                     }
                 }
             }
 
-            getAjaxBalanceForHeroId(draggedHeroId, 1);
+            if (typeof draggedHeroId == 'undefined')
+            {
+                doRecountCounterPickBalance();
+            } else {
+                getAjaxBalanceForHeroId(draggedHeroId, 1);                
+            }
 
+            iconGlowFunction();
 
             // refresh fillPickBanInput
-            // var friendPickElements = $('.friendPick.slot');
-            // var enemyPickElements = $('.enemyPick.slot');
-            // var banPickElements = $('.banPick.slot');
-            // fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);                                     
+            var friendPickElements = $('.friendPick.slot');
+            var enemyPickElements = $('.enemyPick.slot');
+            var banPickElements = $('.banPick.slot');
+            fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);                                   
         },
         over: function(event, ui) {
             // kainax-check
@@ -488,6 +989,7 @@ $(document).ready(function ()
     {
         var fillInputValue = $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val();
 
+        // $('#miniMapWrap > div').html('');
         // console.log('okclick');
         
         // commaSepArray = '(E) Alchim, Axe, BS (B) Lina (F) Lion';
@@ -541,7 +1043,7 @@ $(document).ready(function ()
             var curHeroIdInSlot = $(this).attr('data-hero-id');
             removeHeroFromSlot( $(this), 0 );
             releaseHeroInList(curHeroIdInSlot);
-            deleteHeroFromMinimap(heroId);
+            deleteHeroFromMinimap(curHeroIdInSlot);
         });
 
         // создаем массив со словами, которые не совпали с alias-single
@@ -766,8 +1268,10 @@ $(document).ready(function ()
 
     // deleteHeroFromMinimap('axe');
 
-    $('#miniMapWrap [id^="dire"]').addClass('iconGlowGreen');
-    $('#miniMapWrap [id^="radiant"]').addClass('iconGlowRed');
+    // $('#miniMapWrap [id^="dire"]').addClass('iconGlowGreen');
+    // $('#miniMapWrap [id^="radiant"]').addClass('iconGlowRed');
+
+    iconGlowFunction();
     
     // console.log(window.strategieList);
     // console.log(window.roleList);
@@ -1224,7 +1728,7 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot, needAddHeroToTheMap
         }
     }
     
-
+    // make icons draggable after lockNewHeroInSlot
     //drag n drop for mini-map icons
     // drag'n'drop
     $('#miniMapWrap img[data-hero-id]').draggable({
@@ -1256,9 +1760,13 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot, needAddHeroToTheMap
 
             // highlight free slots on map
             $('#miniMapWrap > div[data-slot-role]').each(function(){
-                if($(this).find('img').length == 0)
+                if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
                 {
-                    $(this).addClass('highlightSlot');
+                    // $(this).addClass('highlightSlot');
+
+                    $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                    $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                    .addClass('opacityForHighlight');
                 }
             });
         },
@@ -1268,7 +1776,12 @@ function lockNewHeroInSlot(slotEl, heroId, recountNeedOrNot, needAddHeroToTheMap
             // ui.helper.removeClass('draggable');
 
             // remove highlight from free slots on map
-            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+            // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+            .removeClass('opacityForHighlight');
         }
     });
     // end of drag'n'drop for mini map
@@ -1337,7 +1850,7 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
         }
     });
 
-    // cross button (remove pick/ban)
+    // cross/delete button (remove pick/ban)
     slotEl.find('.pickedHeroImgDelete').on('mousedown', function ()
     {
         // console.log($(this).parent().attr('data-hero-id'));
@@ -1351,7 +1864,6 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
         // lineThroughLockedRoles();
     });
 
-    // appending uncertain heroes into #uncertainDireHeroesWrap
     // console.log(draggedHeroCodename);
     if(needAddHeroToTheMap == 1)
     {
@@ -1369,7 +1881,7 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
         }
     }
     
-
+    // make icons draggable after lockNewHeroInSlotForDroppableEmptySlot
     //drag n drop for mini-map icons
     // drag'n'drop
     $('#miniMapWrap img[data-hero-id]').draggable({
@@ -1401,9 +1913,13 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
 
             // highlight free slots on map
             $('#miniMapWrap > div[data-slot-role]').each(function(){
-                if($(this).find('img').length == 0)
+                if($(this).find('img').length == 0 && $(this).find('i.questionMark').length == 0)
                 {
-                    $(this).addClass('highlightSlot');
+                    // $(this).addClass('highlightSlot');
+
+                    $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                    $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                    .addClass('opacityForHighlight');
                 }
             });
         },
@@ -1413,7 +1929,12 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
             // ui.helper.removeClass('draggable');
 
             // remove highlight from free slots on map
-            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+            // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+            .removeClass('opacityForHighlight');
         }
     });
     // end of drag'n'drop for mini map
@@ -1488,8 +2009,10 @@ function getAjaxBalanceForHeroId(draggedHeroId, recountNeedOrNot)
 
 function doRecountCounterPickBalance()
 {
+    console.log('do recount function on');
     if (window.globalHeroAjaxRequests == 0)
     {
+        console.log('do recount function INSIDE');
         $('#finalBalanceItemListWrap').html('');
         var tempCounterBalance = [];
         
@@ -1579,10 +2102,6 @@ function doRecountCounterPickBalance()
                 }
             }
         });
-
-
-
-
 
 
         var defaultEmptyVal = -9999;        
@@ -2078,21 +2597,57 @@ function doRecountCounterPickBalance()
             var friendTeam = 'radiant';
         }
     
+       
+
+
         // remove all old lineThrough classes
         $('.heroRolesForBalance > .lineThrough').removeClass('lineThrough');
-        
-        // add new lineThrough classes
+                    
+        // there are no any questionMarks on mini-map, line through all roles
         var allFriendTeamSlots = $('#miniMapWrap > div[id^="'+friendTeam+'"]');
         allFriendTeamSlots.each(function() {
             if( $(this).find('img').length) // do not remove
             {
                 var curLockedRole = $(this).attr('data-slot-role');
                 $('.heroRolesForBalance > span[data-hero-role="'+curLockedRole+'"]').addClass('lineThrough');
-                // console.log(curLockedRole);
-                // console.log($('.heroRolesForBalance > span[data-hero-role="'+curLockedRole+'"]'));
             }
         });
-    
+
+
+        $('.heroRolesForBalance > span.roleFilterGreen').removeClass('roleFilterGreen');
+        // add question marks filters green classes 
+        if($('#miniMapWrap i.questionMark').length)
+        {
+            // questionMark on mini-map, line through all roles exept questionMark roles
+            // lineThrough all roles, then clear those which questionMarked
+            //$('.heroRolesForBalance > span[data-hero-role]').addClass('lineThrough');
+            
+            // get all questionMarked roles
+            var questionMarkRolesArray = [];
+            $('#miniMapWrap i.questionMark').each(function() 
+            {
+                // var curQuestionMarkRole = $(this).parent().attr('data-slot-role');
+                var curQuestionMarkRoleOrders = $(this).parent().attr('data-role-order');
+                for(var i = 0; i < curQuestionMarkRoleOrders.length; i++)
+                {
+                    var curQuestionSingleRoleOrder = curQuestionMarkRoleOrders.charAt(i);
+                    $('.heroRolesForBalance > span[data-role-order="'+curQuestionSingleRoleOrder+'"').each(function()
+                    {
+                        //$(this).removeClass('lineThrough');
+                        $(this).addClass('roleFilterGreen');
+                        var curTotalCoefForBalanceEl = $(this).parent().siblings('.heroTotalCoefForBalance');
+                        var newTotalVal = Number(curTotalCoefForBalanceEl.text()) + (1 * Number($(this).attr('data-role-val')));
+                        if (newTotalVal > 0)
+                        {
+                            newTotalVal = '+'+newTotalVal;
+                        }
+                        curTotalCoefForBalanceEl.html(newTotalVal);
+                    });
+                }
+            });
+        }
+
+
         // add 10 bonus points to actual role
         $('.heroRolesForBalance').each(function()
         {
@@ -2130,14 +2685,40 @@ function doRecountCounterPickBalance()
             function sortByAvailableRole(a, b) {
                 var contentA = Number($(a).find('.heroTotalCoefForBalance').text());
                 var contentB = Number($(b).find('.heroTotalCoefForBalance').text());
+                // A:
                 if (Number($(a).find('.heroRolesForBalance').attr('data-has-good-role')) > 0)
                 {
                     contentA = contentA+1000;
                 }
+                var curFilterRolesCount = 0;
+                var curFilterRolesValSumm = 0;
+                $(a).find('.roleFilterGreen').each(function()
+                {
+                    curFilterRolesCount++;
+                    curFilterRolesValSumm = curFilterRolesValSumm + Number($(this).attr('data-role-val'));
+                });
+                if (curFilterRolesCount > 0)
+                {
+                    contentA = contentA+((curFilterRolesValSumm / curFilterRolesCount) * 1000);
+                }
+
+                // B:
                 if (Number($(b).find('.heroRolesForBalance').attr('data-has-good-role')) > 0)
                 {
                     contentB = contentB+1000;
                 }
+                var curFilterRolesCount = 0;
+                var curFilterRolesValSumm = 0;
+                $(b).find('.roleFilterGreen').each(function()
+                {
+                    curFilterRolesCount++;
+                    curFilterRolesValSumm = curFilterRolesValSumm + Number($(this).attr('data-role-val'));
+                });
+                if (curFilterRolesCount > 0)
+                {
+                    contentB = contentB+((curFilterRolesValSumm / curFilterRolesCount) * 1000);
+                }
+
                 return contentA < contentB ? 1 : -1;
             };
             $('#finalBalanceItemListWrap').each(function(){
@@ -2180,7 +2761,7 @@ function doRecountCounterPickBalance()
 
                 // highlight free slots on map
                 $('#miniMapWrap > div[data-slot-role]').each(function(){
-                    if($(this).find('img').length == 0)
+                    if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
                     {
                         $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
                         $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
@@ -2219,6 +2800,9 @@ function doRecountCounterPickBalance()
             }
         });
         // end of draggable for recommend heroes
+
+        // remove iconglow from questionMark
+        iconGlowFunction();
     }
 
 
@@ -2244,7 +2828,7 @@ function doRecountCounterPickBalance()
 //функция для заполнения инпута текстом пиков и банов
 function fillPickBanInput(friendPickElements, enemyPickElements, banPickElements) 
 {
-    // delete highlight from heroes if noone if pick/ban slots (fix 12900)
+    // delete highlight from heroes if none in pick/ban slots (fix 12900)
     if(friendPickElements.length < 1 && enemyPickElements.length < 1 && banPickElements.length < 1)
     {
         $('img.highlight').remove();
@@ -2812,35 +3396,47 @@ function getHeroRolesNamesByHeroIdAsHtml(heroId)
         if((allHeroRoles.charAt(0) > 0)
         && (allHeroRoles.charAt(0) == i))
         {
-            heroNamesRolesHtml += '<span data-hero-role="1">Carry</span>';
+            heroNamesRolesHtml += '<span data-hero-role="1" data-role-order="0" data-role-val="'+i+'">1(Carry)</span>';
         }
         if((allHeroRoles.charAt(1) > 0)
         && (allHeroRoles.charAt(1) == i))
         {
-            heroNamesRolesHtml += '<span data-hero-role="2">Mider</span>';
+            heroNamesRolesHtml += '<span data-hero-role="2" data-role-order="1" data-role-val="'+i+'">2(Mider)</span>';
         }
-        if(((allHeroRoles.charAt(2) > 0 || allHeroRoles.charAt(3) > 0))
-        &&((allHeroRoles.charAt(2) == i) || (allHeroRoles.charAt(3) == i)))
+        if((allHeroRoles.charAt(2) > 0)
+        && (allHeroRoles.charAt(2) == i))
         {
-            if (typeof arrayIsAlreadyAdded[3] == 'undefined')
-            {
-                arrayIsAlreadyAdded[3] = 1;
-                heroNamesRolesHtml += '<span data-hero-role="3">Hardlaner</span>';
-            }
+            heroNamesRolesHtml += '<span data-hero-role="3" data-role-order="2" data-role-val="'+i+'">3(Off solo)</span>';
         }
-        if((allHeroRoles.charAt(4) > 0 || allHeroRoles.charAt(5) > 0 || allHeroRoles.charAt(6) > 0 || allHeroRoles.charAt(7) > 0)
-        &&((allHeroRoles.charAt(4) == i) || (allHeroRoles.charAt(5) == i)) || (allHeroRoles.charAt(6) == i) || (allHeroRoles.charAt(7) == i))
+        if((allHeroRoles.charAt(3) > 0)
+        && (allHeroRoles.charAt(3) == i))
         {
-            if (typeof arrayIsAlreadyAdded[4] == 'undefined')
-            {
-                arrayIsAlreadyAdded[4] = 1;
-                heroNamesRolesHtml += '<span data-hero-role="4">Semi-support</span>';
-            }
+            heroNamesRolesHtml += '<span data-hero-role="3" data-role-order="3" data-role-val="'+i+'">3(Off core)</span>';
+        }
+        if((allHeroRoles.charAt(4) > 0)
+        && (allHeroRoles.charAt(4) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="4" data-role-order="4" data-role-val="'+i+'">4(Mid supp)</span>';
+        }
+        if((allHeroRoles.charAt(5) > 0)
+        && (allHeroRoles.charAt(5) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="4" data-role-order="5" data-role-val="'+i+'">4(Off supp)</span>';
+        }
+        if((allHeroRoles.charAt(6) > 0)
+        && (allHeroRoles.charAt(6) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="4" data-role-order="6" data-role-val="'+i+'">4(Roam)</span>';
+        }
+        if((allHeroRoles.charAt(7) > 0)
+        && (allHeroRoles.charAt(7) == i))
+        {
+            heroNamesRolesHtml += '<span data-hero-role="4" data-role-order="7" data-role-val="'+i+'">4(Jungler)</span>';
         }
         if((allHeroRoles.charAt(8) > 0)
         && (allHeroRoles.charAt(8) == i))
         {
-            heroNamesRolesHtml += '<span data-hero-role="5">Support</span>';
+            heroNamesRolesHtml += '<span data-hero-role="5" data-role-order="8" data-role-val="'+i+'">5(Full supp)</span>';
         }
     }
 
@@ -3155,6 +3751,78 @@ function swapSides()
     var direRoamHtml = direRoamEl.html();
     radiantRoamEl.html(direRoamHtml);
     direRoamEl.html(radiantRoamHtml);
+
+    // make icons draggable after swap sides
+    //drag n drop for mini-map icons
+    // drag'n'drop
+    $('#miniMapWrap img[data-hero-id]').draggable({
+        cursor: 'default'
+        ,helper: "clone"
+        ,revert: 'invalid'
+        // , zIndex: 99999999
+        , drag: function (event, ui)
+        {
+            var draggedHero = $(this);
+            window.draggableEl = $(this);
+            window.draggableElParent = $(this).parent();
+
+            //var dragHeroId = draggedHero.attr('data-hero-id');
+            draggedHero.addClass('grayscale');
+            // ui.helper.addClass('draggable');
+        },
+        start: function (e, ui)
+        {
+            var draggedHero = $(this);
+            // if (draggedHero.hasClass('pickedOrBaned'))
+            // {
+            //     //This will prevent moving the element from it's position
+            //     e.preventDefault();
+            // }
+
+            ui.helper.attr('data-dragged-from', 'fromMiniMap');
+            ui.helper.attr('data-dragged-from-id', draggedHero.parent().attr('id'));
+
+            // highlight free slots on map
+            $('#miniMapWrap > div[data-slot-role]').each(function(){
+                if($(this).find('img').length == 0  && $(this).find('i.questionMark').length == 0)
+                {
+                    // $(this).addClass('highlightSlot');
+
+                    $(this).addClass('highlightSlot').html('<span>'+$(this).attr('data-slot-role')+'</span>');
+                    $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+                    .addClass('opacityForHighlight');
+                }
+            });
+        },
+        stop: function (event, ui) {
+            var draggedHero = $(this);
+            draggedHero.removeClass('grayscale');
+            // ui.helper.removeClass('draggable');
+
+            // remove highlight from free slots on map
+            // $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot');
+
+            // remove highlight from free slots on map
+            $('#miniMapWrap > div.highlightSlot').removeClass('highlightSlot').find('span').remove();
+            $('#radiantEasy3, #radiantJungle, #radiantMid2, #radiantMid3, #radiantHard2, #radiantHard3, #direEasy3, #direJungle, #direMid2, #direMid3, #direHard2, #direHard3')
+            .removeClass('opacityForHighlight');
+        }
+    });
+    // end of drag'n'drop for mini map
+
+    // swap icon glow color
+    // if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+    // {
+    //     // our team dire
+    //     $('#miniMapWrap [id^="dire"]').addClass('iconGlowGreen').removeClass('iconGlowRed');
+    //     $('#miniMapWrap [id^="radiant"]').addClass('iconGlowRed').removeClass('iconGlowGreen');
+    // } else {
+    //     // our team radiant
+    //     $('#miniMapWrap [id^="dire"]').addClass('iconGlowRed').removeClass('iconGlowGreen');
+    //     $('#miniMapWrap [id^="radiant"]').addClass('iconGlowGreen').removeClass('iconGlowRed');
+    // }
+
+    iconGlowFunction();
 }
 
 function addHeroToTheMap(side, heroId, heroCodename)
@@ -3304,4 +3972,26 @@ function resizeVerticalMenu()
         $('#heroCounterBalanceListWrap').css('height', innerHeight - heroCounterBalanceListWrapOffset - 11);
         $('#finalBalanceItemListWrap').css('height', innerHeight - firstRecommendItemOffset - 13);
     }
+}
+
+function iconGlowFunction()
+{  
+    $('#miniMapWrap .iconGlowGreen').removeClass('iconGlowGreen');
+    $('#miniMapWrap .iconGlowRed').removeClass('iconGlowRed');
+
+    if( $('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+    {
+        // our team is dire
+        $('#miniMapWrap div[id^="dire"]:not(div:has(i.questionMark))').addClass('iconGlowGreen');
+        $('#miniMapWrap div[id^="radiant"]:not(div:has(i.questionMark))').addClass('iconGlowRed');
+    } else {
+        // our team is radiant
+        $('#miniMapWrap div[id^="dire"]:not(div:has(i.questionMark))').addClass('iconGlowRed');
+        $('#miniMapWrap div[id^="radiant"]:not(div:has(i.questionMark))').addClass('iconGlowGreen');
+    }
+}
+
+function removeQuestionMarkFromMap(questionMarkMapSlotId)
+{
+    $('#miniMapWrap div[id="'+questionMarkMapSlotId+'"]').find('i.questionMark').remove();
 }

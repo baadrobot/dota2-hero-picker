@@ -224,52 +224,54 @@
             echo '<div class="col-2">';
                 echo '<div id="miniMapWrap">';
                     // divs for radiant easy lane
-                    echo '<div id="radiantEasy1" data-slot-role="1"></div>';
-                    echo '<div id="radiantEasy2" data-slot-role="5"></div>';
-                    echo '<div id="radiantEasy3" data-slot-role="4"></div>';
+                    echo '<div id="radiantEasy1" data-slot-role="1" data-role-order="0"></div>';
+                    echo '<div id="radiantEasy2" data-slot-role="5" data-role-order="8"></div>';
+                    echo '<div id="radiantEasy3" data-slot-role="4" data-role-order="86"></div>';
 
                     // divs for radiant mid lane
-                     echo '<div id="radiantMid1" data-slot-role="2"></div>';
-                    echo '<div id="radiantMid2" data-slot-role="4"></div>';
-                    echo '<div id="radiantMid3" data-slot-role="5"></div>';
+                    echo '<div id="radiantMid1" data-slot-role="2" data-role-order="1"></div>';
+                    echo '<div id="radiantMid2" data-slot-role="4" data-role-order="6"></div>';
+                    echo '<div id="radiantMid3" data-slot-role="5" data-role-order="4"></div>';
 
                     // divs for radiant hard lane
-                     echo '<div id="radiantHard1" data-slot-role="3"></div>';
-                    echo '<div id="radiantHard2" data-slot-role="4"></div>';
-                    echo '<div id="radiantHard3" data-slot-role="5"></div>';
+                    echo '<div id="radiantHard1" data-slot-role="3" data-role-order="2"></div>';
+                    echo '<div id="radiantHard2" data-slot-role="4" data-role-order="5"></div>';
+                    echo '<div id="radiantHard3" data-slot-role="5" data-role-order="8"></div>';
 
                     // divs for radiant jungle
-                    echo '<div id="radiantJungle" data-slot-role="4"></div>';
+                    echo '<div id="radiantJungle" data-slot-role="4" data-role-order="7"></div>';
 
                     // div for radiant roamer
-                    echo '<div id="radiantRoam" data-slot-role="4"></div>';
+                    echo '<div id="radiantRoam" data-slot-role="4" data-role-order="6"></div>';
 
                     // divs for dire easy lane
-                    echo '<div id="direEasy1" data-slot-role="1"></div>';
-                    echo '<div id="direEasy2" data-slot-role="5"></div>';
-                    echo '<div id="direEasy3" data-slot-role="4"></div>';
+                    echo '<div id="direEasy1" data-slot-role="1" data-role-order="0"></div>';
+                    echo '<div id="direEasy2" data-slot-role="5" data-role-order="8"></div>';
+                    echo '<div id="direEasy3" data-slot-role="4" data-role-order="86"></div>';
 
                     // divs for dire mid lane
-                    echo '<div id="direMid1" data-slot-role="2"></div>';
-                    echo '<div id="direMid2" data-slot-role="4"></div>';
-                    echo '<div id="direMid3" data-slot-role="5"></div>';
+                    echo '<div id="direMid1" data-slot-role="2" data-role-order="1"></div>';
+                    echo '<div id="direMid2" data-slot-role="4" data-role-order="6"></div>';
+                    echo '<div id="direMid3" data-slot-role="5" data-role-order="4"></div>';
 
                     // divs for dire hard lane
                     
-                    echo '<div id="direHard1" data-slot-role="3"></div>';
-                    echo '<div id="direHard2" data-slot-role="4"></div>';
-                    echo '<div id="direHard3" data-slot-role="5"></div>';
+                    echo '<div id="direHard1" data-slot-role="3" data-role-order="2"></div>';
+                    echo '<div id="direHard2" data-slot-role="4" data-role-order="5"></div>';
+                    echo '<div id="direHard3" data-slot-role="5" data-role-order="8"></div>';
 
                     // div for dire jungle
-                    echo '<div id="direJungle" data-slot-role="4"></div>';
+                    echo '<div id="direJungle" data-slot-role="4" data-role-order="7"></div>';
 
                     // div for dire roamer
-                    echo '<div id="direRoam" data-slot-role="4"></div>';
+                    echo '<div id="direRoam" data-slot-role="4" data-role-order="6"></div>';
 
                     echo '<img id="miniMapImg" src="images/mini-map-dire.png">';
                 echo '</div>';
 
             echo '</div>';
+            
+            echo '<i id="userRole" class="questionMark fa fa-question-circle"></i>';
 
             // echo '<div class="col-3">';
             //     echo '<div id="uncertainDireHeroesWrap" class="align-top">';
