@@ -107,7 +107,7 @@ $(document).ready(function ()
                         var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+result.item_list[i]['itemCodename']+'_lg.png';                        
 
                         itemsHtml += '<div class="itemImgWrap">';
-                            itemsHtml += '<img src="'+itemIconUrl+'" height="27px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
+                            itemsHtml += '<img src="'+itemIconUrl+'" height="20px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
                         itemsHtml += '</div>';
                     }
                     
@@ -168,6 +168,7 @@ $(document).ready(function ()
                                 if (result.php_result == 'OK')
                                 {
                                     ajaxGetTagsArray(rebuildEditorTags);
+                                    $('#forSelectedTag span.fa-times').click();
                                 }
                                 else if (result.php_result == 'ERROR')
                                 {
@@ -225,12 +226,12 @@ $(document).ready(function ()
             {
                 pleaseWaitOpen();
                 // $('.tag.selectedTag').click();
-
+                window.selectedTagId = $('#tagListWrap .selectedTag').attr('data-tag-id');
                 //Ajax
                 $.ajax({
                     url: 'php/ajax.editor.php',
                     data: {  ajaxType: 'editorRenameTag'
-                            , renamedTagId: $('#tagListWrap .selectedTag').attr('data-tag-id')
+                            , renamedTagId: selectedTagId
                            , renamedTagName: $.trim($('#inputRenameTagName').val())
                           },
                     datatype: 'jsonp',
@@ -242,6 +243,9 @@ $(document).ready(function ()
                         {
                             $('#createNewTagPopup').modal('hide');
                             ajaxGetTagsArray(rebuildEditorTags);
+                            rebuildEditorBalanceTags();
+                            // $('#tagListWrap span[data-tag-id="'+selectedTagId+'"]').click();
+                            // console.log(selectedTagId);
                         }
                         else if (result.php_result == 'ERROR')
                         {
@@ -1308,7 +1312,7 @@ function rebuildEditorBalanceTags()
                                         var itemIconUrl = 'http://cdn.dota2.com/apps/dota2/images/items/'+result.item_list[i]['itemCodename']+'_lg.png';                        
 
                                         itemsHtml += '<div class="itemImgWrap">';
-                                            itemsHtml += '<img src="'+itemIconUrl+'" height="26px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
+                                            itemsHtml += '<img src="'+itemIconUrl+'" height="20px" data-inactive-tooltip="'+tooltip+'" data-item-single="'+result.item_list[i]['itemAliasSingle']+'">';
                                         itemsHtml += '</div>';
                                     }
                                     
@@ -1340,6 +1344,11 @@ function rebuildEditorBalanceTags()
                     // });
 
                     sortEditorBalanceTags();
+                    // console.log(window.selectedTagId);
+                    if(typeof window.selectedTagId != 'undefined')
+                    {
+                        $('#tagListWrap span[data-tag-id="'+window.selectedTagId+'"]').click();
+                    }
                 }
                 else if (result.php_result == 'ERROR')
                 {

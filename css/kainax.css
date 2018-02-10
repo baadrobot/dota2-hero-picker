@@ -72,6 +72,17 @@ body {
     display: inline-flex;
     float: left;
 }
+
+.editor #heroListWrap .smlGrp:nth-child(1){
+    display: inline-flex;
+    float: left;
+}
+
+.editor #heroListWrap .smlGrp:nth-child(2){
+    display: inline-flex;
+    float: right;
+}
+
 #heroListWrap .smlGrp:nth-child(3){
     float: right;
 }

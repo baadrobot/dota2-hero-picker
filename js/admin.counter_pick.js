@@ -4,7 +4,7 @@ $(document).ready(function ()
     if(getCookie('fillInputValue') != '')
     {
         // fill input OK btn
-        $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').before('<span id="fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn" class="input-group-addon"><i class="fa fa-undo"></i></span>');
+        $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').before('<span id="fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn" class="input-group-addon" title="Get previous pick"><i class="fa fa-undo"></i></span>');
 
         $('#fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn').on('click', function() 
         {

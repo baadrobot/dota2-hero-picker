@@ -75,7 +75,8 @@
 .heroListImg:hover:not(.pickedOrBaned) {
     /* -webkit-filter: grayscale(0%); Safari 6.0 - 9.0 */
     /* filter: grayscale(0%); */
-    cursor: pointer;
+    /* cursor: pointer; */
+    cursor: url("/images/openhand.png"), auto;
 }
 
 hr {
@@ -396,7 +397,7 @@ line-height: 40px
 }
 
 .heroInfoWrapForBalance:hover {
-    cursor: pointer;
+    cursor: url("/images/openhand.png"), auto;
     background-color: rgb(58, 63, 59);
     box-shadow: 3px 2px 9px #634747;
     box-shadow: 1px 1px 9px #381f1f;
@@ -894,6 +895,7 @@ line-height: 40px
 
 #balanceSortWrap {
     /* text-align: center; */
+    display: inline-block;
 }
 
 #balanceSortWrap label {
@@ -926,7 +928,7 @@ line-height: 40px
 }
 
 .pickedHeroImgWrap, #miniMapWrap > div > img[data-hero-id] {
-    cursor: pointer;
+    cursor: url("/images/openhand.png"), auto;
 }
 
 .heroRolesForBalance {
@@ -969,8 +971,11 @@ line-height: 40px
     position: relative;
 }
 
+
+
 .questionMark {
-    cursor: pointer;
+    cursor: url("/images/openhand.png"), auto;
+    /* cursor: pointer; */
     font-size: 28px;
     border: 2px solid #05880d;
     border-radius: 17px;
@@ -982,4 +987,40 @@ line-height: 40px
     line-height: 24px;
     color: black;
     font-weight: bold;
+}
+
+.removeIconMark {
+    font-size: 28px;
+    border: 2px solid #cd1616;
+    border-radius: 17px;
+    width: 28px;
+    height: 28px;
+    background-color: #cd1616;
+    margin: 0;
+    padding: 0;
+    line-height: 24px;
+    color: black;
+    font-weight: bold;
+}
+
+#removeIcon {
+    left: -12px;
+    top: 30px;
+    position: relative;
+}
+
+.finalBalaceItem .heroRolesForBalance>span[data-hero-role]:not(.lineThrough):hover {
+    text-decoration: underline;
+}
+
+#copyRecommendHeroesBtn {
+    color: white;
+    display: inline-block;
+    float: right;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.ui-draggable-dragging, .draggable {
+    cursor: url("/images/closedhand.png"), auto;
 }

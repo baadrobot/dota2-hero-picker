@@ -177,7 +177,7 @@
 
             echo '<div id="heroListWrap" class="col-8">';
 
-                echo '<div id="swapSidesBtn" class="input-group smlGrp">';
+                echo '<div id="swapSidesBtn" class="input-group smlGrp" title="Swap sides">';
                     echo '<span class="input-group-addon"><i class="fa fa-exchange"></i></span>';
                 echo '</div>';
     
@@ -210,6 +210,9 @@
                         echo '</label>';
                     // echo '</div>';
                 echo '</div>';
+
+                echo '<i id="copyRecommendHeroesBtn" style="display:none" class="fa fa-clipboard" title="Copy to clipboard"></i>';
+                echo '<input id="inputForClipboard" style="display: none" width="1px">';
 
                 echo '<div id="counterPleaseWait" style="display:none">';                
                     echo 'Loading...';
@@ -271,7 +274,8 @@
 
             echo '</div>';
             
-            echo '<i id="userRole" class="questionMark fa fa-question-circle"></i>';
+            echo '<i id="userRole" class="questionMark fa fa-question-circle" title="Drag into position to filter roles"></i>';
+            echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them"></i>';
 
             // echo '<div class="col-3">';
             //     echo '<div id="uncertainDireHeroesWrap" class="align-top">';
