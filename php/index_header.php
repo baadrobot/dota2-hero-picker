@@ -48,6 +48,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<link href="favicon.ico" rel="shortcut icon" type="image/x-icon">';
 
         echo '<script src="https://use.fontawesome.com/3f039be9d2.js"></script>';
+        // echo '<script src="js/fontawesome.js"></script>';
 
 
 
@@ -65,16 +66,27 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             */
         }
 
-        echo '<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" crossorigin="anonymous">';
-        echo '<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>';
-        echo '<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>';
-        //echo '<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>';
-        echo '<script src="js/bootstrap.min.js"></script>';
+        // echo '<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" crossorigin="anonymous">';
+        echo '<link rel="stylesheet" href="css/bootstrap.min.css">';
+
+        // echo '<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>';
+        echo '<script src="js/jquery.min.js"></script>';
+
+        // echo '<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>';
+        echo '<script src="js/popper.min.js"></script>';
+
+        echo '<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>';
+        // echo '<script src="js/bootstrap.min.js"></script>';
 
 
         // jQuery UI
-        echo '<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">';
-        echo '<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>';
+        // echo '<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">';
+        echo '<link rel="stylesheet" href="css/jquery-ui.css">';
+
+        // echo '<script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>';
+        echo '<script src="js/jquery-ui.js"></script>';
+
+
         echo '<script src="js/jquery.ui.autocomplete.js"></script>';
 
 

@@ -35,16 +35,16 @@
 
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                    echo '<span class="input-group-append"><button class="fa fa-search btn btn-secondary"></button></span>';
                 echo '</div>';
 
 
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchAbilityInput" type="text" class="form-control" disabled="disabled" placeholder="Поиск по способностям"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                    echo '<span class="input-group-append"><button class="fa fa-search btn btn-secondary"></button></span>';
                 echo '</div>';
 
-                echo '<div id="forSelectedTag">';
+                echo '<div id="selectedTagDisplay">';
                     echo '<span></span>';
                     echo '<span class="fa fa-times" style="display:none"></span>';
                 echo '</div>';
@@ -57,7 +57,7 @@
 
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchTagInput" type="text" class="form-control" disabled="disabled" placeholder="Поиск тэгов"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                    echo '<span class="input-group-append"><button class="fa fa-search btn btn-secondary"></button></span>';
                 echo '</div>';
 
                 echo '<div id="editAccordion" data-children=".item">';

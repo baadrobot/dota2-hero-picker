@@ -225,9 +225,9 @@
                          WHERE `cf_d2HeroTagSet_tag_id` = ?;';
         $isDeleteOkTwo = $dbClass->delete($query, $_POST['tagId']);
 
-        $query2 = 'DELETE FROM tb_dota2_tag_list
+        $query = 'DELETE FROM tb_dota2_tag_list
                         WHERE `cf_d2TagList_id` = ?;';
-        $isDeleteOkOne = $dbClass->delete($query2, $_POST['tagId']);
+        $isDeleteOkOne = $dbClass->delete($query, $_POST['tagId']);
 
         if ($isDeleteOkOne && $isDeleteOkTwo)
         {
@@ -250,9 +250,9 @@
                 FROM tb_dota2_tag_balance_set
                 LEFT JOIN tb_lang_vars
                     ON CONCAT('_BALANCE', tb_dota2_tag_balance_set.cf_d2TagBalanceSet_id, '_') = tb_lang_vars.cf_siteLang_pre
-                WHERE tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 1
-                AND tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value > 0
-                OR tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 0
+                -- WHERE (tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 1
+                -- AND tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value > 0)
+                -- OR tb_dota2_tag_balance_set.cf_d2TagBalanceSet_set_type = 0
                 ORDER BY value DESC;";
         $allBalanceTags = $dbClass->select($query);
 
@@ -303,9 +303,10 @@
         $query = 'SELECT cf_d2TagBalanceSet_id as `balanceSetId`
                     FROM tb_dota2_tag_balance_set
                     WHERE cf_d2TagBalanceSet_first_tag_id = ?
-                      AND cf_d2TagBalanceSet_second_tag_id = ?;';
+                      AND cf_d2TagBalanceSet_second_tag_id = ?
+                      AND cf_d2TagBalanceSet_set_type = ?;';
 
-        $resultMirrorTagBalance = $dbClass->select($query, $secondTagId, $firstTagId);
+        $resultMirrorTagBalance = $dbClass->select($query, $firstTagId, $secondTagId, $_POST['setType']);
 
         if (count($resultMirrorTagBalance) > 0)
         {
@@ -332,20 +333,20 @@
             $query = 'DELETE FROM tb_lang_vars
                             WHERE cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id
                                                     FROM tb_dota2_tag_balance_set
-                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_");';
+                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? AND cf_d2TagBalanceSet_set_type = ? LIMIT 1), "_");';
 
-            $isResultOk2 = $dbClass->delete($query, $firstTagId, $secondTagId);
+            $isResultOk2 = $dbClass->delete($query, $firstTagId, $secondTagId, $_POST['setType']);
         } else {
             // insert/update balance notes
             $query = 'INSERT INTO tb_lang_vars
                             SET cf_siteLang_module = ?
                                 , cf_siteLang_pre = CONCAT("_BALANCE", (SELECT cf_d2TagBalanceSet_id
                                                     FROM tb_dota2_tag_balance_set
-                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? LIMIT 1), "_")
+                                                    WHERE cf_d2TagBalanceSet_first_tag_id = ? AND cf_d2TagBalanceSet_second_tag_id = ? AND cf_d2TagBalanceSet_set_type = ? LIMIT 1), "_")
                                 , cf_siteLang_ru_RU = ?
                     ON DUPLICATE KEY UPDATE cf_siteLang_ru_RU = ?;';
 
-            $isResultOk2 = $dbClass->insert($query, 'NOTES', $firstTagId, $secondTagId, $balanceNote, $balanceNote);
+            $isResultOk2 = $dbClass->insert($query, 'NOTES', $firstTagId, $secondTagId, $_POST['setType'], $balanceNote, $balanceNote);
         }
 
         if ($isResultOk1 && $isResultOk2)

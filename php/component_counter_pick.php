@@ -1,4 +1,5 @@
 <?php
+    require_once('php/a_functions.php');
     global $dbClass;
 
     $query = 'SELECT cf_d2HeroList_id as `id`
@@ -8,6 +9,9 @@
                     ,cf_d2HeroList_name_aliases as `na`
                     ,cf_d2HeroList_aliases_custom as `nac`
                     ,cf_d2HeroList_alias_single as `nas`
+                    ,cf_d2HeroList_role_initiator as `initiator`
+                    ,cf_d2HeroList_role_durable as `durable`
+                    ,cf_d2HeroList_role_pusher as `pusher`
                     -- ,cf_d2HeroList_icon as `icon`
                 FROM tb_dota2_hero_list ORDER BY cf_d2HeroList_name_en_US;';
 
@@ -124,6 +128,67 @@
         $lastWeakHeroId = $curWeakHeroId;
     }
 
+    $heroesPickWinRates = [];    
+    $todaysPrebuildPickAndWinRateFileCachePath = __DIR__.'/prebuild/prebuild.hero_pick&win'.date("Y-m-d").'.json';
+    if (file_exists($todaysPrebuildPickAndWinRateFileCachePath))
+    {
+        $heroesPickWinRates = json_decode(file_get_contents($todaysPrebuildPickAndWinRateFileCachePath), true);
+    } else {
+        // parse
+        // получаем html
+        $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/meta');
+        
+        foreach($html->find('table > tbody tr') as $heroTableRow)
+        {
+            if ($heroTableRow->children(0)->hasAttribute('data-value'))
+            {
+                $heroName = $heroTableRow->children(0)->getAttribute('data-value');
+                $pickPercent = 0;
+                if(is_object($heroTableRow->children(10)))
+                {
+                    $pickPercent = $heroTableRow->children(10)->plaintext;
+                }
+                $winPercent = 50;
+                if(is_object($heroTableRow->children(11)))
+                {
+                    $winPercent = $heroTableRow->children(11)->plaintext;
+                }
+
+                for($i = 0; $i < count($hero_array); $i++)
+                {
+                    if($hero_array[$i]['n'] == $heroName)
+                    {
+                        $hId = $hero_array[$i]['id'];
+                        $heroesPickWinRates[$hId] = [];
+                        $heroesPickWinRates[$hId]['pr'] = (float)$pickPercent;
+                        $heroesPickWinRates[$hId]['wr'] = (float)$winPercent;
+                    }
+                }
+            }
+        }
+            // echo '<pre>',print_r($hero_array),'</pre>';
+            // exit;    
+        // end of parse
+
+        // save to json for future use duiring this day
+        if ($heroesPickWinRates != [])
+        {
+            file_put_contents($todaysPrebuildPickAndWinRateFileCachePath, json_encode($heroesPickWinRates));
+        }        
+    }
+
+    //for($j = 0; $j < count($$heroesPickWinRates); $j++)
+    foreach ($heroesPickWinRates as $keyHeroId => $value)
+    {
+        for($i = 0; $i < count($hero_array); $i++)
+        {
+            if($hero_array[$i]['id'] == $keyHeroId)
+            {
+                $hero_array[$i]['pr'] = $value['pr'];
+                $hero_array[$i]['wr'] = $value['wr'];
+            }
+        }
+    }
 
     echo '<script>';
         echo 'window.heroList = '.json_encode($hero_array).';';
@@ -178,17 +243,17 @@
             echo '<div id="heroListWrap" class="col-8">';
 
                 echo '<div id="swapSidesBtn" class="input-group smlGrp" title="Swap sides">';
-                    echo '<span class="input-group-addon"><i class="fa fa-exchange"></i></span>';
+                    echo '<span><button class="fa fa-exchange btn btn-secondary"></button></span>';
                 echo '</div>';
     
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
-                    echo '<span class="input-group-addon"><i class="fa fa-search"></i></span>';
+                    echo '<span class="input-group-append"><button class="fa fa-search btn btn-secondary"></button></span>';
                 echo '</div>';
 
                 echo '<div class="input-group smlGrp smlGrpWidth">';
                     echo '<input id="fillHeroPickAndBanSlotsViaAliasSingleInput" type="text" class="form-control" placeholder="(E) sk, wk, bm (B) doom, kotl (F) ss, sd, brew"/>';
-                    echo '<span id="fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn" class="input-group-addon"><i class="fa fa-telegram"></i></span>';
+                    echo '<span id="fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn" class="input-group-append"><button class="fa fa-paper-plane btn btn-secondary" ></button></span>';
                 echo '</div>';
                 
             echo '</div>';
@@ -196,10 +261,11 @@
 // ----------------------------- Editor panel
             echo '<div id="heroCounterBalanceListWrap" class="col-4">';
 
-                echo '<div id="balanceSortWrap" style="display:none">';
+                echo '<div id="balanceSortWrap" class="input-group-text" style="display:none">';
                     // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
                     // echo '<input id="sortByRole" type="radio" name="balanceSort">';     
                     // echo '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
+                    // echo '<div class="input-group-text">';
                         echo 'Sort by:';
                         echo '<label>';
                             echo '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off" checked> Role';
@@ -208,10 +274,18 @@
                         echo '<label>';
                             echo '<input type="radio" name="sortBalance" id="sortByRating" autocomplete="off"> Rating';
                         echo '</label>';
+                    echo '</div>';
                     // echo '</div>';
-                echo '</div>';
+                // echo '</div>';
 
-                echo '<i id="copyRecommendHeroesBtn" style="display:none" class="fa fa-clipboard" title="Copy to clipboard"></i>';
+                // echo '<i id="copyRecommendHeroesBtn" style="display:none" class="fa fa-clipboard" title="Copy to clipboard"></i>';
+                // echo '<input id="inputForClipboard" style="display: none" width="1px">';
+
+                echo '<div id="copyRecommendHeroesBtn" style="display:none" class="input-group smlGrp" title="Copy to clipboard">';
+                    echo '<span>';
+                        echo '<button class="fa fa-clipboard btn btn-secondary"></button>';
+                    echo '</span>';
+                echo '</div>';
                 echo '<input id="inputForClipboard" style="display: none" width="1px">';
 
                 echo '<div id="counterPleaseWait" style="display:none">';                
@@ -275,7 +349,7 @@
             echo '</div>';
             
             echo '<i id="userRole" class="questionMark fa fa-question-circle" title="Drag into position to filter roles"></i>';
-            echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them"></i>';
+            echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them" style="display: none"></i>';
 
             // echo '<div class="col-3">';
             //     echo '<div id="uncertainDireHeroesWrap" class="align-top">';

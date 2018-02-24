@@ -89,15 +89,21 @@ body {
 .counter_pick #heroListWrap .smlGrp:nth-child(1){
     width: 42px;
 }
-.smlGrp .input-group-addon,
+.smlGrp .input-group-append,
 .smlGrp input
 {
     font-size: 11px;
 }
 
-#heroListWrap .input-group-addon {
+#heroListWrap .input-group-append {
     cursor: pointer;
-    width: 34px;
+    /* width: 34px; */
+}
+
+.input-group button.fa
+{
+	color: white;
+	padding: 0 8px;
 }
 
 .plus {
@@ -125,7 +131,7 @@ body {
 	font-size: 12px;
 }
 
-.balanceTag:hover, input+span.input-group-addon {
+.balanceTag:hover, input+span.input-group-append {
     cursor: pointer;
     /* color: rgb(18, 168, 23); */
 }

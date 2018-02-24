@@ -2,27 +2,7 @@
     opacity: 0.3;
 }
 
-/* .acrdHdrBtn {
-    cursor: pointer;
-    margin: 5px 0 0 5px;
-} */
 
-/* .hvrDrkGr:hover {
-    color: green!important;
-} */
-
-/* #btnDeleteSelectedTagPopup {
-    cursor: pointer;
-    display: none;
-} */
-
-/* .hvrMaroon:hover {
-    color: maroon!important;
-} */
-
-/* .hvrOrange:hover {
-    color: rgb(255, 136, 0)!important;
-} */
 
 .heroList {
     width: 100%;
@@ -30,10 +10,6 @@
     /* max-width: 702px; */
     clear: both;
 }
-
-/* #editAccordion{ */
-    /* margin: 10px auto 10px auto; */
-/* } */
 
 .heroListImg {
     float: left;
@@ -72,10 +48,9 @@
     opacity: 0.8;
 }
 
-.heroListImg:hover:not(.pickedOrBaned) {
+#heroListWrap .heroListImg:hover:not(.pickedOrBaned) {
     /* -webkit-filter: grayscale(0%); Safari 6.0 - 9.0 */
     /* filter: grayscale(0%); */
-    /* cursor: pointer; */
     cursor: url("/images/openhand.png"), auto;
 }
 
@@ -88,7 +63,6 @@ hr {
     width: 40px;
     height: auto;
     margin: 1px;
-    cursor: pointer;
 } */
 
 /* .heroBalance {
@@ -147,7 +121,6 @@ hr {
 }
 .tagBalanceItem:hover {
     border-color: rgb(104, 154, 208);
-    cursor: pointer;
 } */
 
 .noticeRed {
@@ -307,14 +280,13 @@ hr {
     float: right;
 } */
 
-/* .smlGrp .input-group-addon, */
+/* .smlGrp .input-group-append, */
 .smlGrp input
 {
     font-size: 11px;
 }
 
-/* #heroListWrap .input-group-addon {
-    cursor: pointer;
+/* #heroListWrap .input-group-append {
     width: 34px;
 } */
 /* #editInfoTagHeroNone{
@@ -349,12 +321,10 @@ margin-right: 10px;
 }
 
 .editHeroPopupTag:hover {
-    cursor: pointer;
     color: rgb(24, 226, 30);
 }
 
  .editHeroPopupTagVal:hover {
-    cursor: pointer;
     color: red;
 }
 
@@ -397,7 +367,7 @@ line-height: 40px
 }
 
 .heroInfoWrapForBalance:hover {
-    cursor: url("/images/openhand.png"), auto;
+    cursor: pointer;
     background-color: rgb(58, 63, 59);
     box-shadow: 3px 2px 9px #634747;
     box-shadow: 1px 1px 9px #381f1f;
@@ -427,6 +397,7 @@ line-height: 40px
     background-color: black;
     width: 34px;
     height: 39px;
+    cursor: url("/images/openhand.png"), auto;
 }
 
 .heroImgWrapForBalance.dragOverMap {
@@ -895,11 +866,13 @@ line-height: 40px
 
 #balanceSortWrap {
     /* text-align: center; */
-    display: inline-block;
+    /* display: inline-block; */
+    display: inline-flex;
+    line-height: 0.5;
 }
 
 #balanceSortWrap label {
-    margin-left: 10px;
+    margin: 0 0 0 10px;
 }
 
 #balanceSortWrap label:hover, #balanceSortWrap input:hover {
@@ -927,7 +900,10 @@ line-height: 40px
     border-radius: 13px;
 }
 
-.pickedHeroImgWrap, #miniMapWrap > div > img[data-hero-id] {
+#pickedHeroWrap .pickedHeroImgWrap 
+, #miniMapWrap > div img[data-hero-id]
+, #userRole
+, #miniMapWrap .questionMark {
     cursor: url("/images/openhand.png"), auto;
 }
 
@@ -951,7 +927,7 @@ line-height: 40px
 }
 
 @keyframes blinker {  
-    1% {
+    0% {
         opacity: 0.3;
     }
     50% {
@@ -974,8 +950,6 @@ line-height: 40px
 
 
 .questionMark {
-    cursor: url("/images/openhand.png"), auto;
-    /* cursor: pointer; */
     font-size: 28px;
     border: 2px solid #05880d;
     border-radius: 17px;
@@ -1004,9 +978,10 @@ line-height: 40px
 }
 
 #removeIcon {
-    left: -12px;
-    top: 30px;
+    left: 15px;
     position: relative;
+    opacity: 0.7;
+    z-index: -1;
 }
 
 .finalBalaceItem .heroRolesForBalance>span[data-hero-role]:not(.lineThrough):hover {
@@ -1017,10 +992,30 @@ line-height: 40px
     color: white;
     display: inline-block;
     float: right;
-    font-size: 20px;
+    /* font-size: 20px; */
     cursor: pointer;
+    width: 10%;
 }
 
-.ui-draggable-dragging, .draggable {
+#finalBalanceItemListWrap {
+    clear: both;
+}
+
+.ui-draggable-dragging, .draggable, .ui-draggable {
+    /* cursor: url("/images/closedhand.png"), auto; */
+    z-index: 9999!important;
+}
+
+.cursorClosedHand {
     cursor: url("/images/closedhand.png"), auto;
+}
+
+#fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn .fa-undo
+, #fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn .fa-paper-plane
+, #searchHeroAliasInput + span.input-group-append > .fa-search {
+    font-size: 12px;
+}
+
+.pointerEventsNone {
+    pointer-events: none;
 }

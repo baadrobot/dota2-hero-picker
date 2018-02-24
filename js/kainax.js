@@ -363,7 +363,7 @@ function getHeroImg(heroNameLocal, heroId, heroCodeName, isNeedValueSpan, heroNa
     {
         div += '<span class="heroTagValue" data-hero-id="'+heroId+'"></span>';
     }
-    div += '<img data-img-src="'+getHeroImgPath(heroCodeName, 'vert')+'" class="heroImgV" /></div>';
+    div += '<img data-img-src="'+getHeroImgPath(heroCodeName, 'vert')+'" class="heroImgV" draggable="false"/></div>';
     return div;
 }
 
@@ -429,7 +429,7 @@ function getPreStr_js(component, preStr)
 function inputLoaderStart(inputElement)
 {
     var paramObj = {};
-    var inputGroup = inputElement.siblings('.input-group-addon');
+    var inputGroup = inputElement.siblings('.input-group-append');
     if (inputGroup.length)
     {
         var element = inputGroup;
@@ -462,7 +462,7 @@ function inputLoaderStart(inputElement)
 
 function inputLoaderStop(inputElement)
 {
-    var inputGroup = inputElement.siblings('.input-group-addon');
+    var inputGroup = inputElement.siblings('.input-group-append');
     if (inputGroup.length)
     {
         inputGroup.find('i').show();
@@ -760,25 +760,25 @@ function getLastInputValue(inputId)
         var searchVal = searchInputEl.val();
         if(searchVal == '')
         {
-            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+            searchInputEl.siblings('.input-group-append').find('button').addClass('fa-search').removeClass('fa-times');
             
         } else {
-            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
+            searchInputEl.siblings('.input-group-append').find('button').addClass('fa-times').removeClass('fa-search');
         }
     });
 
-    $(searchInputEl).siblings('.input-group-addon').on('click', function() {
+    $(searchInputEl).siblings('.input-group-append').on('click', function() {
         // click on search btn
         var searchVal = searchInputEl.val();
         if (searchVal != '')
         {
             // если чтото есть
             searchInputEl.attr('data-last-search', searchVal).val('');
-            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+            searchInputEl.siblings('.input-group-append').find('button').addClass('fa-search').removeClass('fa-times');
         } else {
             // если пусто
             searchInputEl.val( searchInputEl.attr('data-last-search') );
-            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
+            searchInputEl.siblings('.input-group-append').find('button').addClass('fa-times').removeClass('fa-search');
         }
         searchInputEl.trigger('keyup');
     });
