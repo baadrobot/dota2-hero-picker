@@ -860,7 +860,7 @@
             echo '<script>';
                 echo 'document.location.replace("/index.php?lang='.$_SESSION['SUserLang'].'&component=master");';
             echo '</script>';
-        }
+        } // конец else
     }
 
 function getParamsFromDotaFile($heroAbilitiesDota2FilePathName)

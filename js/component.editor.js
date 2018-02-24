@@ -168,7 +168,7 @@ $(document).ready(function ()
                                 if (result.php_result == 'OK')
                                 {
                                     ajaxGetTagsArray(rebuildEditorTags);
-                                    $('#forSelectedTag span.fa-times').click();
+                                    $('#selectedTagDisplay span.fa-times').click();
                                 }
                                 else if (result.php_result == 'ERROR')
                                 {
@@ -243,7 +243,7 @@ $(document).ready(function ()
                         {
                             $('#createNewTagPopup').modal('hide');
                             ajaxGetTagsArray(rebuildEditorTags);
-                            rebuildEditorBalanceTags();
+                            //rebuildEditorBalanceTags();
                             // $('#tagListWrap span[data-tag-id="'+selectedTagId+'"]').click();
                             // console.log(selectedTagId);
                         }
@@ -873,7 +873,7 @@ $(document).ready(function ()
         var abilitySearchInputEl = $('#searchAbilityInput');
         if (abilitySearchInputEl.val() != '')
         {
-            abilitySearchInputEl.siblings('.input-group-addon').find('i').trigger('click');
+            abilitySearchInputEl.siblings('.input-group-append').find('button').trigger('click');
         }
 
         var heroSearchVal = $(this).val().toLowerCase();
@@ -992,7 +992,7 @@ $(document).ready(function ()
 
         if (abilitySearchVal != '')
         {
-            searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-times').removeClass('fa-search');
+            searchInputEl.siblings('.input-group-append').find('button').addClass('fa-times').removeClass('fa-search');
             if (typeof window.abilityData != 'undefined')
             {
                     var resultCurLang;
@@ -1055,7 +1055,7 @@ $(document).ready(function ()
                 }
             } else {
                 $('#heroListWrap .heroListImgOpacity').removeClass('heroListImgOpacity');
-                searchInputEl.siblings('.input-group-addon').find('i').addClass('fa-search').removeClass('fa-times');
+                searchInputEl.siblings('.input-group-append').find('button').addClass('fa-search').removeClass('fa-times');
             }
 
             if ($('#heroListWrap .heroListImgOpacity').length == 0)
@@ -1091,7 +1091,7 @@ $(document).ready(function ()
             }
         }
     }).removeAttr('disabled'
-    ).siblings('.input-group-addon').on('click', function () {
+    ).siblings('.input-group-append').on('click', function () {
         // click on search btn
         var searchInputEl = $('#searchAbilityInput');
         var searchVal = searchInputEl.val();
@@ -1266,25 +1266,25 @@ function rebuildEditorBalanceTags()
                             var balanceRowHtml = '';
                             balanceRowHtml += '<div class="tagBalanceItem">';
 
-                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'" data-balance-descr="'+tagSetDescription+'" data-tag-id="'+firstBalanceTagId+'" data-tag-name="'+firstBalanceTagName+'" data-tag-value="'+firstBalanceTagValue+'" data-tag-settype="'+balanceSetType+'">';
-                                    balanceRowHtml += '(' + firstBalanceTagValue + ')';
-                                balanceRowHtml += '</div>';
-                                balanceRowHtml += '<div class="'+firstBalanceTagClass+'">';
-                                    balanceRowHtml += '[' + firstBalanceTagName + ']';
-                                balanceRowHtml += '</div>';
+                            balanceRowHtml += '<div class="'+firstBalanceTagClass+'" data-balance-descr="'+tagSetDescription+'" data-tag-id="'+firstBalanceTagId+'" data-tag-name="'+firstBalanceTagName+'" data-tag-value="'+firstBalanceTagValue+'" data-tag-settype="'+balanceSetType+'">';
+                                balanceRowHtml += '(' + firstBalanceTagValue + ')';
+                            balanceRowHtml += '</div>';
+                            balanceRowHtml += '<div class="'+firstBalanceTagClass+'">';
+                                balanceRowHtml += '[' + firstBalanceTagName + ']';
+                            balanceRowHtml += '</div>';
 
-                                balanceRowHtml += '<div>'+balanceSeparator+'</div>';
+                            balanceRowHtml += '<div>'+balanceSeparator+'</div>';
 
-                                balanceRowHtml += '<div class="'+secondBalanceTagClass+'" data-tag-id="'+secondBalanceTagId+'" data-tag-name="'+secondBalanceTagName+'">';
-                                    balanceRowHtml += '[' + secondBalanceTagName + ']';
-                                balanceRowHtml += '</div>';
-                                balanceRowHtml += '<div class="'+secondBalanceTagClass+'">';
-                                    balanceRowHtml += '(' + secondBalanceTagValue + ')';
-                                balanceRowHtml += '</div>';
+                            balanceRowHtml += '<div class="'+secondBalanceTagClass+'" data-tag-id="'+secondBalanceTagId+'" data-tag-name="'+secondBalanceTagName+'">';
+                                balanceRowHtml += '[' + secondBalanceTagName + ']';
+                            balanceRowHtml += '</div>';
+                            balanceRowHtml += '<div class="'+secondBalanceTagClass+'">';
+                                balanceRowHtml += '(' + secondBalanceTagValue + ')';
+                            balanceRowHtml += '</div>';
 
-                            tagBalanceListEl.append(balanceRowHtml);
-                        }
+                        tagBalanceListEl.append(balanceRowHtml);
                     }
+                }
 
                     $('#tagBalanceListWrap .tagBalanceItem').click(function ()
                     {
@@ -1337,11 +1337,7 @@ function rebuildEditorBalanceTags()
 
                     });
 
-                    // toDo Kainax: add on_click for tag
-                    // $('#tagBalanceListWrap .tag:first').parent().click(function ()
-                    // {
-                    //     tagBalancePopupDo('edit', $(this));
-                    // });
+                    
 
                     sortEditorBalanceTags();
                     // console.log(window.selectedTagId);
@@ -1431,8 +1427,8 @@ function rebuildEditorTags(tagsList)
             colorizeAllHeroes();
 
             // remove selected tag from center between inputs
-            $('#forSelectedTag > span:first').text('').removeClass('selectedTag');
-            $('#forSelectedTag > span:last').hide();
+            $('#selectedTagDisplay > span:first').text('').removeClass('selectedTag');
+            $('#selectedTagDisplay > span:last').hide();
 
             //remove transparrency from all balance items
             $('#tagBalanceListWrap .balanceSetItemOpacity').removeClass('balanceSetItemOpacity');
@@ -1529,17 +1525,19 @@ function rebuildEditorTags(tagsList)
 
             // add selected tag in center between inputs
             var selectedTagText = selectedTagEl.text();
-            $('#forSelectedTag > span:first').text(selectedTagText).addClass('selectedTag');
-            $('#forSelectedTag > span:last').show()
+            $('#selectedTagDisplay > span:first').text(selectedTagText).addClass('selectedTag');
+            $('#selectedTagDisplay > span:last').show()
             .on('click', function(){
                 $('#tagListWrap > .selectedTag').trigger('click');
-                $('#forSelectedTag > span:first').text('');
-                $('#forSelectedTag > span:last').hide();
+                $('#selectedTagDisplay > span:first').text('');
+                $('#selectedTagDisplay > span:last').hide();
             });
         }
 
         sortEditorBalanceTags();
     });
+
+    rebuildEditorBalanceTags();
 }
 
 
@@ -2015,6 +2013,7 @@ function tagBalancePopupDo(addOrEdit, clickedEl, htmlForItems)
         }
         ,onUserClickedOK : function ()
         {
+            console.log($('[name="counterpickOrSynergy"]:checked').val());
             pleaseWaitOpen();
             // $('.tag.selectedTag').click();
 

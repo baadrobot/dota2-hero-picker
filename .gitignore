@@ -8,6 +8,7 @@ css/min.kainax.*.css
 js/eco_prebuild_*.js
 css/eco_prebuild_*.css
 php/eco_prebuild_*.php
+php/prebuild/prebuild*.json
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*

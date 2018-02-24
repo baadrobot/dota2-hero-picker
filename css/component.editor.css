@@ -433,7 +433,7 @@ line-height: 40px
     border-radius: 3px;
 }
 
-.itemImgWrap > img:hover, #forSelectedTag > span:last-of-type{
+.itemImgWrap > img:hover, #selectedTagDisplay > span:last-of-type{
     cursor: pointer;
 }
 
@@ -449,6 +449,11 @@ line-height: 40px
     width: 365px;
 }
 
-#forSelectedTag {
+#selectedTagDisplay {
     display: inline-block;
+}
+
+.fa-search
+, .fa-times {
+    font-size: 12px;
 }
