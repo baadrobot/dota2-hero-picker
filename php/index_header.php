@@ -70,7 +70,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         echo '<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>';
         //echo '<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>';
         echo '<script src="js/bootstrap.min.js"></script>';
-        
+
 
         // jQuery UI
         echo '<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">';
@@ -182,6 +182,8 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
             }
             else if ($_GET['component'] == 'counter_pick')
             {
+                //echo '<script src="js/jquery.pasteimage.js"></script>';
+
                 // echo '<script src="js/component.counter_pick.js"></script>';
                 // echo '<link rel="stylesheet" href="css/component.counter_pick.css">';
                 //
