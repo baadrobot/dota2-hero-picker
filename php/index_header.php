@@ -75,8 +75,8 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
         // echo '<script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" crossorigin="anonymous"></script>';
         echo '<script src="js/popper.min.js"></script>';
 
-        echo '<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>';
-        // echo '<script src="js/bootstrap.min.js"></script>';
+        // echo '<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" crossorigin="anonymous"></script>';
+        echo '<script src="js/bootstrap.min.js"></script>';
         
 
         // jQuery UI
@@ -207,6 +207,14 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                     echo '<script src="js/admin.counter_pick.js"></script>';
                 }
                 $bodyClass = $_GET['component'];
+
+                if (isset($_GET['input']))
+                {
+                    echo '<script>';
+                        echo 'window.inputGetParam = '.$_GET['input'].';';
+                    echo '</script>';
+                    // echo $_GET['input'];
+                }
             }
         }
 

@@ -457,3 +457,7 @@ line-height: 40px
 , .fa-times {
     font-size: 12px;
 }
+
+#selectedTagDisplay {
+    font-size: 11px;
+}

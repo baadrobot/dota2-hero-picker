@@ -1110,6 +1110,16 @@ $(document).ready(function ()
     {
         $(window).trigger('resize');
     });
+
+    $('#editAccordion2').on('show.bs.collapse', function() 
+    {
+        $('#editAccordion1').collapse('toggle');
+    });
+
+    $('#editAccordion1').on('show.bs.collapse', function() 
+    {
+        $('#editAccordion2').collapse('toggle');
+    });
 });
 // - END DOC READY//////////////////////////////////////
 
