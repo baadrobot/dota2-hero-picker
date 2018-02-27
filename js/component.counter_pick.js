@@ -14,7 +14,12 @@ $(document).ready(function ()
     //   });
     //   console.log(found);
     //   console.log(found.initiator);
+<<<<<<< HEAD
 
+=======
+      
+    
+>>>>>>> 628c212dafb342cf8404b3336625e890d0c88043
 
     $(window).resize(function () {
         resizeVerticalMenu();
@@ -980,6 +985,14 @@ $(document).ready(function ()
     {
         swapSides();
     });
+
+    // console.log(window.inputGetParam);
+
+    if(typeof window.inputGetParam != 'undefined')
+    {
+        $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(window.inputGetParam);
+        $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');        
+    }
 });
 // - end jQuery ready
 
@@ -1899,6 +1912,10 @@ function doRecountCounterPickBalance()
             teamComposition['durable'] += found.durable;
             teamComposition['pusher'] += found.pusher;
         });
+
+        console.log(teamComposition['initiator']);
+        console.log(teamComposition['durable']);
+        console.log(teamComposition['pusher']);
 
         window.totallyCounteredHeroArray = [];
         var banedAllStrongCountersBonusPoints = 50;

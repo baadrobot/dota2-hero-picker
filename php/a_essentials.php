@@ -517,6 +517,7 @@
         pushToLegalGet('pct', '', '', '', '');    //page creation time
         pushToLegalGet('met', '', '', '', '');    //max execution time
         pushToLegalGet('ref', '', '', '', '');    //referral/affiliate
+        pushToLegalGet('input', '', '', '', '');
 
         //Google Analytics UTM Fields - http://www.stijit.com/web-analytics/utm-url-builder
         pushToLegalGet('utm_source', '', '', '', '');     // standart
