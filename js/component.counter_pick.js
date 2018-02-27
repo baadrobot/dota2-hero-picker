@@ -15,7 +15,46 @@ $(document).ready(function ()
     //   console.log(found);
     //   console.log(found.initiator);
       
-    
+    // ChartJS Radar
+        var canvasEl = $('#chartRadar');
+
+        var data = {
+            labels: ['Initiator', 'Durable', 'Pusher']
+            ,datasets: [{
+                data: [0, 0, 0]
+                ,backgroundColor: 'rgba(246,144,8, 0.3)'
+                ,borderColor: 'rgba(246,144,8, 0.8)'
+                ,borderWidth: 2
+                ,pointBackgroundColor: 'rgba(246,144,8, 1)'
+                // ,pointBorderColor: 'white'
+            }]
+        }
+
+        var options = {
+            scale: {
+                ticks: {
+                    display: false
+                    ,beginAtZero: true
+                    // ,max: 7
+                }
+                // ,display: false
+            }
+            ,legend: {
+                display: false
+            }
+            ,animation: {
+                duration: 500
+            }
+            ,responsive: false
+        }
+
+        window.radarChart = new Chart(canvasEl, {
+            type: 'radar',
+            data: data,
+            options: options
+        });
+        // Chart.defaults.responsive = false;
+    // end of ChartJS Radar
 
     $(window).resize(function () {
         resizeVerticalMenu();
@@ -990,7 +1029,7 @@ $(document).ready(function ()
         $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');        
     }
 });
-// - end jQuery ready
+// - end of jQuery ready
 
 
 
@@ -1909,6 +1948,8 @@ function doRecountCounterPickBalance()
             teamComposition['pusher'] += found.pusher;
         });
 
+        changeRadar(teamComposition);
+
         console.log(teamComposition['initiator']);
         console.log(teamComposition['durable']);
         console.log(teamComposition['pusher']);
@@ -2734,16 +2775,20 @@ function doRecountCounterPickBalance()
         // END line through
 
         // ***** BEGIN rate stars
-        var maxScoreVal = Number($('.heroTotalCoefForBalance:first').text());
+        var maxScoreVal = -9999;
+        $('.heroTotalCoefForBalance').each(function()
+        {        
+            var curScoreVal = Number($(this).text());
+            if (curScoreVal > maxScoreVal)
+            {
+                maxScoreVal = curScoreVal;               
+            }
+        });
 
         var starOnePercentVal = maxScoreVal / 100;        
         $('.heroTotalCoefForBalance').each(function() {
             var curVal = Number($(this).text());
             var curStarPercent = curVal / starOnePercentVal;
-            if(curStarPercent > 100)
-            {
-                curStarPercent = 100;
-            }
             $(this).siblings('.rating').find('.current-rating').css('width', curStarPercent+'%');
         });
 
@@ -4278,4 +4323,12 @@ function draggableForRecommendHeroes()
         }
     });
     // end of draggable for recommend heroes
+}
+
+function changeRadar(teamCompositionDataArray) {
+    window.radarChart.data.datasets[0].data = [teamCompositionDataArray['initiator']
+                                        ,teamCompositionDataArray['durable']
+                                        ,teamCompositionDataArray['pusher']];
+    window.radarChart.update();
+    console.log('radar changed');
 }

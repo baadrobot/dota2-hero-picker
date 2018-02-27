@@ -204,6 +204,11 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 echo '<link rel="stylesheet" href="css/component.counter_pick.css" />';
                 echo '<script src="js/component.counter_pick.js"></script>';
                 echo $externalData;
+
+                // chart.js 
+                echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>';
+                echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>';
+
                 if(isGotAccess(_ROLE_EDITOR))
                 {
                     echo '<script src="js/admin.counter_pick.js"></script>';

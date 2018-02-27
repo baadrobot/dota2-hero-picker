@@ -346,10 +346,13 @@
                     echo '<img id="miniMapImg" src="images/mini-map-dire.png">';
                 echo '</div>';
 
-            echo '</div>';
-            
+            echo '</div>';            
             echo '<i id="userRole" class="questionMark fa fa-question-circle" title="Drag into position to filter roles"></i>';
             echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them" style="display: none"></i>';
+
+            echo '<div class="col-4 offset-2">';
+                echo '<canvas id="chartRadar" width="350" height="190"></canvas>';
+            echo '</div>';
 
             // echo '<div class="col-3">';
             //     echo '<div id="uncertainDireHeroesWrap" class="align-top">';
