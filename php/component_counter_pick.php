@@ -36,7 +36,7 @@
     $query = 'SELECT cf_d2HeroTagSet_hero_id as `heroId`
                     ,cf_d2HeroTagSet_tag_id as `tagId`
                     ,cf_d2HeroTagSet_tag_val as `val`
-                FROM tb_dota2_heroTag_set 
+                FROM tb_dota2_heroTag_set
                 WHERE cf_d2HeroTagSet_tag_id IN (32, 33, 34, 35, 36, 37, 38, 39, 40);';
 
     $roles_array = $dbClass->select($query);
@@ -110,11 +110,11 @@
                     AND b.cf_d2HeroTagSet_tag_val = 5
                 WHERE tb_dota2_tag_balance_set.cf_d2TagBalanceSet_balance_value > 49
                 ORDER BY weakHeroId;';
-                
+
     $result_dontPickHeroesBeforeBanArray = $dbClass->select($query);
 
     $lastWeakHeroId = '-1';
-    $ready_dontPickHeroesBeforeBanArray = [];  
+    $ready_dontPickHeroesBeforeBanArray = [];
     for($i = 0; $i < count($result_dontPickHeroesBeforeBanArray); $i++)
     {
         $curWeakHeroId = $result_dontPickHeroesBeforeBanArray[$i]['weakHeroId'];
@@ -128,7 +128,7 @@
         $lastWeakHeroId = $curWeakHeroId;
     }
 
-    $heroesPickWinRates = [];    
+    $heroesPickWinRates = [];
     $todaysPrebuildPickAndWinRateFileCachePath = __DIR__.'/prebuild/prebuild.hero_pick&win'.date("Y-m-d").'.json';
     if (file_exists($todaysPrebuildPickAndWinRateFileCachePath))
     {
@@ -137,7 +137,7 @@
         // parse
         // получаем html
         $html = getHtmlObjFromUrl('https://www.dotabuff.com/heroes/meta');
-        
+
         foreach($html->find('table > tbody tr') as $heroTableRow)
         {
             if ($heroTableRow->children(0)->hasAttribute('data-value'))
@@ -167,14 +167,14 @@
             }
         }
             // echo '<pre>',print_r($hero_array),'</pre>';
-            // exit;    
+            // exit;
         // end of parse
 
         // save to json for future use duiring this day
         if ($heroesPickWinRates != [])
         {
             file_put_contents($todaysPrebuildPickAndWinRateFileCachePath, json_encode($heroesPickWinRates));
-        }        
+        }
     }
 
     //for($j = 0; $j < count($$heroesPickWinRates); $j++)
@@ -195,11 +195,11 @@
         echo 'window.itemList = '.json_encode($itemListArray).';';
         echo 'window.strategyList = '.json_encode($strategies_array).';';
         echo 'window.roleList = '.json_encode($roles).';';
-        echo 'window.dontPickHeroesBeforeBanArray = '.json_encode($ready_dontPickHeroesBeforeBanArray).';';        
+        echo 'window.dontPickHeroesBeforeBanArray = '.json_encode($ready_dontPickHeroesBeforeBanArray).';';
     echo '</script>';
 
 
-    
+
 
         echo '<div id="dragNdropInstructions" class="row">';
             echo '<div class="col-4 colorWhite sideTitleGlowRed">ПЕРЕТЯНИТЕ В ЭТИ ЯЧЕЙКИ ПИКИ ПРОТИВНИКОВ</div>';
@@ -245,7 +245,7 @@
                 echo '<div id="swapSidesBtn" class="input-group smlGrp" title="Swap sides">';
                     echo '<span><button class="fa fa-exchange btn btn-secondary"></button></span>';
                 echo '</div>';
-    
+
                 echo '<div class="input-group smlGrp">';
                     echo '<input id="searchHeroAliasInput" type="text" class="form-control" placeholder="Поиск героев"/>';
                     echo '<span class="input-group-append"><button class="fa fa-search btn btn-secondary"></button></span>';
@@ -255,7 +255,7 @@
                     echo '<input id="fillHeroPickAndBanSlotsViaAliasSingleInput" type="text" class="form-control" placeholder="(E) sk, wk, bm (B) doom, kotl (F) ss, sd, brew"/>';
                     echo '<span id="fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn" class="input-group-append"><button class="fa fa-paper-plane btn btn-secondary" ></button></span>';
                 echo '</div>';
-                
+
             echo '</div>';
 
 // ----------------------------- Editor panel
@@ -263,7 +263,7 @@
 
                 echo '<div id="balanceSortWrap" class="input-group-text" style="display:none">';
                     // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
-                    // echo '<input id="sortByRole" type="radio" name="balanceSort">';     
+                    // echo '<input id="sortByRole" type="radio" name="balanceSort">';
                     // echo '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
                     // echo '<div class="input-group-text">';
                         echo 'Sort by:';
@@ -288,9 +288,10 @@
                 echo '</div>';
                 echo '<input id="inputForClipboard" style="display: none" width="1px">';
 
-                echo '<div id="counterPleaseWait" style="display:none">';                
-                    echo 'Loading...';
-                echo '</div>';                
+                echo '<div id="counterPleaseWait" style="display:none">';
+                    echo '<div class="circle"></div>';
+                    echo '<div class="circle1"></div>';
+                echo '</div>';
                 echo '<div id="finalBalanceItemListWrap" class="scrollablePanelYAuto">';
                 echo '</div>';
 
@@ -332,7 +333,7 @@
                     echo '<div id="direMid3" data-slot-role="5" data-role-order="4"></div>';
 
                     // divs for dire hard lane
-                    
+
                     echo '<div id="direHard1" data-slot-role="3" data-role-order="2"></div>';
                     echo '<div id="direHard2" data-slot-role="4" data-role-order="5"></div>';
                     echo '<div id="direHard3" data-slot-role="5" data-role-order="8"></div>';
@@ -347,7 +348,7 @@
                 echo '</div>';
 
             echo '</div>';
-            
+
             echo '<i id="userRole" class="questionMark fa fa-question-circle" title="Drag into position to filter roles"></i>';
             echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them" style="display: none"></i>';
 
@@ -362,7 +363,7 @@
             //         // echo '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/slark_icon.png?v=4299287">';
             //     echo '</div>';
             // echo '</div>';
-            
+
         echo '</div>';
 
 
