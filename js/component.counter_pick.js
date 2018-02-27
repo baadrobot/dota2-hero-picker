@@ -14,12 +14,8 @@ $(document).ready(function ()
     //   });
     //   console.log(found);
     //   console.log(found.initiator);
-<<<<<<< HEAD
 
-=======
-      
-    
->>>>>>> 628c212dafb342cf8404b3336625e890d0c88043
+
 
     $(window).resize(function () {
         resizeVerticalMenu();
@@ -991,7 +987,7 @@ $(document).ready(function ()
     if(typeof window.inputGetParam != 'undefined')
     {
         $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(window.inputGetParam);
-        $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');        
+        $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');
     }
 });
 // - end jQuery ready
