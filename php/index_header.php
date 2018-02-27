@@ -2,6 +2,9 @@
 echo '<!DOCTYPE html>';
 echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
     echo '<head>';
+        // force IE browser to use latest version 9+
+        //echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">';
+
         echo '<meta http-equiv="content-type" content="text/html; charset=utf-8">';
         echo '<meta name="language" content="'.$_SESSION["SUserLang"].'">';
         echo '<meta name="viewport" content="width=device-width, initial-scale=1">';

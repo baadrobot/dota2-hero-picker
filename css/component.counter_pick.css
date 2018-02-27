@@ -383,10 +383,10 @@ line-height: 40px
     font-size: 11px;
     line-height: 21px;
     text-align: center;
-    border-top: 1px solid #a663a2;
     width: 335px;
     border-bottom-right-radius: 5px;
     overflow: hidden;
+    /* border-top: 1px solid #20940880; */
 }
 .heroNotesWrapForBalance {
     margin-top: -5px;
@@ -467,7 +467,7 @@ line-height: 40px
     width: 30px;
     text-align: center;
     background-color: #f3f3f3;
-    border-left: 1px solid #a663a2;
+    border-left: 1px solid #20940880;
     display: none;
 }
 
@@ -900,7 +900,7 @@ line-height: 40px
     border-radius: 13px;
 }
 
-#pickedHeroWrap .pickedHeroImgWrap 
+#pickedHeroWrap .pickedHeroImgWrap
 , #miniMapWrap > div img[data-hero-id]
 , #userRole
 , #miniMapWrap .questionMark {
@@ -926,7 +926,7 @@ line-height: 40px
     animation: blinker 1s linear infinite;
 }
 
-@keyframes blinker {  
+@keyframes blinker {
     0% {
         opacity: 0.3;
     }
