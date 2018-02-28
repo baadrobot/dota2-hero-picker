@@ -9,24 +9,31 @@ $(document).ready(function ()
     // console.log(result);
     // console.log(result[0].initiator);
 
-    // var found = window.heroList.find(function(element) {
+    // var heroObj = window.heroList.find(function(element) {
     //     return element.id == 1;
     //   });
-    //   console.log(found);
-    //   console.log(found.initiator);
+    //   console.log(heroObj);
+    //   console.log(heroObj.initiator);
       
     // ChartJS Radar
         var canvasEl = $('#chartRadar');
+        var enemyRadarColor = '#8b08158f';
 
         var data = {
-            labels: ['Initiator', 'Durable', 'Pusher']
+            labels: ['Initiator', 'Durable', 'Pusher', 'Nuker', 'Antipusher', 'Control']
             ,datasets: [{
-                data: [0, 0, 0]
+                data: [0, 0, 0, 0, 0, 0]
                 ,backgroundColor: 'rgba(246,144,8, 0.3)'
                 ,borderColor: 'rgba(246,144,8, 0.8)'
                 ,borderWidth: 2
                 ,pointBackgroundColor: 'rgba(246,144,8, 1)'
-                // ,pointBorderColor: 'white'
+            }
+            ,{
+                data: [0, 0, 0, 0, 0, 0]
+                ,backgroundColor: enemyRadarColor
+                ,borderColor: enemyRadarColor
+                ,borderWidth: 2
+                ,pointBackgroundColor: enemyRadarColor
             }]
         }
 
@@ -1762,7 +1769,7 @@ function doRecountCounterPickBalanceForEnemy()
                 }
             }
 
-            var rangeBonusForWinRate = 20;
+            var rangeBonusForWinRate = 26;
 
             for (var j = 0; j < window.maxRecomendations;j++)
             {
@@ -1887,7 +1894,13 @@ function doRecountCounterPickBalance()
 
         // check if there are no any heroes in slots
 
-
+        var enemyTeamComposition = [];
+        enemyTeamComposition['initiator'] = 0;
+        enemyTeamComposition['durable'] = 0;
+        enemyTeamComposition['pusher'] = 0;
+        enemyTeamComposition['nuker'] = 0;
+        enemyTeamComposition['antipusher'] = 0;
+        enemyTeamComposition['control'] = 0;
         enemyPickElements.each(function()
         {
             var curEnemyHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
@@ -1908,12 +1921,33 @@ function doRecountCounterPickBalance()
                     tempCounterBalance[secondHeroId] = tempCounterBalance[secondHeroId] + (Number(balanceCoef) * -1);
                 }
             });
+
+            var curEnemyHeroObj = window.heroList.find(function(element) {
+                return element.id == curEnemyHeroId;
+              });
+              
+            enemyTeamComposition['initiator'] += curEnemyHeroObj.initiator;
+            enemyTeamComposition['durable'] += curEnemyHeroObj.durable;
+            enemyTeamComposition['pusher'] += curEnemyHeroObj.pusher;
+            enemyTeamComposition['nuker'] += curEnemyHeroObj.nuker;
+            if(curEnemyHeroObj.antipusher != null)
+            {
+                enemyTeamComposition['antipusher'] += curEnemyHeroObj.antipusher;
+            }
+            if(curEnemyHeroObj.control != null)
+            {
+                enemyTeamComposition['control'] += curEnemyHeroObj.control;
+                // console.log(curEnemyHeroObj.control);
+            }
         });
 
         var teamComposition = [];
         teamComposition['initiator'] = 0;
         teamComposition['durable'] = 0;
         teamComposition['pusher'] = 0;
+        teamComposition['nuker'] = 0;
+        teamComposition['antipusher'] = 0;
+        teamComposition['control'] = 0;
         // еще раз проход, но по союзникам
         var friendPickElements = $('.friendPick.slot');
         friendPickElements.each(function()
@@ -1937,22 +1971,44 @@ function doRecountCounterPickBalance()
                 }
             });
 
-            var found = window.heroList.find(function(element) {
+            var curFriendHeroObj = window.heroList.find(function(element) {
                 return element.id == curFriendHeroId;
               });
-            //   console.log(found);
-            //   console.log(found.initiator);
 
-            teamComposition['initiator'] += found.initiator;
-            teamComposition['durable'] += found.durable;
-            teamComposition['pusher'] += found.pusher;
+            teamComposition['initiator'] += curFriendHeroObj.initiator;
+            teamComposition['durable'] += curFriendHeroObj.durable;
+            teamComposition['pusher'] += curFriendHeroObj.pusher;
+            teamComposition['nuker'] += curFriendHeroObj.nuker;
+            if(curFriendHeroObj.antipusher != null)
+            {
+                teamComposition['antipusher'] += curFriendHeroObj.antipusher;
+            }
+            if(curFriendHeroObj.control != null)
+            {
+                teamComposition['control'] += curFriendHeroObj.control;
+                // console.log(curFriendHeroObj.control);
+            }
         });
 
-        changeRadar(teamComposition);
+        changeRadar(teamComposition, enemyTeamComposition);
 
-        console.log(teamComposition['initiator']);
-        console.log(teamComposition['durable']);
-        console.log(teamComposition['pusher']);
+        // get low composition properties
+        var teamCompositionLowProperties = [];
+        Object.keys(teamComposition).forEach(function (key)
+        {
+            var value = teamComposition[key];
+            if(value < 2)
+            {
+                teamCompositionLowProperties[key] = value;
+            }
+        });
+
+        // console.log(teamComposition['initiator']);
+        // console.log(teamComposition['durable']);
+        // console.log(teamComposition['pusher']);
+        // console.log(teamComposition['nuker']);
+        // console.log(teamComposition['antipusher']);
+        // console.log(teamComposition['control']);
 
         window.totallyCounteredHeroArray = [];
         var banedAllStrongCountersBonusPoints = 50;
@@ -1987,7 +2043,6 @@ function doRecountCounterPickBalance()
                 }
             }
         });
-
 
         var defaultEmptyVal = -9999;
         // remove already baned and picked heroes from recommendation
@@ -2028,10 +2083,9 @@ function doRecountCounterPickBalance()
                 }
             });
 
-
             var winRateMin = 50;
             var winRateMax = 50;
-            // add extra point for being in current meta
+            // get max and min win rates
             for(var x = 0; x < window.heroList.length; x++)
             {
                 //window.heroList[x]['wr'] = Number(window.heroList[x]['wr']);
@@ -2047,7 +2101,6 @@ function doRecountCounterPickBalance()
             }
 
             var rangeBonusForWinRate = 20;
-
 
             for (var j = 0; j < window.maxRecomendations;j++)
             {
@@ -2073,71 +2126,208 @@ function doRecountCounterPickBalance()
                         }
                     }
                 }
-
+                curRecomHeroVal = curRecomHeroVal + bonusScoreForWinRate;
                 // if (curRecomHeroVal == -9999)
                 // {
                 //     curRecomHeroVal = 5;
                 // }
-                // add point to those who is good for enemy pick
-                var enemysGoodPicksArray = doRecountCounterPickBalanceForEnemy();
-                Object.keys(enemysGoodPicksArray).forEach(function (keyHeroId)
-                {
-                    var value = enemysGoodPicksArray[keyHeroId];
-                    if(keyHeroId == curRecomHeroId)
-                    {
-                        curRecomHeroVal += value;
-                    }
-                });
-                // console.log(enemysGoodPicksArray);
-                // создать дату тому кому добавить надо за то что герой подходит противнику
 
-                curRecomHeroVal = curRecomHeroVal + bonusScoreForWinRate;
-
-                // if сейчас выбрано меньше 3 союзников (1-2 пик) && curRecomHeroId == герою с 4 или 5 позицией
-                if($('#friendPickList .friendPick.emptySlot').length > 3)
-                {
-                    // get side of friendly team
-                    if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                // add points to those who are good for enemy picks
+                    var dataEnemyBestPickBonus = '';
+                    var enemysGoodPicksArray = doRecountCounterPickBalanceForEnemy();
+                    Object.keys(enemysGoodPicksArray).forEach(function (keyHeroId)
                     {
-                        var friendTeam = 'dire';
-                    } else if($('#miniMapImg').attr('src') == 'images/mini-map-radiant.png')
-                    {
-                        var friendTeam = 'radiant';
-                    }
-
-                    // check if 4 or 5 pos is already locked
-                    var pos4isLocked = false;
-                    var pos5isLocked = false;
-
-                    $('#miniMapWrap div[id^="'+friendTeam+'"] > img').each(function()
-                    {
-                        var curHeroPosition = $(this).parent().attr('data-slot-role');
-                        if(curHeroPosition == 4)
+                        var value = enemysGoodPicksArray[keyHeroId];
+                        if(keyHeroId == curRecomHeroId)
                         {
-                            pos4isLocked = true;
-                        } else if(curHeroPosition == 5) {
-                            pos5isLocked = true;
+                            curRecomHeroVal += value;
+                            dataEnemyBestPickBonus = ' data-enemy-best="'+value+'"';
                         }
                     });
+                // end of add point to those who is good for enemy pick
 
-                    var curHeroRoles = getHeroRolesByHeroId(curRecomHeroId);
-                    var bonusForEarlyPick = 0;
-                    if(pos4isLocked == false)
+                
+                // add bonus to early pick supports
+                    if($('#friendPickList .friendPick.emptySlot').length > 3)
                     {
-                        if(curHeroRoles.charAt(4) != '0' || curHeroRoles.charAt(5) != '0' || curHeroRoles.charAt(6) != '0')
+                        // get side of friendly team
+                        if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
                         {
-                            bonusForEarlyPick += 10;
+                            var friendTeam = 'dire';
+                        } else if($('#miniMapImg').attr('src') == 'images/mini-map-radiant.png')
+                        {
+                            var friendTeam = 'radiant';
+                        }
+
+                        // check if 4 or 5 pos is already locked
+                        var pos4isLocked = false;
+                        var pos5isLocked = false;
+
+                        $('#miniMapWrap div[id^="'+friendTeam+'"] > img').each(function()
+                        {
+                            var curHeroPosition = $(this).parent().attr('data-slot-role');
+                            if(curHeroPosition == 4)
+                            {
+                                pos4isLocked = true;
+                            } else if(curHeroPosition == 5) {
+                                pos5isLocked = true;
+                            }
+                        });
+
+                        var curHeroRoles = getHeroRolesByHeroId(curRecomHeroId);
+                        var bonusForEarlyPick = 0;
+                        if(pos4isLocked == false)
+                        {
+                            if(curHeroRoles.charAt(4) != '0' || curHeroRoles.charAt(5) != '0' || curHeroRoles.charAt(6) != '0')
+                            {
+                                bonusForEarlyPick += 10;
+                            }
+                        }
+                        if(pos5isLocked == false) {
+                            if(curHeroRoles.charAt(8) != '0')
+                            {
+                                bonusForEarlyPick += 10;
+                            }
+                        }
+                        curRecomHeroVal += bonusForEarlyPick;
+                    }
+                // end of add bonus to early pick supports
+
+                var curRecommHeroObj = window.heroList.find(function(element) {
+                    return element.id == curRecomHeroId;
+                });
+
+                // complexity bonus
+                    var complexityBonus = 0;
+                    if(typeof curRecommHeroObj != 'undefined')
+                    {
+                        if(curRecommHeroObj.complexity == 1)
+                        {
+                            complexityBonus = 5;
+                        } else if(curRecommHeroObj.complexity == 3) {
+                            complexityBonus = -5;
                         }
                     }
-                    if(pos5isLocked == false) {
-                        if(curHeroRoles.charAt(8) != '0')
+                    curRecomHeroVal += complexityBonus;
+                // end of complexity bonus
+
+                // low team composition properties bonus
+                    var propertiesBonus = 0;
+
+                                    // if(teamComposition['initiator'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.initiator > 0)
+                                    //         {
+                                    //             if(teamComposition['initiator'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['initiator'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // if(teamComposition['durable'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.durable > 0)
+                                    //         {
+                                    //             if(teamComposition['durable'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['durable'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // if(teamComposition['pusher'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.pusher > 0)
+                                    //         {
+                                    //             if(teamComposition['pusher'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['pusher'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // if(teamComposition['nuker'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.nuker > 0)
+                                    //         {
+                                    //             if(teamComposition['nuker'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['nuker'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // if(teamComposition['antipusher'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.antipusher > 0)
+                                    //         {
+                                    //             if(teamComposition['antipusher'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['antipusher'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+                                    // if(teamComposition['control'] < 2)
+                                    // {
+                                    //     if(typeof curRecommHeroObj != 'undefined')
+                                    //     {
+                                    //         if(curRecommHeroObj.control > 0)
+                                    //         {
+                                    //             if(teamComposition['control'] == 1)
+                                    //             {
+                                    //                 propertiesBonus += 5;
+                                    //             } else if(teamComposition['control'] == 0)
+                                    //             {
+                                    //                 propertiesBonus += 10;
+                                    //             }
+                                    //         }
+                                    //     }
+                                    // }
+
+                    var dataAllComposition = ''; 
+
+                    Object.keys(teamCompositionLowProperties).forEach(function (key)
+                    {
+                        var value = teamCompositionLowProperties[key];
+                        var curPropertyBonus = value == 1 ? 5 : 10;
+                        if(typeof curRecommHeroObj != 'undefined')
                         {
-                            bonusForEarlyPick += 10;
+                            if ((typeof curRecommHeroObj[key] != 'undefined') && (Number(curRecommHeroObj[key]) > 0))
+                            {
+                                dataAllComposition += ' data-composition-'+key+'="'+curPropertyBonus+'"';
+                                propertiesBonus += curPropertyBonus;
+                            }
                         }
-                    }
-                    curRecomHeroVal += bonusForEarlyPick;
-                }
-                // то добавить в curRecomHeroVal + 10
+                    });
+                    curRecomHeroVal += propertiesBonus;
+                // end of low team composition properties bonus
 
                 // if overall score less than 0 then DO NOT RECOMMEND AT ALL (go to next record)
                 if(curRecomHeroVal < 0)
@@ -2153,8 +2343,8 @@ function doRecountCounterPickBalance()
                 var colorCoefColor = curRecomHeroVal >= 0 ? 'noticeGreen' : 'noticeRed';
                 var tempBalanceHeroValueTotalText = curRecomHeroVal > 0 ? '+'+ curRecomHeroVal : curRecomHeroVal;
 
-
-                recommendHtml += '<div class="finalBalaceItem" data-wr-score="'+bonusScoreForWinRate+'" data-early-pick="'+bonusForEarlyPick+'">';
+                                                                                                                                                                                                                     
+                recommendHtml += '<div class="finalBalaceItem" data-wr-score="'+bonusScoreForWinRate+'" data-early-pick="'+bonusForEarlyPick+'" data-complexity="'+complexityBonus+'"'+dataAllComposition+dataEnemyBestPickBonus+'>';
                     recommendHtml += '<div class="heroInfoWrapForBalance clearFix">';
                         recommendHtml += '<div class="heroImgWrapForBalance float-left align-middle" data-hero-id="'+curRecomHeroId+'">';
                             recommendHtml += '<img src="' + heroImgPath + '" width="30px" height="auto">';
@@ -2676,9 +2866,10 @@ function doRecountCounterPickBalance()
                 }
             });
 
-            // add note to meta heroes
+            // add notes to meta heroes, early pick, complexity, team composition
             $('.finalBalaceItem').each(function()
             {
+                // meta
                 if($(this).attr('data-wr-score') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
@@ -2688,6 +2879,7 @@ function doRecountCounterPickBalance()
                     .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">Герой не в мете</div><div class="coefForBalance"></div></div>');
                 }
 
+                // early pick
                 if($(this).attr('data-early-pick') > 10)
                 {
                     $(this).find('.heroNotesWrapForBalance')
@@ -2696,6 +2888,23 @@ function doRecountCounterPickBalance()
                 {
                     $(this).find('.heroNotesWrapForBalance')
                     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Бонус за ранний пик</div><div class="coefForBalance"></div></div>');
+                }
+
+                // complexity
+                if($(this).attr('data-complexity') > 0)
+                {
+                    $(this).find('.heroNotesWrapForBalance')
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Герой простой в испольнении</div><div class="coefForBalance"></div></div>');
+                } else if($(this).attr('data-complexity') < 0) {
+                    $(this).find('.heroNotesWrapForBalance')
+                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">Герой сложный в исполнении</div><div class="coefForBalance"></div></div>');
+                }
+
+                // team composition
+                if($(this).attr('data-team-composition') > 0)
+                {
+                    $(this).find('.heroNotesWrapForBalance')
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Бонус для баланса team composition</div><div class="coefForBalance"></div></div>');
                 }
             });
 
@@ -3911,7 +4120,12 @@ function tryToAddHeroToTheMapSomwhere(sideTry, heroIdTry, heroCodenameTry)
     var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameTry+'_icon.png?v=4299287" data-hero-id="'+heroIdTry+'" data-hero-codename="'+heroCodenameTry+'" data-roles-values="'+getHeroRolesByHeroId(heroIdTry)+'" width="28px">';
     var whereToAppend;
 
-    if($('#miniMapWrap > div[id="'+sideTry+'Hard1"] img').length == 0)
+    // if last pick and mid is free put it in
+    if($('#friendPickList .slot').length == 5 && $('#miniMapWrap > div[id="'+sideTry+'Mid1"] img').length == 0)
+    {
+        whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Mid1"]');
+    } 
+    else if($('#miniMapWrap > div[id="'+sideTry+'Hard1"] img').length == 0)
     {
         whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Hard1"]');
     }
@@ -4325,10 +4539,21 @@ function draggableForRecommendHeroes()
     // end of draggable for recommend heroes
 }
 
-function changeRadar(teamCompositionDataArray) {
+function changeRadar(teamCompositionDataArray, enemyTeamCompositionDataArray) {
     window.radarChart.data.datasets[0].data = [teamCompositionDataArray['initiator']
                                         ,teamCompositionDataArray['durable']
-                                        ,teamCompositionDataArray['pusher']];
+                                        ,teamCompositionDataArray['pusher']
+                                        ,teamCompositionDataArray['nuker']
+                                        ,teamCompositionDataArray['antipusher']
+                                        ,teamCompositionDataArray['control']];
+
+    window.radarChart.data.datasets[1].data = [enemyTeamCompositionDataArray['initiator']
+                                        ,enemyTeamCompositionDataArray['durable']
+                                        ,enemyTeamCompositionDataArray['pusher']
+                                        ,enemyTeamCompositionDataArray['nuker']
+                                        ,enemyTeamCompositionDataArray['antipusher']
+                                        ,enemyTeamCompositionDataArray['control']];
+
     window.radarChart.update();
     console.log('radar changed');
 }

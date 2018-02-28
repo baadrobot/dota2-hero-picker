@@ -1111,15 +1111,39 @@ $(document).ready(function ()
         $(window).trigger('resize');
     });
 
-    $('#editAccordion2').on('show.bs.collapse', function() 
-    {
-        $('#editAccordion1').collapse('toggle');
-    });
+    // $('#editAccordion2').on('show.bs.collapse', function() 
+    // {
+    //     $('#editAccordion1').collapse('show');
+    //     $('#editAccordion2').collapse('hide');
+    // });
 
-    $('#editAccordion1').on('show.bs.collapse', function() 
-    {
-        $('#editAccordion2').collapse('toggle');
-    });
+    // $('#editAccordion1').on('show.bs.collapse', function() 
+    // {
+    //     $('#editAccordion2').collapse('show');
+    //     $('#editAccordion1').collapse('hide');
+    // });
+
+    // $('#editAccordion > .item > .accordionHeader[aria-controls="editAccordion1"]').on('click', function() 
+    // {
+    //     if($(this).hasClass('collapsed'))
+    //     {
+    //         $(this).removeClass('collapsed');
+    //         $('#editAccordion > .item > .accordionHeader[aria-controls="editAccordion2"]').addClass('collapsed');
+    //     } else {
+    //         $(this).addClass('collapsed');
+    //     }
+    // });
+
+    // $('#editAccordion > .item > .accordionHeader[aria-controls="editAccordion2"]').on('click', function() 
+    // {
+    //     if($(this).hasClass('collapsed'))
+    //     {
+    //         $(this).removeClass('collapsed');
+    //         $('#editAccordion > .item > .accordionHeader[aria-controls="editAccordion1"]').addClass('collapsed');
+    //     } else {
+    //         $(this).addClass('collapsed');
+    //     }
+    // });
 });
 // - END DOC READY//////////////////////////////////////
 
@@ -2103,13 +2127,7 @@ function changeNotesWrapHtml()
 
 function resizeAccordions()
 {
-    // set height of accordions
-    // console.log(window.innerHeight);
-    // console.log(window.outerHeight);
-    var innerHeight = window.innerHeight;
-    var firstAccordionTopOffset = $("#editAccordion1").offset().top;
-    var secondAccordionTopOffset = firstAccordionTopOffset + 29;
-
-    $("#editAccordion1").css('max-height', innerHeight - firstAccordionTopOffset - 40);
-    $("#editAccordion2").css('max-height', innerHeight - secondAccordionTopOffset - 140);
+    var topOffset = window.innerHeight - $("#editAccordion").offset().top - 70;
+    $("#editAccordion1").css('max-height', topOffset);
+    $("#editAccordion2").css('max-height', topOffset);
 }

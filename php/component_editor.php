@@ -62,14 +62,14 @@
 
                 echo '<div id="editAccordion" data-children=".item">';
                     echo '<div class="item">';
-                        echo '<a class="accordionHeader" data-toggle="collapse" data-parent="#editAccordion" href="#editAccordion1" aria-expanded="true" aria-controls="editAccordion1">';
+                        echo '<a class="accordionHeader" role="button" data-toggle="collapse" href="#editAccordion1" aria-expanded="true" aria-controls="editAccordion1">';
                             echo '<span class="h4 text-secondary">Список тэгов</span>';
                         echo '</a>';
                         echo '<i id="btnCreateNewTagPopup" class="fa fa-plus-square text-secondary acrdHdrBtn hvrDrkGr" aria-hidden="true"></i>';
                         echo '<i id="btnDeleteSelectedTagPopup" class="fa fa-minus-square text-secondary acrdHdrBtn hvrMaroon" aria-hidden="true"></i>';
                         echo '<i id="btnRenameSelectedTagPopup" class="fa fa-pencil-square text-secondary acrdHdrBtn hvrOrange" aria-hidden="true"></i>';
 
-                        echo '<div id="editAccordion1" class="collapse show" role="tabpanel">';
+                        echo '<div id="editAccordion1" class="collapse show"  data-parent="#editAccordion" role="tabpanel">';
                             echo '<p id="tagListWrap" class="mb-3">';
 
                                 echo '<span>Загрузка...</span>';
@@ -78,13 +78,13 @@
                         echo '</div>';
                     echo '</div>';
                     echo '<div class="item">';
-                        echo '<a class="accordionHeader collapsed" data-toggle="collapse" data-parent="#editAccordion" href="#editAccordion2" aria-expanded="false" aria-controls="editAccordion2">';
+                        echo '<a class="accordionHeader collapsed" role="button" data-toggle="collapse" href="#editAccordion2" aria-expanded="false" aria-controls="editAccordion2">';
                             echo '<span class="h4 text-secondary">Баланс тэгов</span>';
                         echo '</a>';
                         echo '<i id="btnCreateNewBalancePopup" class="fa fa-plus-square text-secondary acrdHdrBtn hvrDrkGr" aria-hidden="true"></i>';
                         //echo '<i id="btnDeleteSelectedBalancePopup" class="fa fa-minus-square text-secondary acrdHdrBtn hvrMaroon" aria-hidden="true"></i>';
 
-                        echo '<div id="editAccordion2" class="collapse" role="tabpanel">';
+                        echo '<div id="editAccordion2" class="collapse" data-parent="#editAccordion" role="tabpanel">';
                             echo '<div id="tagBalanceListWrap" class="mb-3">';
 
                                 echo '<span>Загрузка...</span>';

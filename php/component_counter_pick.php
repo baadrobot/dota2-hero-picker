@@ -2,18 +2,33 @@
     require_once('php/a_functions.php');
     global $dbClass;
 
-    $query = 'SELECT cf_d2HeroList_id as `id`
-                    ,cf_d2HeroList_name_en_US as `n`
-                    ,cf_d2HeroList_codename as `cn`
-                    ,cf_d2HeroList_primary_attr as `a`
-                    ,cf_d2HeroList_name_aliases as `na`
-                    ,cf_d2HeroList_aliases_custom as `nac`
-                    ,cf_d2HeroList_alias_single as `nas`
-                    ,cf_d2HeroList_role_initiator as `initiator`
-                    ,cf_d2HeroList_role_durable as `durable`
-                    ,cf_d2HeroList_role_pusher as `pusher`
-                    -- ,cf_d2HeroList_icon as `icon`
-                FROM tb_dota2_hero_list ORDER BY cf_d2HeroList_name_en_US;';
+    $query = 'SELECT
+                cf_d2HeroList_id AS `id`,
+                cf_d2HeroList_name_en_US AS `n`,
+                cf_d2HeroList_codename AS `cn`,
+                cf_d2HeroList_primary_attr AS `a`,
+                cf_d2HeroList_name_aliases AS `na`,
+                cf_d2HeroList_aliases_custom AS `nac`,
+                cf_d2HeroList_alias_single AS `nas`,
+                cf_d2HeroList_role_initiator AS `initiator`,
+                cf_d2HeroList_role_durable AS `durable`,
+                cf_d2HeroList_role_pusher AS `pusher`,
+                cf_d2HeroList_role_nuker AS `nuker`,
+                cf_d2HeroList_complexity AS `complexity`,
+                antipusherTable.cf_d2HeroTagSet_tag_val AS `antipusher`,
+                controlTable.cf_d2HeroTagSet_tag_val AS `control`
+                FROM tb_dota2_hero_list
+                LEFT JOIN
+                (SELECT cf_d2HeroTagSet_hero_id, cf_d2HeroTagSet_tag_val
+                    FROM tb_dota2_heroTag_set
+                    WHERE cf_d2HeroTagSet_tag_id = 141) AS `antipusherTable`
+                    ON antipusherTable.cf_d2HeroTagSet_hero_id = cf_d2HeroList_id
+                LEFT JOIN
+                (SELECT cf_d2HeroTagSet_hero_id, cf_d2HeroTagSet_tag_val
+                    FROM tb_dota2_heroTag_set
+                    WHERE cf_d2HeroTagSet_tag_id = 216) AS `controlTable`
+                    ON controlTable.cf_d2HeroTagSet_hero_id = cf_d2HeroList_id
+                ORDER BY n;';
 
     $hero_array = $dbClass->select($query);
 
