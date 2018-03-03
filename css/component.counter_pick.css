@@ -1019,3 +1019,11 @@ line-height: 40px
 .pointerEventsNone {
     pointer-events: none;
 }
+
+#chartRadar {
+    width:350px;
+    height:190px;
+    /* -ms-transform: rotate(-25.2deg);
+    -webkit-transform: rotate(-25.2deg);
+    transform: rotate(-25.2deg); */
+}
