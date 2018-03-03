@@ -1683,7 +1683,7 @@ function doRecountCounterPickBalanceForEnemy()
 
         // order recommendation
         window.maxRecomendations = 100;
-        if ((enemyPickElements.length + friendPickElements.length + banPickElements.length) > 0)
+        // if ((enemyPickElements.length + friendPickElements.length + banPickElements.length) > 0)
         {
             var tempBalanceHeroIdArray = [];
             var tempBalanceHeroValueArray = [];
@@ -2074,6 +2074,39 @@ function doRecountCounterPickBalance()
             }
         });
 
+        var winRateMin = 50;
+        var winRateMax = 50;
+        var rangeBonusForWinRate = 20;
+        // get max and min win rates
+        for(var x = 0; x < window.heroList.length; x++)
+        {
+            //window.heroList[x]['wr'] = Number(window.heroList[x]['wr']);
+            if(window.heroList[x]['wr'] > winRateMax)
+            {
+                winRateMax = window.heroList[x]['wr'];
+            }
+            else
+            if(window.heroList[x]['wr'] < winRateMin)
+            {
+                winRateMin = window.heroList[x]['wr'];
+            }
+        }
+        for(var x = 0; x < window.heroList.length; x++)
+        {
+            if(window.heroList[x]['wr'] >= 50)
+            {
+                var curRecomHeroWinRate = window.heroList[x]['wr'] - 50;
+                var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));                            
+
+                if (typeof tempCounterBalance[window.heroList[x]['id']] == 'undefined')
+                {
+                    tempCounterBalance[window.heroList[x]['id']] = 0;
+                }
+                //tempCounterBalance[window.heroList[x]['id']] = tempCounterBalance[window.heroList[x]['id']] + bonusScoreForWinRate;
+            }
+        }
+
+
         var defaultEmptyVal = -9999;
         // remove already baned and picked heroes from recommendation
         $('.enemyPick.slot, .friendPick.slot, .banPick.slot').each(function()
@@ -2085,7 +2118,7 @@ function doRecountCounterPickBalance()
 
         // order recommendation
         window.maxRecomendations = 100;
-        if ((enemyPickElements.length + friendPickElements.length + banPickElements.length) > 0)
+        // if ((enemyPickElements.length + friendPickElements.length + banPickElements.length) > 0)
         {
             var tempBalanceHeroIdArray = [];
             var tempBalanceHeroValueArray = [];
@@ -2113,25 +2146,6 @@ function doRecountCounterPickBalance()
                 }
             });
 
-            var winRateMin = 50;
-            var winRateMax = 50;
-            // get max and min win rates
-            for(var x = 0; x < window.heroList.length; x++)
-            {
-                //window.heroList[x]['wr'] = Number(window.heroList[x]['wr']);
-                if(window.heroList[x]['wr'] > winRateMax)
-                {
-                    winRateMax = window.heroList[x]['wr'];
-                }
-                else
-                if(window.heroList[x]['wr'] < winRateMin)
-                {
-                    winRateMin = window.heroList[x]['wr'];
-                }
-            }
-
-            var rangeBonusForWinRate = 20;
-
             for (var j = 0; j < window.maxRecomendations;j++)
             {
                 var curRecomHeroId = tempBalanceHeroIdArray[j];
@@ -2146,7 +2160,7 @@ function doRecountCounterPickBalance()
                         if(window.heroList[x]['wr'] >= 50)
                         {
                             var curRecomHeroWinRate = window.heroList[x]['wr'] - 50;
-                            var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));
+                            var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));                            
                         } else
                         if(window.heroList[x]['wr'] < 50)
                         {
@@ -2156,6 +2170,9 @@ function doRecountCounterPickBalance()
                         }
                     }
                 }
+                
+                
+
                 curRecomHeroVal = curRecomHeroVal + bonusScoreForWinRate;
                 // if (curRecomHeroVal == -9999)
                 // {
@@ -2210,13 +2227,13 @@ function doRecountCounterPickBalance()
                         {
                             if(curHeroRoles.charAt(4) != '0' || curHeroRoles.charAt(5) != '0' || curHeroRoles.charAt(6) != '0')
                             {
-                                bonusForEarlyPick += 10;
+                                bonusForEarlyPick += 15;
                             }
                         }
                         if(pos5isLocked == false) {
                             if(curHeroRoles.charAt(8) != '0')
                             {
-                                bonusForEarlyPick += 10;
+                                bonusForEarlyPick += 15;
                             }
                         }
                         curRecomHeroVal += bonusForEarlyPick;
@@ -2944,7 +2961,7 @@ function doRecountCounterPickBalance()
             {
                 $('[data-composition-'+key+']').each(function(){
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()) +'</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()+'_') +'</div><div class="coefForBalance"></div></div>');
                 });
             });                
 
