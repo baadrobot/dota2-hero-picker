@@ -419,6 +419,32 @@ echo '<script>';
     echo 'window.LangPreStr["COUNTER_PICK"]["_CHOOSE_HERO_"] = "Выбор героя";';
     echo 'window.LangPreStr["COUNTER_PICK"]["_CLARIFY_HERO_"] = "Какого героя Вы подразумевали?";';
 
+    echo 'window.LangPreStr["COUNTER_PICK"]["_STRONG_COUNTERPICK_BONUS"] = "Все серьезные контерпики в бане или в дружественном пике";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_ROLE_BONUS_"] = "Бонус за актуальную роль";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_META_HERO_"] = "Герой в мете";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_NON_META_HERO_"] = "Герой не в мете";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_EARLY_PICK_BONUS_"] = "Бонус за ранний пик";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_DOUBLE_EARLY_PICK_BONUS_"] = "Двойной бонус за ранний пик";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_EASY_"] = "Герой простой в испольнении";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_HARD_"] = "Герой сложный в исполнении";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_BONUS_"] = "Бонус для баланса team composition";';
+
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_INITIATOR"] = "Инициатор";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_DURABLE"] = "Танк";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_PUSHER"] = "Пушер";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_NUKER"] = "Нюкер";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_ANTIPUSHER"] = "Антипушер";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_CONTROL"] = "Контроль";';
+
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_INITIATOR_BONUS_"] = "Инициатор бонус";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_DURABLE_BONUS_"] = "Танк бонус";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_PUSHER_BONUS_"] = "Пушер бонус";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_NUKER_BONUS_"] = "Нюкер бонус";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_ANTIPUSHER_BONUS_"] = "Антипушер бонус";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_COMPOSITION_CONTROL_BONUS_"] = "Контроль бонус";';
+    
+    
+
 
 echo '</script>';
 

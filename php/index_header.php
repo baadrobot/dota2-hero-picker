@@ -50,8 +50,8 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
 
         echo '<link href="favicon.ico" rel="shortcut icon" type="image/x-icon">';
 
-        echo '<script src="https://use.fontawesome.com/3f039be9d2.js"></script>';
-        // echo '<script src="js/fontawesome.js"></script>';
+        // echo '<script src="https://use.fontawesome.com/3f039be9d2.js"></script>';
+        echo '<script src="js/fontawesome.js"></script>';
 
 
 
@@ -209,8 +209,7 @@ echo '<html lang="'.substr($_SESSION["SUserLang"], 0, 2).'">';
                 echo $externalData;
 
                 // chart.js 
-                echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>';
-                echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>';
+                echo '<script src="js/Chart.bundle.min.js"></script>';
 
                 if(isGotAccess(_ROLE_EDITOR))
                 {
