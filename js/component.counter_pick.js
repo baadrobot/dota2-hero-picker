@@ -17,23 +17,29 @@ $(document).ready(function ()
       
     // ChartJS Radar
         var canvasEl = $('#chartRadar');
-        var enemyRadarColor = '#8b08158f';
+        var enemyRadarColor = 'rgba(255,0,0, 0.3)';
 
         var data = {
-            labels: ['Initiator', 'Durable', 'Pusher', 'Nuker', 'Antipusher', 'Control']
+            labels: [window.LangPreStr["COUNTER_PICK"]["_RADAR_INITIATOR"]
+                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_DURABLE"]
+                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_PUSHER"]
+                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_NUKER"]
+                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_ANTIPUSHER"]
+                    // , window.LangPreStr["COUNTER_PICK"]["_RADAR_CONTROL"]
+                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_CONTROL"]]
             ,datasets: [{
                 data: [0, 0, 0, 0, 0, 0]
                 ,backgroundColor: 'rgba(246,144,8, 0.3)'
                 ,borderColor: 'rgba(246,144,8, 0.8)'
                 ,borderWidth: 2
-                ,pointBackgroundColor: 'rgba(246,144,8, 1)'
+                ,pointBackgroundColor: 'rgb(246,144,8)'
             }
             ,{
                 data: [0, 0, 0, 0, 0, 0]
-                ,backgroundColor: enemyRadarColor
-                ,borderColor: enemyRadarColor
+                ,backgroundColor: 'rgba(255,0,0, 0.3)'
+                ,borderColor: 'rgba(255,0,0, 0.8)'
                 ,borderWidth: 2
-                ,pointBackgroundColor: enemyRadarColor
+                ,pointBackgroundColor: 'rgb(255,0,0)'
             }]
         }
 
@@ -53,6 +59,7 @@ $(document).ready(function ()
                 duration: 500
             }
             ,responsive: false
+            ,startAngle: (((data.labels.length & 1) == 0) ? 180 / data.labels.length : 0)
         }
 
         window.radarChart = new Chart(canvasEl, {
@@ -229,10 +236,10 @@ $(document).ready(function ()
 
 
                 // refresh fillPickBanInput
-                var friendPickElements = $('.friendPick.slot');
-                var enemyPickElements = $('.enemyPick.slot');
-                var banPickElements = $('.banPick.slot');
-                fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
+                var friendPickSlots = $('#friendPickList .friendPick');
+                var enemyPickSlots = $('#enemyPickList .enemyPick');
+                var banPickSlots = $('#banPickList .banPick');
+                fillPickBanInput(friendPickSlots, enemyPickSlots, banPickSlots);
             },
             over: function(event, ui) {
                 ui.helper.addClass('draggableOverDroppable');
@@ -634,10 +641,10 @@ $(document).ready(function ()
             iconGlowFunction();
 
             // refresh fillPickBanInput
-            var friendPickElements = $('.friendPick.slot');
-            var enemyPickElements = $('.enemyPick.slot');
-            var banPickElements = $('.banPick.slot');
-            fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
+            var friendPickSlots = $('#friendPickList .friendPick');
+            var enemyPickSlots = $('#enemyPickList .enemyPick');
+            var banPickSlots = $('#banPickList .banPick');
+            fillPickBanInput(friendPickSlots, enemyPickSlots, banPickSlots);
         },
         over: function(event, ui) {
             $(this).addClass('highlightHoveredSlot');
@@ -690,17 +697,15 @@ $(document).ready(function ()
     $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').on('click', function ()
     {
         var fillInputValue = $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val();
-
-        // $('#miniMapWrap > div').html('');
-        // console.log('okclick');
+        var maxCapHeroes = false;
 
         // commaSepArray = '(E) Alchim, Axe, BS (B) Lina (F) Lion';
         //commaSepArray[0] = '';
         //commaSepArray[1] = 'E) Alchim, Axe, BS';
         //commaSepArray[2] = 'B) Lina';
-        //commaSepArray[3] = 'F) Lion';
-        var maxCapHeroes = false;
+        //commaSepArray[3] = 'F) Lion';     
 
+        // get get team sides
         if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
         {
             var friendTeam = 'dire';
@@ -710,6 +715,7 @@ $(document).ready(function ()
             var enemyTeam = 'dire';
         }
 
+        // split input value by enemy/friend/ban
         var typeSepArray = fillInputValue.trim().toLowerCase().split('(');
         for (var i = 0; i < typeSepArray.length; i++)
         {
@@ -719,62 +725,66 @@ $(document).ready(function ()
                 typeSepArray[i] = typeSepArray[i].replace(/  /g, ' ');
             }
         }
-        window.tempArrayE = [];
-        window.tempArrayF = [];
-        window.tempArrayB = [];
-        if (typeSepArray.length == 0)
-        {
-            return;
-        } else
-        if (typeSepArray.length == 1)
-        {
-            // не было закрывающей скобоки, рассматриваем всех героев как Врагов
-            window.tempArrayE = recognizeHeroesAndWriteToArray(typeSepArray[0], window.tempArrayE);
-        } else {
-            for (var i = 0; i < typeSepArray.length; i++)
+        
+        // put each hero into its array
+            window.tempArrayE = [];
+            window.tempArrayF = [];
+            window.tempArrayB = [];
+            if (typeSepArray.length == 0)
             {
-                if (typeSepArray[i].substring(0, 2) == 'e)')
+                return;
+            } else
+            if (typeSepArray.length == 1)
+            {
+                // не было закрывающей скобоки, рассматриваем всех героев как Врагов
+                window.tempArrayE = recognizeHeroesAndWriteToArray(typeSepArray[0], window.tempArrayE);
+            } else {
+                for (var i = 0; i < typeSepArray.length; i++)
                 {
-                    window.tempArrayE = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayE);
+                    if (typeSepArray[i].substring(0, 2) == 'e)')
+                    {
+                        window.tempArrayE = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayE);
 
-                    if(window.tempArrayE.length > 5)
+                        if(window.tempArrayE.length > 5)
+                        {
+                            alert('В команду врага записано более 5ти героев');
+                            maxCapHeroes = true;
+                        }
+                        if(window.tempArrayE.length == 5)
+                        {
+                            $('#miniMapWrap div[id^="'+enemyTeam+'"] > i.questionMark').remove();
+                        }
+                    } else if (typeSepArray[i].substring(0, 2) == 'f)')
                     {
-                        alert('В команду врага записано более 5ти героев');
-                        maxCapHeroes = true;
-                    }
-                    if(window.tempArrayE.length == 5)
-                    {
-                        $('#miniMapWrap div[id^="'+enemyTeam+'"] > i.questionMark').remove();
-                    }
-                } else if (typeSepArray[i].substring(0, 2) == 'f)')
-                {
-                    window.tempArrayF = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayF);
+                        window.tempArrayF = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayF);
 
-                    if(window.tempArrayF.length > 5)
+                        if(window.tempArrayF.length > 5)
+                        {
+                            alert('В команду союзников записано более 5ти героев');
+                            maxCapHeroes = true;
+                        }
+                        if(window.tempArrayF.length == 5)
+                        {
+                            $('#miniMapWrap div[id^="'+friendTeam+'"] > i.questionMark').remove();
+                        }
+                    } else if (typeSepArray[i].substring(0, 2) == 'b)')
                     {
-                        alert('В команду союзников записано более 5ти героев');
-                        maxCapHeroes = true;
-                    }
-                    if(window.tempArrayF.length == 5)
-                    {
-                        $('#miniMapWrap div[id^="'+friendTeam+'"] > i.questionMark').remove();
-                    }
-                } else if (typeSepArray[i].substring(0, 2) == 'b)')
-                {
-                    window.tempArrayB = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayB);
+                        window.tempArrayB = recognizeHeroesAndWriteToArray(typeSepArray[i].substring(2), window.tempArrayB);
 
-                    if(window.tempArrayB.length > 5)
-                    {
-                        alert('В баны записано более 5ти героев');
-                        maxCapHeroes = true;
+                        if(window.tempArrayB.length > 5)
+                        {
+                            alert('В баны записано более 5ти героев');
+                            maxCapHeroes = true;
+                        }
+                    } else {
+                        // do nothing
                     }
-                } else {
-                    // do nothing
                 }
             }
-        }
-        //(b) axe, dazzle (f) AA (e) medusa, lion
+            //(b) axe, dazzle (f) AA (e) medusa, lion
+        // end of put each hero into its array
 
+        // break if more than 5 heroes in same team/ban
         if(maxCapHeroes)
         {
             return;
@@ -790,158 +800,140 @@ $(document).ready(function ()
             pickedOrBanedHeroPointerEvents(curHeroIdInSlot);
         });
 
-        // создаем массив со словами, которые не совпали с alias-single
-        window.conflictWordsArray = [];
-        // var allMatchesHeroIdsByConflictWordKeyArray = [];
-        // массив для тех слов которые вообще ни с чем не совпали (абракадабра)
-        window.noMatchedWordsArray = [];
-
         // Находим конфликтные слова и их совпадения
-        // for enemy
-        if(window.tempArrayE.length)
-        {
-            for(var i = 0; i < window.tempArrayE.length; i++)
+            // создаем массив со словами, которые не совпали с alias-single
+            window.conflictWordsArray = [];
+            // массив для тех слов которые вообще ни с чем не совпали (абракадабра)
+            window.noMatchedWordsArray = [];
+            
+            // for enemy
+            if(window.tempArrayE.length)
             {
-                var countForSearchMatches = 0;
-
-                // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
-                if(!(window.tempArrayE[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-alias-single')))
+                for(var i = 0; i < window.tempArrayE.length; i++)
                 {
-                    $('[data-hero-aliases]').each(function ()
-                    {
-                        //склеиваем все алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                            + ',' + $(this).attr('data-hero-namelocal')
-                            + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                    var countForSearchMatches = 0;
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        var curEnemyHeroAlias = window.tempArrayE[i].toLowerCase().replace(/\s|_|\-/g, '');
-                        if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                    // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
+                    if(!(window.tempArrayE[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-alias-single'))
+                    && window.tempArrayE[i] != '-')
+                    {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            // если уже найдено более 1го совпадения, значит есть конфликт и надо заполнять
-                            // массив с совпадениями тутже, чтобы не делать одну и ту же работу дважды
-                                // if(countForSearchMatches > 1)
-                                // {
-                                //     allMatchesHeroIdsByConflictWordKeyArray[window.tempArrayE[i]].push($(this).attr('data-hero-id'));
-                                // }
+                            //склеиваем все алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                + ',' + $(this).attr('data-hero-namelocal')
+                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            // увеличиваем на 1 если найдено совпадение
-                            // потом по ней мы проверяем было найдено 0, 1 или более совпадений
-                            countForSearchMatches++;
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            var curEnemyHeroAlias = window.tempArrayE[i].toLowerCase().replace(/\s|_|\-/g, '');
+                            if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                            {
+                                // увеличиваем на 1 если найдено совпадение
+                                // потом по ней мы проверяем было найдено 0, 1 или более совпадений
+                                countForSearchMatches++;
+                            }
+                        });
+
+                        // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
+                        if(countForSearchMatches > 1)
+                        {
+                            window.conflictWordsArray.push(window.tempArrayE[i]);
                         }
-                    });
-
-                    // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
-                    if(countForSearchMatches > 1)
-                    {
-                        window.conflictWordsArray.push(window.tempArrayE[i]);
-                    }
-                    else if (countForSearchMatches == 0)
-                    {
-                        window.noMatchedWordsArray.push(window.tempArrayE[i]);
+                        else if (countForSearchMatches == 0)
+                        {
+                            window.noMatchedWordsArray.push(window.tempArrayE[i]);
+                        }
                     }
                 }
             }
-        }
 
-        // for ban
-        if(window.tempArrayB.length)
-        {
-            for(var i = 0; i < window.tempArrayB.length; i++)
+            // for ban
+            if(window.tempArrayB.length)
             {
-                var countForSearchMatches = 0;
-
-                // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
-                if(!(window.tempArrayB[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-alias-single')))
+                for(var i = 0; i < window.tempArrayB.length; i++)
                 {
-                    $('[data-hero-aliases]').each(function ()
-                    {
-                        //склеиваем все алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                            + ',' + $(this).attr('data-hero-namelocal')
-                            + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                    var countForSearchMatches = 0;
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        var curEnemyHeroAlias = window.tempArrayB[i].toLowerCase().replace(/\s|_|\-/g, '');
-                        if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                    // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
+                    if(!(window.tempArrayB[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-alias-single'))
+                    && window.tempArrayB[i] != '-')
+                    {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            // если уже найдено более 1го совпадения, значит есть конфликт и надо заполнять
-                            // массив с совпадениями тутже, чтобы не делать одну и ту же работу дважды
-                                // if(countForSearchMatches > 1)
-                                // {
-                                //     allMatchesHeroIdsByConflictWordKeyArray[window.tempArrayE[i]].push($(this).attr('data-hero-id'));
-                                // }
+                            //склеиваем все алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                + ',' + $(this).attr('data-hero-namelocal')
+                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            // увеличиваем на 1 если найдено совпадение
-                            // потом по ней мы проверяем было найдено 0, 1 или более совпадений
-                            countForSearchMatches++;
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            var curEnemyHeroAlias = window.tempArrayB[i].toLowerCase().replace(/\s|_|\-/g, '');
+                            if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                            {
+                                // увеличиваем на 1 если найдено совпадение
+                                // потом по ней мы проверяем было найдено 0, 1 или более совпадений
+                                countForSearchMatches++;
+                            }
+                        });
+
+                        // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
+                        if(countForSearchMatches > 1)
+                        {
+                            window.conflictWordsArray.push(window.tempArrayB[i]);
                         }
-                    });
-
-                    // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
-                    if(countForSearchMatches > 1)
-                    {
-                        window.conflictWordsArray.push(window.tempArrayB[i]);
-                    }
-                    else if (countForSearchMatches == 0)
-                    {
-                        window.noMatchedWordsArray.push(window.tempArrayB[i]);
+                        else if (countForSearchMatches == 0)
+                        {
+                            window.noMatchedWordsArray.push(window.tempArrayB[i]);
+                        }
                     }
                 }
             }
-        }
 
-        // for friend
-        if(window.tempArrayF.length)
-        {
-            for(var i = 0; i < window.tempArrayF.length; i++)
+            // for friend
+            if(window.tempArrayF.length)
             {
-                var countForSearchMatches = 0;
-
-                // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
-                if(!(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single')))
+                for(var i = 0; i < window.tempArrayF.length; i++)
                 {
-                    $('[data-hero-aliases]').each(function ()
-                    {
-                        //склеиваем все алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                            + ',' + $(this).attr('data-hero-namelocal')
-                            + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                    var countForSearchMatches = 0;
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        var curEnemyHeroAlias = window.tempArrayF[i].toLowerCase().replace(/\s|_|\-/g, '');
-                        if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                    // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
+                    if(!(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single'))
+                    && window.tempArrayF[i] != '-')
+                    {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            // если уже найдено более 1го совпадения, значит есть конфликт и надо заполнять
-                            // массив с совпадениями тутже, чтобы не делать одну и ту же работу дважды
-                                // if(countForSearchMatches > 1)
-                                // {
-                                //     allMatchesHeroIdsByConflictWordKeyArray[window.tempArrayE[i]].push($(this).attr('data-hero-id'));
-                                // }
+                            //склеиваем все алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                + ',' + $(this).attr('data-hero-namelocal')
+                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            // увеличиваем на 1 если найдено совпадение
-                            // потом по ней мы проверяем было найдено 0, 1 или более совпадений
-                            countForSearchMatches++;
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            var curEnemyHeroAlias = window.tempArrayF[i].toLowerCase().replace(/\s|_|\-/g, '');
+                            if(allAliases.indexOf(curEnemyHeroAlias) !== -1)
+                            {
+                                // увеличиваем на 1 если найдено совпадение
+                                // потом по ней мы проверяем было найдено 0, 1 или более совпадений
+                                countForSearchMatches++;
+                            }
+                        });
+
+                        // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
+                        if(countForSearchMatches > 1)
+                        {
+                            window.conflictWordsArray.push(window.tempArrayF[i]);
                         }
-                    });
-
-                    // если найдено более одно совпадения значит это слово конфликтное и его нужно занести в массив
-                    if(countForSearchMatches > 1)
-                    {
-                        window.conflictWordsArray.push(window.tempArrayF[i]);
-                    }
-                    else if (countForSearchMatches == 0)
-                    {
-                        window.noMatchedWordsArray.push(window.tempArrayF[i]);
+                        else if (countForSearchMatches == 0)
+                        {
+                            window.noMatchedWordsArray.push(window.tempArrayF[i]);
+                        }
                     }
                 }
             }
-        }
+        // end of Находим конфликтные слова и их совпадения
 
         // убираем из массивов enemy, ban, friend те слова которые вообще ни с чем не совапали (абракадабра)
         if (window.noMatchedWordsArray)
         {
-        //for enemy
+            //for enemy
             for(var i = 0; i < window.noMatchedWordsArray.length; i++)
             {
                 for(var j = 0; j < window.tempArrayE.length; j++)
@@ -980,55 +972,12 @@ $(document).ready(function ()
         popupAndPicksFill();
     });
 
-    // putHeroOnMinimap('radiant', 'easy', 1, 'slark');
-    // putHeroOnMinimap('radiant', 'easy', 'axe');
-    // putHeroOnMinimap('radiant', 'easy', 'axe');
-
-    // putHeroOnMinimap('radiant', 'mid', 'axe');
-    // putHeroOnMinimap('radiant', 'mid', 'axe');
-    // putHeroOnMinimap('radiant', 'mid', 'axe');
-
-    // putHeroOnMinimap('radiant', 'hard', 'axe');
-    // putHeroOnMinimap('radiant', 'hard', 'axe');
-    // putHeroOnMinimap('radiant', 'hard', 'axe');
-
-    // putHeroOnMinimap('radiant', 'jungle', 'slark');
-    // putHeroOnMinimap('radiant', 'roam', 'axe');
-
-    // putHeroOnMinimap('dire', 'easy', 'slark');
-    // putHeroOnMinimap('dire', 'easy', 'slark');
-    // putHeroOnMinimap('dire', 'easy', 'slark');
-
-    // putHeroOnMinimap('dire', 'mid', 'slark');
-    // putHeroOnMinimap('dire', 'mid', 'slark');
-    // putHeroOnMinimap('dire', 'mid', 'slark');
-
-    // putHeroOnMinimap('dire', 'hard', 'slark');
-    // putHeroOnMinimap('dire', 'hard', 'slark');
-    // putHeroOnMinimap('dire', 'hard', 'slark');
-
-    // putHeroOnMinimap('dire', 'jungle', 'slark');
-    // putHeroOnMinimap('dire', 'roam', 'axe');
-
-    // deleteHeroFromMinimap('axe');
-
-    // $('#miniMapWrap [id^="dire"]').addClass('iconGlowGreen');
-    // $('#miniMapWrap [id^="radiant"]').addClass('iconGlowRed');
-
     iconGlowFunction();
-
-    // console.log(window.strategieList);
-    // console.log(window.roleList);
-    // console.log(window.roleList2.length);
-
-    // console.log(getHeroRolesByHeroId(9));
 
     $('#swapSidesBtn').on('click', function()
     {
         swapSides();
     });
-
-    // console.log(window.inputGetParam);
 
     if(typeof window.inputGetParam != 'undefined')
     {
@@ -1160,108 +1109,123 @@ function popupAndPicksFill()
         });
     } else {
         // заполнять пики и баны т.к. к этому моменту все массивы со словами чистые
-        // заполняем enemy pick
-        if(window.tempArrayE.length)
-        {
-            for(var i = 0; i < window.tempArrayE.length; i++)
+            // заполняем enemy pick
+            if(window.tempArrayE.length)
             {
-                if(window.tempArrayE[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-alias-single'))
+                for(var i = 0; i < window.tempArrayE.length; i++)
                 {
-                    var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-hero-id');
-                    var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
-
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                    getAjaxBalanceForHeroId(curHeroId, 1);
-                } else {
-                    $('[data-hero-aliases]').each(function ()
+                    if(window.tempArrayE[i] == '-')
                     {
-                        //склеиваем алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                                + ',' + $(this).attr('data-hero-namelocal')
-                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                        // если найден прочерк значит нужно перейти к следующему слову
+                        continue;
+                    }
+                    else if(window.tempArrayE[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-alias-single'))
+                    {
+                        var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-hero-id');
+                        var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        if(allAliases.indexOf(window.tempArrayE[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                        lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                        getAjaxBalanceForHeroId(curHeroId, 1);
+                    } else {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            var curHeroId = ($(this).attr('data-hero-id'));
-                            var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
+                            //склеиваем алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                    + ',' + $(this).attr('data-hero-namelocal')
+                                    + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                            getAjaxBalanceForHeroId(curHeroId, 1);
-                        }
-                    });
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            if(allAliases.indexOf(window.tempArrayE[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                            {
+                                var curHeroId = ($(this).attr('data-hero-id'));
+                                var curSlotForLock = $('#enemyPickList .enemyPick:nth-child('+ (i+1) +')');
+
+                                lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                                getAjaxBalanceForHeroId(curHeroId, 1);
+                            }
+                        });
+                    }
                 }
             }
-        }
 
-        // заполняем ban pick
-        if(window.tempArrayB.length)
-        {
-            for(var i = 0; i < window.tempArrayB.length; i++)
+            // заполняем ban pick
+            if(window.tempArrayB.length)
             {
-                if(window.tempArrayB[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-alias-single'))
+                for(var i = 0; i < window.tempArrayB.length; i++)
                 {
-                    var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-hero-id');
-                    var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
-
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                    getAjaxBalanceForHeroId(curHeroId, 1);
-                } else {
-                    $('[data-hero-aliases]').each(function ()
+                    if(window.tempArrayB[i] == '-')
                     {
-                        //склеиваем алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                                + ',' + $(this).attr('data-hero-namelocal')
-                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                        // если найден прочерк значит нужно перейти к следующему слову
+                        continue;
+                    }
+                    else if(window.tempArrayB[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-alias-single'))
+                    {
+                        var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-hero-id');
+                        var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        if(allAliases.indexOf(window.tempArrayB[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                        lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                        getAjaxBalanceForHeroId(curHeroId, 1);
+                    } else {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            var curHeroId = ($(this).attr('data-hero-id'));
-                            var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
+                            //склеиваем алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                    + ',' + $(this).attr('data-hero-namelocal')
+                                    + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                            getAjaxBalanceForHeroId(curHeroId, 1);
-                        }
-                    });
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            if(allAliases.indexOf(window.tempArrayB[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                            {
+                                var curHeroId = ($(this).attr('data-hero-id'));
+                                var curSlotForLock = $('#banPickList .banPick:nth-child('+ (i+1) +')');
+
+                                lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                                getAjaxBalanceForHeroId(curHeroId, 1);
+                            }
+                        });
+                    }
                 }
             }
-        }
 
-        // заполняем friend pick
-        if(window.tempArrayF.length)
-        {
-            for(var i = 0; i < window.tempArrayF.length; i++)
+            // заполняем friend pick
+            if(window.tempArrayF.length)
             {
-                if(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single'))
+                for(var i = 0; i < window.tempArrayF.length; i++)
                 {
-                    var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-hero-id');
-                    var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
-
-                    lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                    getAjaxBalanceForHeroId(curHeroId, 1);
-                } else {
-                    $('[data-hero-aliases]').each(function ()
+                    if(window.tempArrayF[i] == '-')
                     {
-                        //склеиваем алиасы
-                        var allAliases = ($(this).attr('data-hero-aliases')
-                                + ',' + $(this).attr('data-hero-namelocal')
-                                + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
+                        // если найден прочерк значит нужно перейти к следующему слову
+                        continue;
+                    }
+                    else if(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single'))
+                    {
+                        var curHeroId = $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-hero-id');
+                        var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
 
-                        //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
-                        if(allAliases.indexOf(window.tempArrayF[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                        lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                        getAjaxBalanceForHeroId(curHeroId, 1);
+                    } else {
+                        $('[data-hero-aliases]').each(function ()
                         {
-                            var curHeroId = ($(this).attr('data-hero-id'));
-                            var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
+                            //склеиваем алиасы
+                            var allAliases = ($(this).attr('data-hero-aliases')
+                                    + ',' + $(this).attr('data-hero-namelocal')
+                                    + ',' + $(this).attr('data-hero-codename')).toLowerCase().replace(/\s|_|\-/g, '');
 
-                            lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
-                            getAjaxBalanceForHeroId(curHeroId, 1);
-                        }
-                    });
+                            //подготавливаем имя героя которое нужно искать и проверяем нашлось ли оно
+                            if(allAliases.indexOf(window.tempArrayF[i].toLowerCase().replace(/\s|_|\-/g, '')) !== -1)
+                            {
+                                var curHeroId = ($(this).attr('data-hero-id'));
+                                var curSlotForLock = $('#friendPickList .friendPick:nth-child('+ (i+1) +')');
+
+                                lockNewHeroInSlot(curSlotForLock, curHeroId, 0, 1);
+                                getAjaxBalanceForHeroId(curHeroId, 1);
+                            }
+                        });
+                    }
                 }
             }
-        }
-        // конец заполнения слотов
+        // end of заполнять пики и баны т.к. к этому моменту все массивы со словами чистые
 
         // заполняем инпут
         //текст для врагов
@@ -1344,11 +1308,6 @@ function popupAndPicksFill()
         {
             addFillInputToCookie(textForInput);
         }
-        // refresh fillPickBanInput
-        // var friendPickElements = $('.friendPick.slot');
-        // var enemyPickElements = $('.enemyPick.slot');
-        // var banPickElements = $('.banPick.slot');
-        // fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
 
         $('.pickedHeroImgDelete').hide();
         //doRecountCounterPickBalance();
@@ -1369,10 +1328,10 @@ function removeHeroFromSlot(slotItemEl, recountNeedOrNot)
 
 
     // refresh fillPickBanInput
-    var friendPickElements = $('.friendPick.slot');
-    var enemyPickElements = $('.enemyPick.slot');
-    var banPickElements = $('.banPick.slot');
-    fillPickBanInput(friendPickElements, enemyPickElements, banPickElements);
+    var friendPickSlots = $('#friendPickList .friendPick');
+    var enemyPickSlots = $('#enemyPickList .enemyPick');
+    var banPickSlots = $('#banPickList .banPick');
+    fillPickBanInput(friendPickSlots, enemyPickSlots, banPickSlots);
 
     //remove hero from mini-map and uncertain heroes list
     // var heroId = slotItemEl.attr('data-hero-id');
@@ -1932,12 +1891,49 @@ function doRecountCounterPickBalance()
             enemyTeamComposition['nuker'] += curEnemyHeroObj.nuker;
             if(curEnemyHeroObj.antipusher != null)
             {
-                enemyTeamComposition['antipusher'] += curEnemyHeroObj.antipusher;
+                // enemyTeamComposition['antipusher'] += curEnemyHeroObj.antipusher;
+
+                if(curEnemyHeroObj.antipusher == 2)
+                {
+                    enemyTeamComposition['antipusher'] += 1;
+                } 
+                else if(curEnemyHeroObj.antipusher == 3)
+                {
+                    enemyTeamComposition['antipusher'] += 2;
+                }
+                else if(curEnemyHeroObj.antipusher == 4)
+                {
+                    enemyTeamComposition['antipusher'] += 2;
+                }
+                else if(curEnemyHeroObj.antipusher == 5)
+                {
+                    enemyTeamComposition['antipusher'] += 3;
+                } else {
+                    enemyTeamComposition['antipusher'] += curEnemyHeroObj.antipusher;
+                }
             }
             if(curEnemyHeroObj.control != null)
             {
-                enemyTeamComposition['control'] += curEnemyHeroObj.control;
+                // enemyTeamComposition['control'] += curEnemyHeroObj.control;
                 // console.log(curEnemyHeroObj.control);
+                if(curEnemyHeroObj.control == 2)
+                {
+                    enemyTeamComposition['control'] += 1;
+                } 
+                else if(curEnemyHeroObj.control == 3)
+                {
+                    enemyTeamComposition['control'] += 2;
+                }
+                else if(curEnemyHeroObj.control == 4)
+                {
+                    enemyTeamComposition['control'] += 2;
+                }
+                else if(curEnemyHeroObj.control == 5)
+                {
+                    enemyTeamComposition['control'] += 3;
+                } else {
+                    enemyTeamComposition['control'] += curEnemyHeroObj.control;
+                }
             }
         });
 
@@ -1981,12 +1977,46 @@ function doRecountCounterPickBalance()
             teamComposition['nuker'] += curFriendHeroObj.nuker;
             if(curFriendHeroObj.antipusher != null)
             {
-                teamComposition['antipusher'] += curFriendHeroObj.antipusher;
+                if(curFriendHeroObj.antipusher == 2)
+                {
+                    teamComposition['antipusher'] += 1;
+                } 
+                else if(curFriendHeroObj.antipusher == 3)
+                {
+                    teamComposition['antipusher'] += 2;
+                }
+                else if(curFriendHeroObj.antipusher == 4)
+                {
+                    teamComposition['antipusher'] += 2;
+                }
+                else if(curFriendHeroObj.antipusher == 5)
+                {
+                    teamComposition['antipusher'] += 3;
+                } else {
+                    teamComposition['antipusher'] += curFriendHeroObj.antipusher;
+                }
             }
             if(curFriendHeroObj.control != null)
             {
-                teamComposition['control'] += curFriendHeroObj.control;
                 // console.log(curFriendHeroObj.control);
+                if(curFriendHeroObj.control == 2)
+                {
+                    teamComposition['control'] += 1;
+                } 
+                else if(curFriendHeroObj.control == 3)
+                {
+                    teamComposition['control'] += 2;
+                }
+                else if(curFriendHeroObj.control == 4)
+                {
+                    teamComposition['control'] += 2;
+                }
+                else if(curFriendHeroObj.control == 5)
+                {
+                    teamComposition['control'] += 3;
+                } else {
+                    teamComposition['control'] += curFriendHeroObj.control;
+                }
             }
         });
 
@@ -2326,6 +2356,7 @@ function doRecountCounterPickBalance()
                             }
                         }
                     });
+
                     curRecomHeroVal += propertiesBonus;
                 // end of low team composition properties bonus
 
@@ -2851,7 +2882,7 @@ function doRecountCounterPickBalance()
                 if (typeof window.totallyCounteredHeroArray[curHeroId] != 'undefined')
                 {
                     $(this).parent().siblings('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Все серьезные контерпики в бане или в дружественном пике</div><div class="coefForBalance">'+banedAllStrongCountersBonusPoints+'</div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_STRONG_COUNTERPICK_BONUS"]+'</div><div class="coefForBalance">'+banedAllStrongCountersBonusPoints+'</div></div>');
                 }
 
                 // var actualRoleLength = $(this).find('span:not(.lineThrough)').length;
@@ -2862,7 +2893,7 @@ function doRecountCounterPickBalance()
                     curHeroCoefEl.text('+'+ (curHeroCoef + 10));
 
                     $(this).parent().siblings('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Бонус за актуальную роль</div><div class="coefForBalance">10</div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_ROLE_BONUS_"]+'</div><div class="coefForBalance">10</div></div>');
                 }
             });
 
@@ -2873,40 +2904,49 @@ function doRecountCounterPickBalance()
                 if($(this).attr('data-wr-score') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Герой в мете</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_META_HERO_"]+'</div><div class="coefForBalance"></div></div>');
                 } else {
                     $(this).find('.heroNotesWrapForBalance')
-                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">Герой не в мете</div><div class="coefForBalance"></div></div>');
+                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_NON_META_HERO_"]+'</div><div class="coefForBalance"></div></div>');
                 }
 
                 // early pick
                 if($(this).attr('data-early-pick') > 10)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Двойной бонус за ранний пик</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_EARLY_PICK_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
                 } else if($(this).attr('data-early-pick') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Бонус за ранний пик</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_DOUBLE_EARLY_PICK_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
                 }
 
                 // complexity
                 if($(this).attr('data-complexity') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Герой простой в испольнении</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_EASY_"]+'</div><div class="coefForBalance"></div></div>');
                 } else if($(this).attr('data-complexity') < 0) {
                     $(this).find('.heroNotesWrapForBalance')
-                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">Герой сложный в исполнении</div><div class="coefForBalance"></div></div>');
+                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_HARD_"]+'</div><div class="coefForBalance"></div></div>');
                 }
 
-                // team composition
-                if($(this).attr('data-team-composition') > 0)
-                {
-                    $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">Бонус для баланса team composition</div><div class="coefForBalance"></div></div>');
-                }
+                // // team composition
+                // if($(this).attr('data-team-composition') > 0)
+                // {
+                //     $(this).find('.heroNotesWrapForBalance')
+                //     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
+                // }
             });
+
+            // team composition notes
+            Object.keys(teamComposition).forEach(function (key)
+            {
+                $('[data-composition-'+key+']').each(function(){
+                    $(this).find('.heroNotesWrapForBalance')
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()) +'</div><div class="coefForBalance"></div></div>');
+                });
+            });                
 
             // sort by role
             if ($('#sortByRole:checked').length)
@@ -3079,51 +3119,90 @@ function doRecountCounterPickBalance()
 } // end of dorecounterpickbalance
 
 //функция для заполнения инпута текстом пиков и банов
-function fillPickBanInput(friendPickElements, enemyPickElements, banPickElements)
+function fillPickBanInput(friendPickSlots, enemyPickSlots, banPickSlots)
 {
     // delete highlight from heroes if none in pick/ban slots (fix 12900)
-    if(friendPickElements.length < 1 && enemyPickElements.length < 1 && banPickElements.length < 1)
-    {
-        $('img.highlight').remove();
-    }
+    // if(friendPickElements.length < 1 && enemyPickElements.length < 1 && banPickElements.length < 1)
+    // {
+    //     $('img.highlight').remove();
+    // }
 
     //текст для врагов
     var enemyPickText = '';
-    var isCommaNeeded = false;
-    enemyPickElements.each(function()
+    // var isCommaNeeded = false;
+    enemyPickSlots.each(function()
     {
-        if (isCommaNeeded)
+        if(enemyPickText != '')
         {
             enemyPickText += ', ';
         }
-        enemyPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
-        isCommaNeeded = true;
+        if($(this).hasClass('slot'))
+        {
+            // hero in slot
+            enemyPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        } else {
+            // free slot
+            enemyPickText += '-';
+        }
+
+        // if (isCommaNeeded)
+        // {
+        //     enemyPickText += ', ';
+        // }
+        // enemyPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        // isCommaNeeded = true;
     });
 
     //текст для банов
     var banPickText = '';
     var isCommaNeeded = false;
-    banPickElements.each(function()
+    banPickSlots.each(function()
     {
-        if (isCommaNeeded)
+        if(banPickText != '')
         {
             banPickText += ', ';
         }
-        banPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
-        isCommaNeeded = true;
+        if($(this).hasClass('slot'))
+        {
+            // hero in slot
+            banPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        } else {
+            // free slot
+            banPickText += '-';
+        }
+
+        // if (isCommaNeeded)
+        // {
+        //     banPickText += ', ';
+        // }
+        // banPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        // isCommaNeeded = true;
     });
 
     //текст для союзников
     var friendPickText = '';
     var isCommaNeeded = false;
-    friendPickElements.each(function()
+    friendPickSlots.each(function()
     {
-        if (isCommaNeeded)
+        if(friendPickText != '')
         {
             friendPickText += ', ';
         }
-        friendPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
-        isCommaNeeded = true;
+        if($(this).hasClass('slot'))
+        {
+            // hero in slot
+            friendPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        } else {
+            // free slot
+            friendPickText += '-';
+        }
+
+        // if (isCommaNeeded)
+        // {
+        //     friendPickText += ', ';
+        // }
+        // friendPickText += $(this).find('[data-alias-single]').attr('data-alias-single');
+        // isCommaNeeded = true;
     });
 
     // окончательное составление текста

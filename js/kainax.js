@@ -537,9 +537,13 @@ function kainaxPreloadImages(paramObj)
 
 function getHeroIcon(heroName, heroNameLocal)
 {
-    var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
-    var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
-    var heroImg = '<img src="'+heroIconUrl+'" height="18px" data-hero-codename="'+heroName+'" data-inactive-tooltip="'+tooltip+'">';
+    var heroImg = '';
+    if ((typeof heroName != 'undefined') && (typeof heroNameLocal != 'undefined'))
+    {
+        var tooltip = "<div class='tooltipWrap'>"+heroNameLocal+'</div>';
+        var heroIconUrl = 'http://cdn.dota2.com/apps/dota2/images/heroes/'+heroName+'_hphover.png?v=4238480';
+        heroImg = '<img src="'+heroIconUrl+'" height="18px" data-hero-codename="'+heroName+'" data-inactive-tooltip="'+tooltip+'">';
+    }
     return heroImg;
 }
 
