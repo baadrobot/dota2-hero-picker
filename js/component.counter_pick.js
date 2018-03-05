@@ -14,7 +14,7 @@ $(document).ready(function ()
     //   });
     //   console.log(heroObj);
     //   console.log(heroObj.initiator);
-      
+
     // ChartJS Radar
         var canvasEl = $('#chartRadar');
         var enemyRadarColor = 'rgba(255,0,0, 0.3)';
@@ -703,7 +703,7 @@ $(document).ready(function ()
         //commaSepArray[0] = '';
         //commaSepArray[1] = 'E) Alchim, Axe, BS';
         //commaSepArray[2] = 'B) Lina';
-        //commaSepArray[3] = 'F) Lion';     
+        //commaSepArray[3] = 'F) Lion';
 
         // get get team sides
         if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
@@ -725,7 +725,7 @@ $(document).ready(function ()
                 typeSepArray[i] = typeSepArray[i].replace(/  /g, ' ');
             }
         }
-        
+
         // put each hero into its array
             window.tempArrayE = [];
             window.tempArrayF = [];
@@ -805,7 +805,7 @@ $(document).ready(function ()
             window.conflictWordsArray = [];
             // массив для тех слов которые вообще ни с чем не совпали (абракадабра)
             window.noMatchedWordsArray = [];
-            
+
             // for enemy
             if(window.tempArrayE.length)
             {
@@ -1884,7 +1884,7 @@ function doRecountCounterPickBalance()
             var curEnemyHeroObj = window.heroList.find(function(element) {
                 return element.id == curEnemyHeroId;
               });
-              
+
             enemyTeamComposition['initiator'] += curEnemyHeroObj.initiator;
             enemyTeamComposition['durable'] += curEnemyHeroObj.durable;
             enemyTeamComposition['pusher'] += curEnemyHeroObj.pusher;
@@ -1896,7 +1896,7 @@ function doRecountCounterPickBalance()
                 if(curEnemyHeroObj.antipusher == 2)
                 {
                     enemyTeamComposition['antipusher'] += 1;
-                } 
+                }
                 else if(curEnemyHeroObj.antipusher == 3)
                 {
                     enemyTeamComposition['antipusher'] += 2;
@@ -1919,7 +1919,7 @@ function doRecountCounterPickBalance()
                 if(curEnemyHeroObj.control == 2)
                 {
                     enemyTeamComposition['control'] += 1;
-                } 
+                }
                 else if(curEnemyHeroObj.control == 3)
                 {
                     enemyTeamComposition['control'] += 2;
@@ -1980,7 +1980,7 @@ function doRecountCounterPickBalance()
                 if(curFriendHeroObj.antipusher == 2)
                 {
                     teamComposition['antipusher'] += 1;
-                } 
+                }
                 else if(curFriendHeroObj.antipusher == 3)
                 {
                     teamComposition['antipusher'] += 2;
@@ -2002,7 +2002,7 @@ function doRecountCounterPickBalance()
                 if(curFriendHeroObj.control == 2)
                 {
                     teamComposition['control'] += 1;
-                } 
+                }
                 else if(curFriendHeroObj.control == 3)
                 {
                     teamComposition['control'] += 2;
@@ -2096,7 +2096,7 @@ function doRecountCounterPickBalance()
             if(window.heroList[x]['wr'] >= 50)
             {
                 var curRecomHeroWinRate = window.heroList[x]['wr'] - 50;
-                var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));                            
+                var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));
 
                 if (typeof tempCounterBalance[window.heroList[x]['id']] == 'undefined')
                 {
@@ -2160,7 +2160,7 @@ function doRecountCounterPickBalance()
                         if(window.heroList[x]['wr'] >= 50)
                         {
                             var curRecomHeroWinRate = window.heroList[x]['wr'] - 50;
-                            var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));                            
+                            var bonusScoreForWinRate = Math.round((rangeBonusForWinRate / 100) * (curRecomHeroWinRate / ((winRateMax - 50) / 100)));
                         } else
                         if(window.heroList[x]['wr'] < 50)
                         {
@@ -2170,8 +2170,8 @@ function doRecountCounterPickBalance()
                         }
                     }
                 }
-                
-                
+
+
 
                 curRecomHeroVal = curRecomHeroVal + bonusScoreForWinRate;
                 // if (curRecomHeroVal == -9999)
@@ -2193,7 +2193,7 @@ function doRecountCounterPickBalance()
                     });
                 // end of add point to those who is good for enemy pick
 
-                
+
                 // add bonus to early pick supports
                     if($('#friendPickList .friendPick.emptySlot').length > 3)
                     {
@@ -2358,7 +2358,7 @@ function doRecountCounterPickBalance()
                                     //     }
                                     // }
 
-                    var dataAllComposition = ''; 
+                    var dataAllComposition = '';
 
                     Object.keys(teamCompositionLowProperties).forEach(function (key)
                     {
@@ -2391,21 +2391,26 @@ function doRecountCounterPickBalance()
                 var colorCoefColor = curRecomHeroVal >= 0 ? 'noticeGreen' : 'noticeRed';
                 var tempBalanceHeroValueTotalText = curRecomHeroVal > 0 ? '+'+ curRecomHeroVal : curRecomHeroVal;
 
-                                                                                                                                                                                                                     
+
                 recommendHtml += '<div class="finalBalaceItem" data-wr-score="'+bonusScoreForWinRate+'" data-early-pick="'+bonusForEarlyPick+'" data-complexity="'+complexityBonus+'"'+dataAllComposition+dataEnemyBestPickBonus+'>';
                     recommendHtml += '<div class="heroInfoWrapForBalance clearFix">';
-                        recommendHtml += '<div class="heroImgWrapForBalance float-left align-middle" data-hero-id="'+curRecomHeroId+'">';
-                            recommendHtml += '<img src="' + heroImgPath + '" width="30px" height="auto">';
+
+                    recommendHtml += '<div class="heroImgWrapForBalance float-left align-middle" data-hero-id="'+curRecomHeroId+'">';
+                        recommendHtml += '<img src="' + heroImgPath + '" width="51px" height="auto">';
+                    recommendHtml += '</div>';
+
+                    recommendHtml += '<div class="recommendationInfo">';
+                            recommendHtml += '<div class="heroNamelocalForBalance float-left align-middle">' + heroLocalName + '</div>';
+                            recommendHtml += '<div class="rating">';
+                                recommendHtml += '<ul class="unit-rating">';
+                                recommendHtml += '<li class="current-rating"></li>';
+                                recommendHtml += '</ul>';
+                            recommendHtml += '</div>';
+                            recommendHtml += '<div class="heroTotalCoefForBalance ' + colorCoefColor + ' float-right align-middle">' + tempBalanceHeroValueTotalText + '</div>';
                         recommendHtml += '</div>';
-                        recommendHtml += '<div class="heroNamelocalForBalance float-left align-middle">' + heroLocalName + '</div>';
-                        recommendHtml += '<div class="rating">';
-                            recommendHtml += '<ul class="unit-rating">';
-                            recommendHtml += '<li class="current-rating"></li>';
-                            recommendHtml += '</ul>';
+                        recommendHtml += '<div class="suggestedRolesWrap">';
+                            recommendHtml += '<div class="heroRolesForBalance">As:'+getHeroRolesNamesByHeroIdAsHtml(curRecomHeroId)+'</div>';
                         recommendHtml += '</div>';
-                        recommendHtml += '<div class="heroTotalCoefForBalance ' + colorCoefColor + ' float-right align-middle">' + tempBalanceHeroValueTotalText + '</div>';
-                        recommendHtml += '<br>';
-                        recommendHtml += '<div class="heroRolesForBalance">As:'+getHeroRolesNamesByHeroIdAsHtml(curRecomHeroId)+'</div>';
                     recommendHtml += '</div>';
                     // console.log(getHeroRolesByHeroId(curRecomHeroId));
                     // console.log(getHeroRolesNamesByHeroIdAsHtml(curRecomHeroId));
@@ -2879,7 +2884,8 @@ function doRecountCounterPickBalance()
                         {
                             //$(this).removeClass('lineThrough');
                             $(this).addClass('roleFilterGreen').removeClass('lineThrough');
-                            var curTotalCoefForBalanceEl = $(this).parent().siblings('.heroTotalCoefForBalance');
+                            var curTotalCoefForBalanceEl = $(this).closest('.heroInfoWrapForBalance ').find('.heroTotalCoefForBalance');
+
                             var newTotalVal = Number(curTotalCoefForBalanceEl.text()) + (1 * Number($(this).attr('data-role-val')));
                             if (newTotalVal > 0)
                             {
@@ -2905,7 +2911,7 @@ function doRecountCounterPickBalance()
                 // var actualRoleLength = $(this).find('span:not(.lineThrough)').length;
                 if($(this).find('span:not(.lineThrough)').length)
                 {
-                    var curHeroCoefEl = $(this).siblings('.heroTotalCoefForBalance');
+                    var curHeroCoefEl = $(this).closest('.heroInfoWrapForBalance ').find('.heroTotalCoefForBalance');;
                     var curHeroCoef = Number(curHeroCoefEl.text());
                     curHeroCoefEl.text('+'+ (curHeroCoef + 10));
 
@@ -2963,7 +2969,7 @@ function doRecountCounterPickBalance()
                     $(this).find('.heroNotesWrapForBalance')
                     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()+'_') +'</div><div class="coefForBalance"></div></div>');
                 });
-            });                
+            });
 
             // sort by role
             if ($('#sortByRole:checked').length)
@@ -3043,11 +3049,11 @@ function doRecountCounterPickBalance()
         // ***** BEGIN rate stars
         var maxScoreVal = -9999;
         $('.heroTotalCoefForBalance').each(function()
-        {        
+        {
             var curScoreVal = Number($(this).text());
             if (curScoreVal > maxScoreVal)
             {
-                maxScoreVal = curScoreVal;               
+                maxScoreVal = curScoreVal;
             }
         });
 
@@ -3055,7 +3061,7 @@ function doRecountCounterPickBalance()
         $('.heroTotalCoefForBalance').each(function() {
             var curVal = Number($(this).text());
             var curStarPercent = curVal / starOnePercentVal;
-            $(this).siblings('.rating').find('.current-rating').css('width', curStarPercent+'%');
+            $(this).closest('.heroInfoWrapForBalance ').find('.rating .current-rating').css('width', curStarPercent+'%');
         });
 
         // show recommendations value for admin
@@ -3075,7 +3081,7 @@ function doRecountCounterPickBalance()
         // click event on roles, except those which line through
         $('.finalBalaceItem .heroRolesForBalance>span[data-hero-role]:not(.lineThrough)').on('click', function()
         {
-            var clickedHeroId = $(this).parent().siblings('[data-hero-id]').attr('data-hero-id');
+            var clickedHeroId = $(this).closest('.heroInfoWrapForBalance ').find('[data-hero-id]').attr('data-hero-id');
             var clickedHeroRoleOrder = $(this).attr('data-role-order');
             // console.log(clickedHeroId + ' / ' + clickedHeroRoleOrder);
 
@@ -4220,7 +4226,7 @@ function tryToAddHeroToTheMapSomwhere(sideTry, heroIdTry, heroCodenameTry)
     if($('#friendPickList .slot').length == 5 && $('#miniMapWrap > div[id="'+sideTry+'Mid1"] img').length == 0)
     {
         whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Mid1"]');
-    } 
+    }
     else if($('#miniMapWrap > div[id="'+sideTry+'Hard1"] img').length == 0)
     {
         whereToAppend = $('#miniMapWrap > div[id="'+sideTry+'Hard1"]');
