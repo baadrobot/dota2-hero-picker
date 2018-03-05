@@ -684,6 +684,7 @@ ul.ui-autocomplete{
 
 .lineThrough {
 	text-decoration: line-through;
+	cursor: default;
 }
 
 #counterPleaseWait {
