@@ -275,12 +275,9 @@
 
 // ----------------------------- Editor panel
             echo '<div id="heroCounterBalanceListWrap" class="col-4">';
+                echo '<button id="getBestFirstPicksInCurrentMetaBtn" class="btn btn-info btn-sm">Get Best First Picks In Current Meta</button>';
 
                 echo '<div id="balanceSortWrap" class="input-group-text" style="display:none">';
-                    // echo '<input id="sortByRating" type="radio" name="balanceSort" checked>';
-                    // echo '<input id="sortByRole" type="radio" name="balanceSort">';
-                    // echo '<div class="btn-group btn-group-toggle" data-toggle="buttons">';
-                    // echo '<div class="input-group-text">';
                         echo 'Sort by:';
                         echo '<label>';
                             echo '<input type="radio" name="sortBalance" id="sortByRole" autocomplete="off" checked> Role';
@@ -427,7 +424,13 @@ echo '<script>';
     echo 'window.LangPreStr["COUNTER_PICK"]["_DOUBLE_EARLY_PICK_BONUS_"] = "Двойной бонус за ранний пик";';
     echo 'window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_EASY_"] = "Герой простой в испольнении";';
     echo 'window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_HARD_"] = "Герой сложный в исполнении";';
-    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_BONUS_"] = "Бонус для баланса team composition";';
+
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_INITIATOR_"] = "Бонус за team composition initiator";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_DURABLE_"] = "Бонус за team composition durable";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_PUSHER_"] = "Бонус за team composition pusher";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_NUKER_"] = "Бонус за team composition nuker";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_ANTIPUSHER_"] = "Бонус за team composition antipusher";';
+    echo 'window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_CONTROL_"] = "Бонус за team composition control";';
 
     echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_INITIATOR"] = "Инициатор";';
     echo 'window.LangPreStr["COUNTER_PICK"]["_RADAR_DURABLE"] = "Танк";';

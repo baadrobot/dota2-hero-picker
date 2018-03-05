@@ -20,13 +20,12 @@ $(document).ready(function ()
         var enemyRadarColor = 'rgba(255,0,0, 0.3)';
 
         var data = {
-            labels: [window.LangPreStr["COUNTER_PICK"]["_RADAR_INITIATOR"]
-                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_DURABLE"]
-                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_PUSHER"]
-                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_NUKER"]
-                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_ANTIPUSHER"]
-                    // , window.LangPreStr["COUNTER_PICK"]["_RADAR_CONTROL"]
-                    , window.LangPreStr["COUNTER_PICK"]["_RADAR_CONTROL"]]
+            labels: [getPreStr_js('COUNTER_PICK', '_RADAR_INITIATOR')
+                    , getPreStr_js('COUNTER_PICK', '_RADAR_DURABLE')
+                    , getPreStr_js('COUNTER_PICK', '_RADAR_PUSHER')
+                    , getPreStr_js('COUNTER_PICK', '_RADAR_NUKER')
+                    , getPreStr_js('COUNTER_PICK', '_RADAR_ANTIPUSHER')
+                    , getPreStr_js('COUNTER_PICK', '_RADAR_CONTROL')]
             ,datasets: [{
                 data: [0, 0, 0, 0, 0, 0]
                 ,backgroundColor: 'rgba(246,144,8, 0.3)'
@@ -40,6 +39,14 @@ $(document).ready(function ()
                 ,borderColor: 'rgba(255,0,0, 0.8)'
                 ,borderWidth: 2
                 ,pointBackgroundColor: 'rgb(255,0,0)'
+            }
+            ,{
+                data: [0, 0, 0, 0, 0, 0]
+                ,backgroundColor: 'rgba(246,144,8, 0)'
+                ,borderColor: 'rgba(246,144,8, 0.8)'
+                ,borderWidth: 2
+                ,pointBackgroundColor: 'rgb(246,144,8)'
+                ,borderDash: [10,5]
             }]
         }
 
@@ -72,6 +79,11 @@ $(document).ready(function ()
 
     $(window).resize(function () {
         resizeVerticalMenu();
+    });
+
+    $('#getBestFirstPicksInCurrentMetaBtn').on('click', function()
+    {
+        doRecountCounterPickBalance();
     });
 
     $('#miniMapWrap').mouseup(function(){
@@ -726,12 +738,24 @@ $(document).ready(function ()
             }
         }
 
+
+        // опустошаем слоты со старыми героями, чтобы потом наполнить их новыми
+        $('.pickedHeroImgWrap').each(function()
+        {
+            var curHeroIdInSlot = $(this).attr('data-hero-id');
+            removeHeroFromSlot( $(this), 0 );
+            releaseHeroInList(curHeroIdInSlot);
+            deleteHeroFromMinimap(curHeroIdInSlot);
+            pickedOrBanedHeroPointerEvents(curHeroIdInSlot);
+        });
+
         // put each hero into its array
             window.tempArrayE = [];
             window.tempArrayF = [];
             window.tempArrayB = [];
-            if (typeSepArray.length == 0)
+            if (typeSepArray[0] == "")
             {
+                doRecountCounterPickBalance();
                 return;
             } else
             if (typeSepArray.length == 1)
@@ -789,16 +813,6 @@ $(document).ready(function ()
         {
             return;
         }
-
-        // опустошаем слоты со старыми героями, чтобы потом наполнить их новыми
-        $('.pickedHeroImgWrap').each(function()
-        {
-            var curHeroIdInSlot = $(this).attr('data-hero-id');
-            removeHeroFromSlot( $(this), 0 );
-            releaseHeroInList(curHeroIdInSlot);
-            deleteHeroFromMinimap(curHeroIdInSlot);
-            pickedOrBanedHeroPointerEvents(curHeroIdInSlot);
-        });
 
         // Находим конфликтные слова и их совпадения
             // создаем массив со словами, которые не совпали с alias-single
@@ -1479,7 +1493,6 @@ function lockNewHeroInSlotForDroppableEmptySlot(slotEl, heroId, recountNeedOrNot
         deleteHeroFromMinimap(heroId);
         // console.log('second');
         doRecountCounterPickBalance();
-        // lineThroughLockedRoles();
         pickedOrBanedHeroPointerEvents(heroId);
     });
 
@@ -1840,6 +1853,7 @@ function doRecountCounterPickBalanceForEnemy()
 
 function doRecountCounterPickBalance()
 {
+    $('#getBestFirstPicksInCurrentMetaBtn').hide();
     // console.log('do recount function on');
     if (window.globalHeroAjaxRequests == 0)
     {
@@ -1998,7 +2012,6 @@ function doRecountCounterPickBalance()
             }
             if(curFriendHeroObj.control != null)
             {
-                // console.log(curFriendHeroObj.control);
                 if(curFriendHeroObj.control == 2)
                 {
                     teamComposition['control'] += 1;
@@ -2033,13 +2046,6 @@ function doRecountCounterPickBalance()
             }
         });
 
-        // console.log(teamComposition['initiator']);
-        // console.log(teamComposition['durable']);
-        // console.log(teamComposition['pusher']);
-        // console.log(teamComposition['nuker']);
-        // console.log(teamComposition['antipusher']);
-        // console.log(teamComposition['control']);
-
         window.totallyCounteredHeroArray = [];
         var banedAllStrongCountersBonusPoints = 50;
         // downgrading heroes for suggestion if in window.dontPickHeroesBeforeBanArray[]
@@ -2059,6 +2065,12 @@ function doRecountCounterPickBalance()
                         isCanBeEasyCountered = true;
                     }
                 });
+
+                // if enemy already got 5 heroes picked - ignore hard counter heroes
+                if($('#enemyPickList .enemyPick.slot').length == 5)
+                {
+                    isCanBeEasyCountered = false;
+                }
 
                 if (isCanBeEasyCountered)
                 {
@@ -2714,7 +2726,7 @@ function doRecountCounterPickBalance()
             {
                 var heroNamesArray = [];
                 var heroValuesArray = [];
-                var numberOfHeroesToCopy = 3;
+                var numberOfHeroesToCopy = 5;
                 var copiedHeroesEl = $('#finalBalanceItemListWrap .finalBalaceItem .heroInfoWrapForBalance').slice(0, numberOfHeroesToCopy);
                 copiedHeroesEl.each(function() {
                     var curRecomHeroId = $(this).find('[data-hero-id]').attr('data-hero-id');
@@ -2826,6 +2838,71 @@ function doRecountCounterPickBalance()
             // remove click highlight
             var clickedHeroId = $('.heroInfoWrapForBalance.selectedHeroPopupBalance').find('[data-hero-id]').attr('data-hero-id');
             $('#heroListWrap [data-hero-id="'+clickedHeroId+'"] > img.highlight').removeClass('highlightFilterForClick');
+
+            // dashed radar
+                var curHoveredRecommHeroObj = window.heroList.find(function(element) {
+                    return element.id == hoveredHeroId;
+                });
+                var curHoveredRecommHeroAntipusher = 0;
+                var curHoveredRecommHeroControl = 0;
+
+                if(typeof curHoveredRecommHeroObj != 'undefined')
+                {
+                    if(curHoveredRecommHeroObj.antipusher != null)
+                    {
+                        if(curHoveredRecommHeroObj.antipusher == 2)
+                        {
+                            curHoveredRecommHeroAntipusher = 1;
+                        }
+                        else if(curHoveredRecommHeroObj.antipusher == 3)
+                        {
+                            curHoveredRecommHeroAntipusher = 2;
+                        }
+                        else if(curHoveredRecommHeroObj.antipusher == 4)
+                        {
+                            curHoveredRecommHeroAntipusher = 2;
+                        }
+                        else if(curHoveredRecommHeroObj.antipusher == 5)
+                        {
+                            curHoveredRecommHeroAntipusher = 3;
+                        } else {
+                            curHoveredRecommHeroAntipusher = curHoveredRecommHeroObj.antipusher;
+                        }
+                    }
+
+                    if(curHoveredRecommHeroObj.control != null)
+                    {
+                        if(curHoveredRecommHeroObj.control == 2)
+                        {
+                            curHoveredRecommHeroControl = 1;
+                        }
+                        else if(curHoveredRecommHeroObj.control == 3)
+                        {
+                            curHoveredRecommHeroControl = 2;
+                        }
+                        else if(curHoveredRecommHeroObj.control == 4)
+                        {
+                            curHoveredRecommHeroControl = 2;
+                        }
+                        else if(curHoveredRecommHeroObj.control == 5)
+                        {
+                            curHoveredRecommHeroControl = 3;
+                        } else {
+                            curHoveredRecommHeroControl = curHoveredRecommHeroObj.control;
+                        }
+                    }
+                }
+
+                window.radarChart.data.datasets[2].data = [
+                                                            window.radarChart.data.datasets[0].data[0] + curHoveredRecommHeroObj.initiator
+                                                            ,window.radarChart.data.datasets[0].data[1] + curHoveredRecommHeroObj.durable
+                                                            ,window.radarChart.data.datasets[0].data[2] + curHoveredRecommHeroObj.pusher
+                                                            ,window.radarChart.data.datasets[0].data[3] + curHoveredRecommHeroObj.nuker
+                                                            ,window.radarChart.data.datasets[0].data[4] + curHoveredRecommHeroAntipusher
+                                                            ,window.radarChart.data.datasets[0].data[5] + curHoveredRecommHeroControl
+                                                        ];
+                window.radarChart.update();
+            // end of dashed radar
         },
         function()
         {
@@ -2836,6 +2913,18 @@ function doRecountCounterPickBalance()
             // restore click highlight
             var clickedHeroId = $('.heroInfoWrapForBalance.selectedHeroPopupBalance').find('[data-hero-id]').attr('data-hero-id');
             $('#heroListWrap [data-hero-id="'+clickedHeroId+'"] > img.highlight').addClass('highlightFilterForClick');
+
+            // dashed radar
+            window.radarChart.data.datasets[2].data = [
+                0
+                ,0
+                ,0
+                ,0
+                ,0
+                ,0
+            ];
+            window.radarChart.update();
+            // end of dashed radar
         });
 
 
@@ -2860,6 +2949,41 @@ function doRecountCounterPickBalance()
                 {
                     var curLockedRole = $(this).attr('data-slot-role');
                     $('.heroRolesForBalance > span[data-hero-role="'+curLockedRole+'"]').addClass('lineThrough');
+
+                    if($(this).attr('id') == friendTeam+'Roam'
+                    || $(this).attr('id') == friendTeam+'Mid2'
+                    || $(this).attr('id') == friendTeam+'Jungle'
+                    || $(this).attr('id') == friendTeam+'Easy3')
+                    {
+                        // если у нас уже есть 4ка и эта 4ка роам/лес, т.е. не хардовая, то нужно зачеркивать pos3: off Core
+                        $('.heroRolesForBalance > span[data-role-order="3"]').addClass('lineThrough');
+                        // $('.heroRolesForBalance > span[data-hero-role="3"]').each(function()
+                        // {
+                        //     if($(this).attr('data-role-order') == 3)
+                        //     {
+                        //         $(this).addClass('lineThrough');
+                        //     }
+                        // });
+                    }
+                    else if($(this).attr('id') == friendTeam+'Hard1')
+                    {
+                        // если в харде пикнут solo hard у которого нет off core, то зачеркивать офф сап и офф семи сапп
+                        if($(this).find('img').attr('data-roles-values').charAt(3) == 0
+                        && $(this).find('img').attr('data-roles-values').charAt(2) > 0)
+                        {
+                            $('.heroRolesForBalance > span[data-role-order="5"]').addClass('lineThrough');
+                        }else
+                        if($(this).find('img').attr('data-roles-values').charAt(3) > 0
+                        && $(this).find('img').attr('data-roles-values').charAt(2) == 0)
+                        {
+                           // если в харду пикнут off core у которого нет off solo, то зачеркивать все 4ки кроме off supp
+                           $('.heroRolesForBalance > span[data-hero-role="4"]:not([data-role-order="5"])').addClass('lineThrough');
+                        }
+                    } else if($(this).attr('id') == friendTeam+'Hard2')
+                    {
+                        // если есть 4ка оффлейн сап, то зачеркнуть офф соло
+                        $('.heroRolesForBalance > span[data-role-order="2"]').addClass('lineThrough');
+                    }
                 }
             });
 
@@ -2868,8 +2992,7 @@ function doRecountCounterPickBalance()
             if($('#miniMapWrap i.questionMark').length)
             {
                 // questionMark on mini-map, line through all roles exept questionMark roles
-                // lineThrough all roles, then clear those which questionMarked
-                //$('.heroRolesForBalance > span[data-hero-role]').addClass('lineThrough');
+                // line through all roles, then clear those which questionMarked
 
                 // get all questionMarked roles
                 var questionMarkRolesArray = [];
@@ -2882,7 +3005,6 @@ function doRecountCounterPickBalance()
                         var curQuestionSingleRoleOrder = curQuestionMarkRoleOrders.charAt(i);
                         $('.heroRolesForBalance > span[data-role-order="'+curQuestionSingleRoleOrder+'"').each(function()
                         {
-                            //$(this).removeClass('lineThrough');
                             $(this).addClass('roleFilterGreen').removeClass('lineThrough');
                             var curTotalCoefForBalanceEl = $(this).closest('.heroInfoWrapForBalance ').find('.heroTotalCoefForBalance');
 
@@ -2897,6 +3019,14 @@ function doRecountCounterPickBalance()
                 });
             }
 
+            // team composition notes
+            Object.keys(teamComposition).forEach(function (key)
+            {
+                $('[data-composition-'+key+']').each(function(){
+                    $(this).find('.heroNotesWrapForBalance')
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()+'_') +'</div><div class="coefForBalance"></div></div>');
+                });
+            });
 
             // add 10 bonus points to actual role
             $('.heroRolesForBalance').each(function()
@@ -2905,10 +3035,9 @@ function doRecountCounterPickBalance()
                 if (typeof window.totallyCounteredHeroArray[curHeroId] != 'undefined')
                 {
                     $(this).parent().siblings('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_STRONG_COUNTERPICK_BONUS"]+'</div><div class="coefForBalance">'+banedAllStrongCountersBonusPoints+'</div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_STRONG_COUNTERPICK_BONUS')+'</div><div class="coefForBalance">'+banedAllStrongCountersBonusPoints+'</div></div>');
                 }
 
-                // var actualRoleLength = $(this).find('span:not(.lineThrough)').length;
                 if($(this).find('span:not(.lineThrough)').length)
                 {
                     var curHeroCoefEl = $(this).closest('.heroInfoWrapForBalance ').find('.heroTotalCoefForBalance');;
@@ -2916,7 +3045,7 @@ function doRecountCounterPickBalance()
                     curHeroCoefEl.text('+'+ (curHeroCoef + 10));
 
                     $(this).parent().siblings('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_ROLE_BONUS_"]+'</div><div class="coefForBalance">10</div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_ROLE_BONUS_')+'</div><div class="coefForBalance">10</div></div>');
                 }
             });
 
@@ -2927,48 +3056,32 @@ function doRecountCounterPickBalance()
                 if($(this).attr('data-wr-score') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_META_HERO_"]+'</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_META_HERO_')+'</div><div class="coefForBalance"></div></div>');
                 } else {
                     $(this).find('.heroNotesWrapForBalance')
-                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_NON_META_HERO_"]+'</div><div class="coefForBalance"></div></div>');
+                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_NON_META_HERO_')+'</div><div class="coefForBalance"></div></div>');
                 }
 
                 // early pick
                 if($(this).attr('data-early-pick') > 10)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_EARLY_PICK_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_EARLY_PICK_BONUS_')+'</div><div class="coefForBalance"></div></div>');
                 } else if($(this).attr('data-early-pick') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_DOUBLE_EARLY_PICK_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_DOUBLE_EARLY_PICK_BONUS_')+'</div><div class="coefForBalance"></div></div>');
                 }
 
                 // complexity
                 if($(this).attr('data-complexity') > 0)
                 {
                     $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_EASY_"]+'</div><div class="coefForBalance"></div></div>');
+                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_COMPLEXITY_EASY_')+'</div><div class="coefForBalance"></div></div>');
                 } else if($(this).attr('data-complexity') < 0) {
                     $(this).find('.heroNotesWrapForBalance')
-                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_COMPLEXITY_HARD_"]+'</div><div class="coefForBalance"></div></div>');
+                    .append('<div class="noteForBalance noticeRed"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_COMPLEXITY_HARD_')+'</div><div class="coefForBalance"></div></div>');
                 }
-
-                // // team composition
-                // if($(this).attr('data-team-composition') > 0)
-                // {
-                //     $(this).find('.heroNotesWrapForBalance')
-                //     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+window.LangPreStr["COUNTER_PICK"]["_TEAM_COMPOSITION_BONUS_"]+'</div><div class="coefForBalance"></div></div>');
-                // }
-            });
-
-            // team composition notes
-            Object.keys(teamComposition).forEach(function (key)
-            {
-                $('[data-composition-'+key+']').each(function(){
-                    $(this).find('.heroNotesWrapForBalance')
-                    .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+ getPreStr_js('COUNTER_PICK', '_TEAM_COMPOSITION_'+key.toUpperCase()+'_') +'</div><div class="coefForBalance"></div></div>');
-                });
             });
 
             // sort by role
@@ -3079,37 +3192,72 @@ function doRecountCounterPickBalance()
         iconGlowFunction();
 
         // click event on roles, except those which line through
-        $('.finalBalaceItem .heroRolesForBalance>span[data-hero-role]:not(.lineThrough)').on('click', function()
-        {
-            var clickedHeroId = $(this).closest('.heroInfoWrapForBalance ').find('[data-hero-id]').attr('data-hero-id');
-            var clickedHeroRoleOrder = $(this).attr('data-role-order');
-            // console.log(clickedHeroId + ' / ' + clickedHeroRoleOrder);
-
-            // make clicked hero picked
-            lockNewHeroInSlotForDroppableEmptySlot($('#friendPickList .friendPick.emptySlot:first'), clickedHeroId, 0, 0);
-            // doRecountCounterPickBalance();
-            getAjaxBalanceForHeroId(clickedHeroId, 1);
-            pickedOrBanedHeroPointerEvents(clickedHeroId);
-
-            // put hero on clicked slot role on map
-            if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+            $('.finalBalaceItem .heroRolesForBalance>span[data-hero-role]:not(.lineThrough)').on('click', function()
             {
-                // friend team is dire
-                var friendSide = 'dire';
-            } else {
-                // friend team is radiant
-                var friendSide = 'radiant';
-            }
-            var clickedHeroRoleOrderForMap = 'r'+(Number(clickedHeroRoleOrder)+1);
-            var clickedHeroCoedname = $('#heroListWrap div[data-hero-id="'+clickedHeroId+'"]').attr('data-hero-codename');
-            tryToAddHeroToTheMap(friendSide, clickedHeroRoleOrderForMap, clickedHeroId, clickedHeroCoedname);
+                var clickedHeroId = $(this).closest('.heroInfoWrapForBalance ').find('[data-hero-id]').attr('data-hero-id');
+                var clickedHeroRoleOrder = $(this).attr('data-role-order');
+                // console.log(clickedHeroId + ' / ' + clickedHeroRoleOrder);
 
-            console.log('end of click');
+                // make clicked hero picked
+                lockNewHeroInSlotForDroppableEmptySlot($('#friendPickList .friendPick.emptySlot:first'), clickedHeroId, 0, 0);
+                // doRecountCounterPickBalance();
+                getAjaxBalanceForHeroId(clickedHeroId, 1);
+                pickedOrBanedHeroPointerEvents(clickedHeroId);
 
-            // make icons draggable after click on recommend hero
-            draggableForHeroIconsOnMap();
-            // end of drag'n'drop for mini map
-        });
+                // put hero on clicked slot role on map
+                if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                {
+                    // friend team is dire
+                    var friendSide = 'dire';
+                } else {
+                    // friend team is radiant
+                    var friendSide = 'radiant';
+                }
+                var clickedHeroRoleOrderForMap = 'r'+(Number(clickedHeroRoleOrder)+1);
+                var clickedHeroCoedname = $('#heroListWrap div[data-hero-id="'+clickedHeroId+'"]').attr('data-hero-codename');
+                tryToAddHeroToTheMap(friendSide, clickedHeroRoleOrderForMap, clickedHeroId, clickedHeroCoedname);
+
+                console.log('end of click');
+
+                draggableForHeroIconsOnMap();
+            });
+        // end of click event on roles, except those which line through
+
+        // hover event on clickable roles
+            $('.finalBalaceItem .heroInfoWrapForBalance .heroRolesForBalance > span:not(.lineThrough)').hover(
+            function()
+            {
+                console.log('hover 1');
+                var hoveredHeroId = $(this).parent().siblings('[data-hero-id]').attr('data-hero-id');
+                var hoveredHeroRoleOrder = $(this).attr('data-role-order');
+                var hoveredHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+hoveredHeroId+'"]').attr('data-hero-codename');
+                console.log(hoveredHeroCodename);
+                // get friend team side
+                if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                {
+                    var friendSide = 'dire';
+                } else {
+                    var friendSide = 'radiant';
+                }
+
+                window.questionBeforeShow = showHeroIconOnMap(friendSide, 'r'+(Number(hoveredHeroRoleOrder)+1), hoveredHeroId, hoveredHeroCodename);
+            },
+            function()
+            {
+                console.log('hover 2');
+                var hoveredHeroRoleOrder = $(this).attr('data-role-order');
+
+                // get friend team side
+                if($('#miniMapImg').attr('src') == 'images/mini-map-dire.png')
+                {
+                    var friendSide = 'dire';
+                } else {
+                    var friendSide = 'radiant';
+                }
+
+                removeShowedHeroIconFromMap(friendSide, 'r'+(Number(hoveredHeroRoleOrder)+1));
+            });
+        // end of hover event on clickable roles
     }
 
 
@@ -4137,7 +4285,6 @@ function addHeroToTheMap(side, heroId, heroCodename)
         return false;
     }
 
-
     var roleslist = getHeroRolesByHeroId(heroId);
     var orderedRolesArray = [];
     for (var iVal=5; iVal>0; iVal--)
@@ -4151,12 +4298,21 @@ function addHeroToTheMap(side, heroId, heroCodename)
       }
     }
 
-    var isAddedOnMap;
-    Object.keys(orderedRolesArray).some(function (key)
-    {
-        isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, key, heroId, heroCodename);
-        return isAddedOnMap; //break
-    });
+
+    var isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, orderedRolesArray, heroId, heroCodename);
+
+
+
+    // if (!isAddedOnMap)
+    // {
+    //     Object.keys(orderedRolesArray).some(function (roleKey)
+    //     {
+    //         var heroIdOfHeroTakingCurrentRole = findHeroIdByRoleId(roleKey);
+
+    //         isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, key, heroId, heroCodename);
+    //         return isAddedOnMap; //break
+    //     });
+    // }
 
     if (!isAddedOnMap)
     {
@@ -4166,55 +4322,171 @@ function addHeroToTheMap(side, heroId, heroCodename)
     }
 }
 
-function tryToAddHeroToTheMap(sideTry, slotRole, heroIdTry, heroCodenameTry)
+function showHeroIconOnMap(sideShow, slotRole, heroIdShow, heroCodenameShow)
 {
-    var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameTry+'_icon.png?v=4299287" data-hero-id="'+heroIdTry+'" data-hero-codename="'+heroCodenameTry+'" data-roles-values="'+getHeroRolesByHeroId(heroIdTry)+'" width="28px">';
+    var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameShow+'_icon.png?v=4299287" class="mapIconHeroShowGrayscale" width="28px">';
     if(slotRole == 'r1')
     {
-        var sidePlusLane = sideTry+'Easy1';
+        var sidePlusLane = sideShow+'Easy1';
     }
     else if (slotRole == 'r2')
     {
-        var sidePlusLane = sideTry+'Mid1';
+        var sidePlusLane = sideShow+'Mid1';
     }
     else if (slotRole == 'r3')
     {
-        var sidePlusLane = sideTry+'Hard1';
+        var sidePlusLane = sideShow+'Hard1';
     }
     else if (slotRole == 'r4')
     {
-        var sidePlusLane = sideTry+'Hard1';
+        var sidePlusLane = sideShow+'Hard1';
     }
     else if (slotRole == 'r5')
     {
-        var sidePlusLane = sideTry+'Mid2';
+        var sidePlusLane = sideShow+'Mid2';
     }
     else if (slotRole == 'r6')
     {
-        var sidePlusLane = sideTry+'Hard2';
+        var sidePlusLane = sideShow+'Hard2';
     }
     else if (slotRole == 'r7')
     {
-        var sidePlusLane = sideTry+'Roam';
+        var sidePlusLane = sideShow+'Roam';
     }
     else if (slotRole == 'r8')
     {
-        var sidePlusLane = sideTry+'Jungle';
+        var sidePlusLane = sideShow+'Jungle';
     }
     else if (slotRole == 'r9')
     {
-        var sidePlusLane = sideTry+'Easy2';
+        var sidePlusLane = sideShow+'Easy2';
     }
 
-    if($('#miniMapWrap > div[id="'+sidePlusLane+'"] img').length == 0)
+    // show hero
+    $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
+
+    // if there is question mark - remove it
+    if($('#miniMapWrap > div[id="'+sidePlusLane+'"] i.questionMark').length)
     {
-        // если слот пустой то добавить героя и вернуть true
+        // если в слоте есть вопросик то убрать его и вернуть true
         $('#miniMapWrap > div[id="'+sidePlusLane+'"]').find('i.questionMark').remove();
-        $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
         return true;
     } else {
         return false;
     }
+}
+
+function removeShowedHeroIconFromMap(side, slotRole)
+{
+    if(slotRole == 'r1')
+    {
+        var sidePlusLane = side+'Easy1';
+    }
+    else if (slotRole == 'r2')
+    {
+        var sidePlusLane = side+'Mid1';
+    }
+    else if (slotRole == 'r3')
+    {
+        var sidePlusLane = side+'Hard1';
+    }
+    else if (slotRole == 'r4')
+    {
+        var sidePlusLane = side+'Hard1';
+    }
+    else if (slotRole == 'r5')
+    {
+        var sidePlusLane = side+'Mid2';
+    }
+    else if (slotRole == 'r6')
+    {
+        var sidePlusLane = side+'Hard2';
+    }
+    else if (slotRole == 'r7')
+    {
+        var sidePlusLane = side+'Roam';
+    }
+    else if (slotRole == 'r8')
+    {
+        var sidePlusLane = side+'Jungle';
+    }
+    else if (slotRole == 'r9')
+    {
+        var sidePlusLane = side+'Easy2';
+    }
+
+    if($('#miniMapWrap > div[id="'+sidePlusLane+'"] img.mapIconHeroShowGrayscale').length)
+    {
+        // если в слоте нет нового героя то там сейчас только подсветка - её нужно убрать
+        $('#miniMapWrap > div[id="'+sidePlusLane+'"] img.mapIconHeroShowGrayscale').remove();
+
+        if(window.questionBeforeShow)
+        {
+            // если там до этого был вопросик то восстановить его
+            $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append('<i class="questionMark fa fa-question-circle"></i>');
+            draggableQuestionInsideMap();
+        }
+    }
+}
+
+function tryToAddHeroToTheMap(sideTry, orderedRolesArray, heroIdTry, heroCodenameTry)
+{
+    var isAddedOnMap = false;
+    Object.keys(orderedRolesArray).some(function (slotRole)
+    {
+        var iconHtml = '<img src="http://cdn.dota2.com/apps/dota2/images/heroes/'+heroCodenameTry+'_icon.png?v=4299287" data-hero-id="'+heroIdTry+'" data-hero-codename="'+heroCodenameTry+'" data-roles-values="'+getHeroRolesByHeroId(heroIdTry)+'" width="28px">';
+        if(slotRole == 'r1')
+        {
+            var sidePlusLane = sideTry+'Easy1';
+        }
+        else if (slotRole == 'r2')
+        {
+            var sidePlusLane = sideTry+'Mid1';
+        }
+        else if (slotRole == 'r3')
+        {
+            var sidePlusLane = sideTry+'Hard1';
+        }
+        else if (slotRole == 'r4')
+        {
+            var sidePlusLane = sideTry+'Hard1';
+        }
+        else if (slotRole == 'r5')
+        {
+            var sidePlusLane = sideTry+'Mid2';
+        }
+        else if (slotRole == 'r6')
+        {
+            var sidePlusLane = sideTry+'Hard2';
+        }
+        else if (slotRole == 'r7')
+        {
+            var sidePlusLane = sideTry+'Roam';
+        }
+        else if (slotRole == 'r8')
+        {
+            var sidePlusLane = sideTry+'Jungle';
+        }
+        else if (slotRole == 'r9')
+        {
+            var sidePlusLane = sideTry+'Easy2';
+        }
+
+        if($('#miniMapWrap > div[id="'+sidePlusLane+'"] img').length == 0)
+        {
+            // если слот пустой то добавить героя и вернуть true
+            $('#miniMapWrap > div[id="'+sidePlusLane+'"]').find('i.questionMark').remove();
+            $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
+            isAddedOnMap = true;
+        } else {
+            //isAddedOnMap = tryToAddHeroToTheMap(sideTry, orderedRolesArray, heroIdTry, heroCodenameTry);
+
+            isAddedOnMap = false;
+        }
+        return isAddedOnMap; //break
+    });
+
+    return isAddedOnMap;
 }
 
 function tryToAddHeroToTheMapSomwhere(sideTry, heroIdTry, heroCodenameTry)
@@ -4359,6 +4631,8 @@ function draggableQuestionInsideMap()
                     }
                 });
             }
+
+            $('#mainContent').addClass('pointerEventsNone');
         },
         stop: function (event, ui) {
             var draggedHero = $(this);
@@ -4373,6 +4647,8 @@ function draggableQuestionInsideMap()
             // hide removeIcon, show userRole
             $('#userRole').show();
             $('#removeIcon').hide();
+
+            $('#mainContent').removeClass('pointerEventsNone');
         }
     });
     // end of make the question inside map draggable
@@ -4381,8 +4657,7 @@ function draggableQuestionInsideMap()
 function draggableForHeroIconsOnMap()
 {
     // make icons draggable after lockNewHeroInSlot
-    //drag n drop for mini-map icons
-    // $('#miniMapWrap i:not(.questionMark)').draggable({
+    // drag n drop for mini-map icons
     $('#miniMapWrap img[data-hero-id]').draggable({
         // cursor: 'default'
         helper: "clone"
@@ -4405,11 +4680,6 @@ function draggableForHeroIconsOnMap()
             $('#removeIcon').show();
 
             var draggedHero = $(this);
-            // var helperLeft = ui.helper.css('left');
-            // var helperTop = ui.helper.css('top');
-            //$(ui.helper).prependTo($('body'));
-            // ui.helper.css('left', helperLeft).css('top', helperTop);
-
 
             ui.helper.attr('data-dragged-from', 'fromMiniMap');
             ui.helper.attr('data-dragged-from-id', draggedHero.parent().attr('id'));
@@ -4425,7 +4695,7 @@ function draggableForHeroIconsOnMap()
             });
 
             // pointer events none
-            $('#removeIcon').addClass('pointerEventsNone');
+            $('#mainContent').addClass('pointerEventsNone');
         },
         stop: function (event, ui) {
             var draggedHero = $(this);
@@ -4436,7 +4706,7 @@ function draggableForHeroIconsOnMap()
             .removeClass('opacityForHighlight');
 
             // pointer events none
-            $('#removeIcon').removeClass('pointerEventsNone');
+            $('#mainContent').removeClass('pointerEventsNone');
 
             // hide removeIcon, show userRole
             $('#userRole').show();
@@ -4545,8 +4815,9 @@ function draggableForPickedHeroImgWrap(slotEl)
         stop: function (event, ui) {
             if (ui.helper.attr('data-is-recieved-or-droped-out') == 0) {
                 var dragedFromSlotEl = $(this);
+                var heroId = dragedFromSlotEl.attr('data-hero-id');
                 removeHeroFromSlot(dragedFromSlotEl, recountNeedOrNot = 1);
-                releaseHeroInList(dragedFromSlotEl.attr('data-hero-id'));
+                releaseHeroInList(heroId);
                 deleteHeroFromMinimap(heroId);
                 pickedOrBanedHeroPointerEvents(heroId);
             }
@@ -4657,5 +4928,5 @@ function changeRadar(teamCompositionDataArray, enemyTeamCompositionDataArray) {
                                         ,enemyTeamCompositionDataArray['control']];
 
     window.radarChart.update();
-    console.log('radar changed');
+    // console.log('radar changed');
 }
