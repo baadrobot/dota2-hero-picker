@@ -1032,11 +1032,10 @@ line-height: 40px
 }
 
 #chartRadar {
-    width:350px;
-    height:190px;
-    /* -ms-transform: rotate(-25.2deg);
-    -webkit-transform: rotate(-25.2deg);
-    transform: rotate(-25.2deg); */
+    /* width:350px; */
+    height:193px;
+    margin-left: -20px;
+    float: right;
 }
 
 .recommendationInfo{

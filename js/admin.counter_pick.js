@@ -1,6 +1,5 @@
 $(document).ready(function ()
 {
-    // if($.cookie('fillInputValue') != '')
     if(getCookie('fillInputValue') != '')
     {
         // fill input OK btn
@@ -17,7 +16,7 @@ $(document).ready(function ()
                 // fill input OK btn
                 $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn').trigger('click');
             }
-        });        
+        });
     }
 });
 // - END DOC READY//////////////////////////////////////

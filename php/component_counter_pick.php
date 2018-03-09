@@ -363,7 +363,7 @@
             echo '<i id="userRole" class="questionMark fa fa-question-circle" title="Drag into position to filter roles"></i>';
             echo '<i id="removeIcon" class="removeIconMark fa fa-ban" title="Drop icons from map to delete them" style="display: none"></i>';
 
-            echo '<div class="col-4 offset-2">';
+            echo '<div class="col-6" style="z-index:-1;">';
                 echo '<canvas id="chartRadar"></canvas>';
             echo '</div>';
 

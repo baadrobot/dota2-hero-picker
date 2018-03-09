@@ -162,25 +162,25 @@ $(document).ready(function ()
                 var draggedHeroId = ui.helper.attr('data-hero-id');
                 // console.log
                 // remove locked hero from map and pick slots
-                removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"'), 1);
-                releaseHeroInList(draggedHeroId);
                 deleteHeroFromMinimap(draggedHeroId);
+                releaseHeroInList(draggedHeroId);
+                removeHeroFromSlot($('#pickedHeroWrap div[data-hero-id="'+draggedHeroId+'"'), 1);
                 pickedOrBanedHeroPointerEvents(draggedHeroId);
 
-                $(this).css({
-                    'border-color': '#cd1616'
-                   ,'background-color': '#cd1616'
-                   ,'opacity': 1
-                });
+                // $(this).css({
+                //     'border-color': '#cd1616'
+                //    ,'background-color': '#cd1616'
+                //    ,'opacity': 1
+                // });
             } else if (ui.helper.attr('data-dragged-from') == 'userRoleFromMiniMap') {
                 // question mark
                 window.draggableElParent.find('i.questionMark').remove();
 
-                $(this).css({
-                    'border-color': '#cd1616'
-                   ,'background-color': '#cd1616'
-                   ,'opacity': 0.7
-                });
+                // $(this).css({
+                //     'border-color': '#cd1616'
+                //    ,'background-color': '#cd1616'
+                //    ,'opacity': 0.7
+                // });
 
                 doRecountCounterPickBalance();
             }
@@ -550,6 +550,11 @@ $(document).ready(function ()
                         lockNewHeroInSlotForDroppableEmptySlot(recieverElForHeroLock, draggedHeroId, 1, 0);
                         pickedOrBanedHeroPointerEvents(draggedHeroId);
                     }
+                    else if(ui.helper.attr('data-dragged-from') == 'userRole')
+                    {
+                        // dragged from userRole
+                        $(recieverEl).removeClass('highlightHoveredSlot');
+                    }
                 }
             } else {
                 // slot is empty
@@ -753,7 +758,7 @@ $(document).ready(function ()
             window.tempArrayE = [];
             window.tempArrayF = [];
             window.tempArrayB = [];
-            if (typeSepArray[0] == "")
+            if ((typeSepArray.length == 1) && (typeSepArray[0] == ""))
             {
                 doRecountCounterPickBalance();
                 return;
@@ -984,6 +989,35 @@ $(document).ready(function ()
             }
         }
         popupAndPicksFill();
+
+        // create clear btn if input is empty and add click event on it
+            var fillPickBanInput = $('#fillHeroPickAndBanSlotsViaAliasSingleInput');
+            var fillPickBanInputOkBtn = $('#fillHeroPickAndBanSlotsViaAliasSingleInputOkBtn');
+
+            if(fillPickBanInput.val() != '' 
+            && fillPickBanInput.val() != '(E) -, -, -, -, - (B) -, -, -, -, - (F) -, -, -, -, -'
+            && $('#fillHeroPickAndBanSlotsViaAliasSingleInputClearBtn').length == 0)
+            {
+                if($('#fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn').length == 0)
+                {
+                    // if there is no cookie btn - create clear btn before OkBtn
+                    fillPickBanInputOkBtn.before('<span id="fillHeroPickAndBanSlotsViaAliasSingleInputClearBtn" class="input-group-append" title="Clear picks and bans"><button class="fa fa-times btn btn-secondary"></button></span>');
+                } else {
+                    // if there is cookie btn - create clear btn before it   
+                    $('#fillHeroPickAndBanSlotsViaAliasSingleInputCookieBtn')
+                    .before('<span id="fillHeroPickAndBanSlotsViaAliasSingleInputClearBtn" class="input-group-append" title="Clear picks and bans"><button class="fa fa-times btn btn-secondary"></button></span>');
+                }
+            } else if(fillPickBanInput.val() == '') {
+                $('#fillHeroPickAndBanSlotsViaAliasSingleInputClearBtn').remove();
+            }
+
+            $('#fillHeroPickAndBanSlotsViaAliasSingleInputClearBtn').on('click', function() 
+            {
+                fillPickBanInput.val('');
+                $(this).remove();
+                fillPickBanInputOkBtn.trigger('click');
+            });
+        // end of create clear btn if input is empty and add click event on it
     });
 
     iconGlowFunction();
@@ -1318,7 +1352,8 @@ function popupAndPicksFill()
 
         $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(textForInput);
 
-        if (typeof addFillInputToCookie == 'function')
+        if (typeof addFillInputToCookie == 'function' 
+        && $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val() != '(E) -, -, -, -, - (B) -, -, -, -, - (F) -, -, -, -, -')
         {
             addFillInputToCookie(textForInput);
         }
@@ -1887,7 +1922,17 @@ function doRecountCounterPickBalance()
                     {
                         tempCounterBalance[secondHeroId] = 0;
                     }
-                    tempCounterBalance[secondHeroId] = tempCounterBalance[secondHeroId] + (Number(balanceCoef) * -1);
+
+                    // if it is core hero 
+                    var curEnemyHeroSlotRole = $('#miniMapWrap img[data-hero-id="'+curEnemyHeroId+'"]').parent().attr('data-slot-role');
+                    if ((curEnemyHeroSlotRole == 1) || (curEnemyHeroSlotRole == 2))
+                    {
+                        var coreCounterCoef = 1.3;
+                    } else 
+                    {
+                        var coreCounterCoef = 1;
+                    }
+                    tempCounterBalance[secondHeroId] = tempCounterBalance[secondHeroId] + Math.round(Number(balanceCoef) * coreCounterCoef * -1);
                 }
             });
 
@@ -3027,10 +3072,10 @@ function doRecountCounterPickBalance()
             // add 10 bonus points to actual role
             $('.heroRolesForBalance').each(function()
             {
-                var curHeroId = $(this).siblings('[data-hero-id]').attr('data-hero-id');
+                var curHeroId = $(this).closest('.finalBalaceItem').find('[data-hero-id]').attr('data-hero-id');
                 if (typeof window.totallyCounteredHeroArray[curHeroId] != 'undefined')
                 {
-                    $(this).parent().siblings('.heroNotesWrapForBalance')
+                    $(this).closest('.finalBalaceItem').find('.heroNotesWrapForBalance')
                     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_STRONG_COUNTERPICK_BONUS')+'</div><div class="coefForBalance">'+banedAllStrongCountersBonusPoints+'</div></div>');
                 }
 
@@ -3040,7 +3085,7 @@ function doRecountCounterPickBalance()
                     var curHeroCoef = Number(curHeroCoefEl.text());
                     curHeroCoefEl.text('+'+ (curHeroCoef + 10));
 
-                    $(this).parent().siblings('.heroNotesWrapForBalance')
+                    $(this).closest('.finalBalaceItem').find('.heroNotesWrapForBalance')
                     .prepend('<div class="noteForBalance noticeGreen"><div class="noteTextForBalance">'+getPreStr_js('COUNTER_PICK', '_ROLE_BONUS_')+'</div><div class="coefForBalance">10</div></div>');
                 }
             });
@@ -3224,7 +3269,7 @@ function doRecountCounterPickBalance()
             function()
             {
                 // console.log('hover 1');
-                var hoveredHeroId = $(this).parent().siblings('[data-hero-id]').attr('data-hero-id');
+                var hoveredHeroId = $(this).closest('.heroInfoWrapForBalance').find('[data-hero-id]').attr('data-hero-id');
                 var hoveredHeroRoleOrder = $(this).attr('data-role-order');
                 var hoveredHeroCodename = $('#heroListWrap .heroListImg[data-hero-id="'+hoveredHeroId+'"]').attr('data-hero-codename');
                 // console.log(hoveredHeroCodename);
@@ -3400,7 +3445,8 @@ function fillPickBanInput(friendPickSlots, enemyPickSlots, banPickSlots)
 
     $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val(textForInput);
 
-    if (typeof addFillInputToCookie == 'function')
+    if (typeof addFillInputToCookie == 'function'
+    && $('#fillHeroPickAndBanSlotsViaAliasSingleInput').val() != '(E) -, -, -, -, - (B) -, -, -, -, - (F) -, -, -, -, -')
     {
         addFillInputToCookie(textForInput);
     }
@@ -4295,7 +4341,14 @@ function addHeroToTheMap(side, heroId, heroCodename)
     }
 
 
-    var isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, orderedRolesArray, heroId, heroCodename);
+    // if it is last pick and mid lane is free - put current hero into mid
+    if($('#friendPickList .slot').length == 5 && $('#miniMapWrap > div[id="'+slotIdAttrBeginWith+'Mid1"] img').length == 0)
+    {
+        tryToAddHeroToTheMapSomwhere(slotIdAttrBeginWith, heroId, heroCodename);
+        var isAddedOnMap = true;
+    } else {
+        var isAddedOnMap = tryToAddHeroToTheMap(slotIdAttrBeginWith, orderedRolesArray, heroId, heroCodename);
+    }
 
 
 
@@ -4360,6 +4413,8 @@ function showHeroIconOnMap(sideShow, slotRole, heroIdShow, heroCodenameShow)
 
     // show hero
     $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
+    $('#miniMapWrap > div[id="'+sidePlusLane+'"]').removeClass('iconGlowGreen');
+    
 
     // if there is question mark - remove it
     if($('#miniMapWrap > div[id="'+sidePlusLane+'"] i.questionMark').length)
@@ -4415,10 +4470,12 @@ function removeShowedHeroIconFromMap(side, slotRole)
     {
         // если в слоте нет нового героя то там сейчас только подсветка - её нужно убрать
         $('#miniMapWrap > div[id="'+sidePlusLane+'"] img.mapIconHeroShowGrayscale').remove();
+        $('#miniMapWrap > div[id="'+sidePlusLane+'"]').addClass('iconGlowGreen');
 
         if(window.questionBeforeShow)
         {
             // если там до этого был вопросик то восстановить его
+            $('#miniMapWrap > div[id="'+sidePlusLane+'"]').removeClass('iconGlowGreen');
             $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append('<i class="questionMark fa fa-question-circle"></i>');
             draggableQuestionInsideMap();
         }
@@ -4472,6 +4529,7 @@ function tryToAddHeroToTheMap(sideTry, orderedRolesArray, heroIdTry, heroCodenam
         {
             // если слот пустой то добавить героя и вернуть true
             $('#miniMapWrap > div[id="'+sidePlusLane+'"]').find('i.questionMark').remove();
+            $('#miniMapWrap > div[id="'+sidePlusLane+'"]').find('img.mapIconHeroShowGrayscale').remove();
             $('#miniMapWrap > div[id="'+sidePlusLane+'"]').append(iconHtml);
             isAddedOnMap = true;
         } else {
@@ -4832,6 +4890,7 @@ function draggableForRecommendHeroes()
         ,appendTo: 'body'
         , zIndex: 9999
         , cursor: 'url("/images/closedhand.png"), auto'
+        , cursorAt: { top: 14, left: 8 }
         , drag: function (event, ui)
         {
             var draggedHero = $(this);
