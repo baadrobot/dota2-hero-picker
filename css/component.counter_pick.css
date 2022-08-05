@@ -1045,3 +1045,10 @@ line-height: 40px
     margin: 1px 0 0 7px;
     height: 21px;
 }
+
+.questionInPickSlot {
+    position: absolute;
+    font-size: 35px;
+    color: #09a809;
+    margin: 3px 0  0 -11px;
+}

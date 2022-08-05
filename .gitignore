@@ -10,6 +10,11 @@ css/eco_prebuild_*.css
 php/eco_prebuild_*.php
 php/prebuild/prebuild*.json
 
+index.binance.php
+mus.mp3
+newbinancerec.mp3
+recbinance.mp3
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

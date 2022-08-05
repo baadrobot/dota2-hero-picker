@@ -834,7 +834,8 @@ $(document).ready(function ()
 
                     // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
                     if(!(window.tempArrayE[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayE[i] + '"]').attr('data-alias-single'))
-                    && window.tempArrayE[i] != '-')
+                    && window.tempArrayE[i] != '-'
+                    && window.tempArrayE[i] != '?')
                     {
                         $('[data-hero-aliases]').each(function ()
                         {
@@ -875,7 +876,8 @@ $(document).ready(function ()
 
                     // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
                     if(!(window.tempArrayB[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayB[i] + '"]').attr('data-alias-single'))
-                    && window.tempArrayB[i] != '-')
+                    && window.tempArrayB[i] != '-'
+                    && window.tempArrayB[i] != '?')
                     {
                         $('[data-hero-aliases]').each(function ()
                         {
@@ -916,7 +918,8 @@ $(document).ready(function ()
 
                     // если слово не совпадает с alias-single и имеет более одного совпадения - то записать его в массив
                     if(!(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single'))
-                    && window.tempArrayF[i] != '-')
+                    && window.tempArrayF[i] != '-'
+                    && window.tempArrayF[i] != '?')
                     {
                         $('[data-hero-aliases]').each(function ()
                         {
@@ -1244,6 +1247,12 @@ function popupAndPicksFill()
                     {
                         // если найден прочерк значит нужно перейти к следующему слову
                         continue;
+                    }
+                    else if(window.tempArrayF[i] == '?')
+                    {
+                        // если найден вопросик то подсветить соответстующий слот вопросиком
+                        $('#friendPickList .friendPick:nth-child('+(i+1)+')')
+                        .prepend('<span><i class="fa fa-question questionInPickSlot"></i></span>');
                     }
                     else if(window.tempArrayF[i].toLowerCase() == $('.heroListImg[data-alias-single="' + window.tempArrayF[i] + '"]').attr('data-alias-single'))
                     {
@@ -3238,8 +3247,16 @@ function doRecountCounterPickBalance()
                 var clickedHeroId = $(this).closest('.heroInfoWrapForBalance ').find('[data-hero-id]').attr('data-hero-id');
                 var clickedHeroRoleOrder = $(this).attr('data-role-order');
 
+                var slotElForHeroLock = $('#friendPickList .friendPick.emptySlot:first');
+                var isQuestionInPickSlot = $('#friendPickList .questionInPickSlot');
+                if(isQuestionInPickSlot.length)
+                {
+                    slotElForHeroLock = isQuestionInPickSlot.parent().parent();
+                    isQuestionInPickSlot.parent().remove();
+                }               
+
                 // make clicked hero picked
-                lockNewHeroInSlotForDroppableEmptySlot($('#friendPickList .friendPick.emptySlot:first'), clickedHeroId, 0, 0);
+                lockNewHeroInSlotForDroppableEmptySlot(slotElForHeroLock, clickedHeroId, 0, 0);
                 
                 getAjaxBalanceForHeroId(clickedHeroId, 1);
                 pickedOrBanedHeroPointerEvents(clickedHeroId);
